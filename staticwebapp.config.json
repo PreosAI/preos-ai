@@ -1,0 +1,11 @@
+{
+  "navigationFallback": {
+    "rewrite": "/src/frontend/index.html"
+  },
+  "routes": [
+    {
+      "route": "/",
+      "rewrite": "/src/frontend/index.html"
+    }
+  ]
+}
