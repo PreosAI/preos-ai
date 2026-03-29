@@ -29,8 +29,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: #fff;
-      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      background: transparent;
       height: 64px;
       display: flex;
       align-items: center;
@@ -54,10 +53,10 @@
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      color: #374151;
+      color: #fff;
       transition: color .2s;
     }
-    .nav-links a:hover { color: var(--red); }
+    .nav-links a:hover { color: rgba(255,255,255,0.75); }
 
     .nav-right {
       margin-left: auto;
@@ -83,11 +82,11 @@
     .lang-toggle {
       font-size: 13px;
       font-weight: 500;
-      color: #374151;
+      color: #fff;
       cursor: pointer;
       user-select: none;
     }
-    .lang-toggle span { color: var(--red); }
+    .lang-toggle span { color: #fff; }
 
     /* ─── HERO ─────────────────────────────────────────────── */
     .hero {
