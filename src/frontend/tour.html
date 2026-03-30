@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda un recorrido — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 64px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      flex-shrink: 0;
+      height: var(--nav-h);
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .nav-brand { flex-shrink: 0; text-decoration: none; }
+
+    .nav-search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .nav-search input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 16px 0 40px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      background: #f9f9f9;
+      transition: border-color .15s;
+    }
+    .nav-search input:focus { border-color: #9ca3af; background: #fff; }
+    .nav-search input::placeholder { color: var(--muted); }
+
+    .nav-search-icon {
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .nav-search-icon svg { width: 15px; height: 15px; display: block; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ─── SPLIT ────────────────────────────────────────────── */
+    .split {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    /* LEFT photo */
+    .split-photo {
+      flex: 0 0 50%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .split-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .split-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,.1) 50%, transparent 100%);
+    }
+
+    /* RIGHT form */
+    .split-right {
+      flex: 0 0 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 40px;
+    }
+
+    .wizard-box {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* ─── STEP INDICATOR ───────────────────────────────────── */
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 32px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: background .2s, color .2s;
+    }
+
+    .step.active .step-circle { background: var(--red); color: #fff; }
+    .step.done .step-circle { background: var(--red); color: #fff; }
+    .step.inactive .step-circle { background: #e5e7eb; color: var(--muted); }
+
+    .step-label {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .step.active .step-label { color: var(--text); }
+    .step.done .step-label { color: var(--text); }
+    .step.inactive .step-label { color: var(--muted); }
+
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 12px;
+    }
+    .step-connector.done { background: var(--red); }
+
+    /* ─── STEP PANELS ──────────────────────────────────────── */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    /* ─── CALENDAR ─────────────────────────────────────────── */
+    .calendar {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+    }
+
+    .cal-month {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: capitalize;
+    }
+
+    .cal-nav {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .cal-nav:hover { background: #f3f4f6; }
+    .cal-nav svg { width: 16px; height: 16px; color: var(--text); }
+
+    .cal-grid {
+      padding: 12px 14px 16px;
+    }
+
+    .cal-days-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 6px;
+    }
+
+    .cal-day-name {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .cal-dates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .cal-date {
+      text-align: center;
+      padding: 7px 4px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .cal-date:hover:not(.past):not(.empty):not(.today):not(.selected) {
+      background: #f3f4f6;
+    }
+
+    .cal-date.empty { cursor: default; }
+
+    .cal-date.past {
+      color: #d1d5db;
+      cursor: default;
+    }
+
+    .cal-date.today {
+      background: #1a1a1a;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .cal-date.selected {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* ─── STEP 1 FOOTER ────────────────────────────────────── */
+    .step1-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* ─── STEP 2 ───────────────────────────────────────────── */
+    .duration-pill {
+      display: inline-block;
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 7px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: fit-content;
+    }
+    .duration-pill svg { width: 14px; height: 14px; color: var(--muted); }
+
+    .time-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .time-slot {
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .15s, color .15s, background .15s;
+      user-select: none;
+    }
+    .time-slot:hover { border-color: #9ca3af; background: #f9f9f9; }
+    .time-slot.selected {
+      border-color: var(--red);
+      color: var(--red);
+      font-weight: 600;
+      background: rgba(204,31,31,.04);
+    }
+
+    /* ─── WIZARD FOOTER ────────────────────────────────────── */
+    .wizard-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-back:hover { background: #f3f4f6; }
+
+    .btn-continue {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-continue:hover { background: var(--red-hover); }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">
+    <div style="width:120px; height:45px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+      <img src="images/Logo.png" style="height:180px; width:auto;" alt="Preos">
+    </div>
+  </a>
+
+  <div class="nav-search">
+    <div class="nav-search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <input type="text" placeholder="Busca por ciudad, dirección o código postal">
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#">Comprar</a></li>
+    <li><a href="#">Vender</a></li>
+    <li><a href="#">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="ingresar.html" class="btn-ingresar">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ SPLIT ════════════════════════════════════════════════ -->
+<div class="split">
+
+  <!-- LEFT: photo -->
+  <div class="split-photo">
+    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80&auto=format&fit=crop" alt="Agente mostrando propiedad">
+    <div class="split-photo-overlay"></div>
+  </div>
+
+  <!-- RIGHT: wizard -->
+  <div class="split-right">
+    <div class="wizard-box">
+
+      <!-- Step indicator -->
+      <div class="steps">
+        <div class="step active" id="step-ind-1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Selecciona una fecha</div>
+        </div>
+        <div class="step-connector" id="step-connector"></div>
+        <div class="step inactive" id="step-ind-2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Duración y hora</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Calendar -->
+      <div class="step-panel active" id="panel-step1">
+        <div class="step-title">Selecciona una fecha</div>
+
+        <div class="calendar">
+          <div class="cal-header">
+            <button class="cal-nav" id="cal-prev" aria-label="Mes anterior">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="cal-month" id="cal-month-label"></div>
+            <button class="cal-nav" id="cal-next" aria-label="Mes siguiente">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-days-header">
+              <div class="cal-day-name">Lu</div>
+              <div class="cal-day-name">Ma</div>
+              <div class="cal-day-name">Mi</div>
+              <div class="cal-day-name">Ju</div>
+              <div class="cal-day-name">Vi</div>
+              <div class="cal-day-name">Sa</div>
+              <div class="cal-day-name">Do</div>
+            </div>
+            <div class="cal-dates" id="cal-dates"></div>
+          </div>
+        </div>
+
+        <div class="step1-footer">
+          <button class="btn-continue" id="btn-step1-continue">Continuar</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Time slots -->
+      <div class="step-panel" id="panel-step2">
+        <div style="display:flex; justify-content:center; margin-bottom:20px;">
+          <div class="duration-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Duración: 30 minutos
+          </div>
+        </div>
+
+        <div class="step-title">Escoge la hora de tu preferencia</div>
+
+        <div class="time-slots">
+          <div class="time-slot">09:00 a.m.</div>
+          <div class="time-slot">10:00 a.m.</div>
+          <div class="time-slot">11:00 a.m.</div>
+          <div class="time-slot">12:00 p.m.</div>
+          <div class="time-slot">01:00 p.m.</div>
+          <div class="time-slot">02:00 p.m.</div>
+        </div>
+
+        <div class="wizard-footer">
+          <button class="btn-back" id="btn-step2-back">Atrás</button>
+          <button class="btn-continue" id="btn-step2-continue">Continuar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Calendar state ──────────────────────────────────────────
+  const today = new Date();
+  let viewYear = today.getFullYear();
+  let viewMonth = today.getMonth(); // 0-indexed
+  let selectedDate = null;
+
+  const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  function renderCalendar() {
+    document.getElementById('cal-month-label').textContent =
+      MONTHS_ES[viewMonth] + ' ' + viewYear;
+
+    const datesEl = document.getElementById('cal-dates');
+    datesEl.innerHTML = '';
+
+    // First day of month (0=Sun, adjust to Mon-start)
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+    const offset = (firstDay === 0) ? 6 : firstDay - 1;
+
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    // Empty cells before first day
+    for (let i = 0; i < offset; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'cal-date empty';
+      datesEl.appendChild(empty);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-date';
+      cell.textContent = d;
+
+      const cellDate = new Date(viewYear, viewMonth, d);
+      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      if (cellDate < todayMidnight) {
+        cell.classList.add('past');
+      } else if (cellDate.getTime() === todayMidnight.getTime()) {
+        cell.classList.add('today');
+        cell.addEventListener('click', () => selectDate(d));
+      } else {
+        cell.addEventListener('click', () => selectDate(d));
+      }
+
+      if (selectedDate &&
+          selectedDate.getFullYear() === viewYear &&
+          selectedDate.getMonth() === viewMonth &&
+          selectedDate.getDate() === d) {
+        cell.classList.remove('today');
+        cell.classList.add('selected');
+      }
+
+      datesEl.appendChild(cell);
+    }
+  }
+
+  function selectDate(d) {
+    selectedDate = new Date(viewYear, viewMonth, d);
+    renderCalendar();
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+
+  document.getElementById('cal-next').addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+
+  renderCalendar();
+
+  // ── Wizard navigation ────────────────────────────────────────
+  document.getElementById('btn-step1-continue').addEventListener('click', () => {
+    document.getElementById('panel-step1').classList.remove('active');
+    document.getElementById('panel-step2').classList.add('active');
+
+    // Update step indicators
+    document.getElementById('step-ind-1').className = 'step done';
+    document.getElementById('step-ind-2').className = 'step active';
+    document.getElementById('step-connector').classList.add('done');
+  });
+
+  document.getElementById('btn-step2-back').addEventListener('click', () => {
+    document.getElementById('panel-step2').classList.remove('active');
+    document.getElementById('panel-step1').classList.add('active');
+
+    document.getElementById('step-ind-1').className = 'step active';
+    document.getElementById('step-ind-2').className = 'step inactive';
+    document.getElementById('step-connector').classList.remove('done');
+  });
+
+  // ── Time slot selection ──────────────────────────────────────
+  document.querySelectorAll('.time-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+      slot.classList.add('selected');
+    });
+  });
+</script>
+
+</body>
+</html>
