@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis favoritos — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 64px;
+      --tabs-h: 48px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #f5f6f8;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+    }
+
+    .nav-brand { flex-shrink: 0; text-decoration: none; }
+
+    .nav-search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .nav-search input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 16px 0 40px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      background: #f9f9f9;
+      transition: border-color .15s;
+    }
+    .nav-search input:focus { border-color: #9ca3af; background: #fff; }
+    .nav-search input::placeholder { color: var(--muted); }
+
+    .nav-search-icon {
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .nav-search-icon svg { width: 15px; height: 15px; display: block; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ─── TABS BAR ─────────────────────────────────────────── */
+    .tabs-bar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      z-index: 190;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      height: var(--tabs-h);
+      display: flex;
+      align-items: stretch;
+      padding: 0 32px;
+    }
+
+    .tab {
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s;
+      text-decoration: none;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+
+    /* ─── PAGE BODY ────────────────────────────────────────── */
+    .page-body {
+      margin-top: calc(var(--nav-h) + var(--tabs-h));
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 32px 32px 60px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    /* ─── CARDS GRID ───────────────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* ─── PROPERTY CARD ────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: box-shadow .25s, transform .25s;
+    }
+    .card:hover {
+      box-shadow: 0 8px 28px rgba(0,0,0,.12);
+      transform: translateY(-3px);
+    }
+
+    /* Image carousel */
+    .card-img-wrap {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      background: #e5e7eb;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .4s;
+    }
+    .card:hover .card-img-wrap img { transform: scale(1.04); }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+      transition: background .15s;
+      opacity: 0;
+    }
+    .card:hover .carousel-btn { opacity: 1; }
+    .carousel-btn:hover { background: #fff; }
+    .carousel-btn svg { width: 14px; height: 14px; color: var(--text); }
+    .carousel-prev { left: 8px; }
+    .carousel-next { right: 8px; }
+
+    /* Heart (favorited = filled red) */
+    .card-heart {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      background: rgba(0,0,0,.35);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 4;
+      transition: background .15s;
+    }
+    .card-heart:hover { background: rgba(0,0,0,.55); }
+    .card-heart svg { width: 16px; height: 16px; }
+
+    /* Badges */
+    .card-badges {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
+      gap: 5px;
+      z-index: 3;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+    .badge-nuevo { background: var(--red); color: #fff; }
+    .badge-3d { background: rgba(0,0,0,0.65); color: #fff; }
+
+    /* Card body */
+    .card-body { padding: 14px 16px 16px; }
+
+    .card-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .card-specs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #374151;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-spec {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-spec svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
+
+    .card-sep { width: 1px; height: 11px; background: var(--border); }
+
+    .card-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .card-location svg { width: 12px; height: 12px; color: var(--red); flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">
+    <div style="width:120px; height:45px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+      <img src="images/Logo.png" style="height:180px; width:auto;" alt="Preos">
+    </div>
+  </a>
+
+  <div class="nav-search">
+    <div class="nav-search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <input type="text" placeholder="Busca por ciudad, dirección o código postal">
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#">Comprar</a></li>
+    <li><a href="#">Vender</a></li>
+    <li><a href="#">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="ingresar.html" class="btn-ingresar">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
+<div class="tabs-bar">
+  <a href="dashboard.html" class="tab">Panel de propietarios</a>
+  <a href="favoritos.html" class="tab active">Mis favoritos</a>
+  <a href="#" class="tab">Configuración de mi perfil</a>
+</div>
+
+<!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
+<div class="page-body">
+
+  <div class="page-title">Mis favoritos <span style="font-weight:400; color:var(--muted);">(6 propiedades)</span></div>
+
+  <div class="cards-grid">
+
+    <!-- Card 1 -->
+    <a class="card" href="propiedad.html">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+        <button class="carousel-btn carousel-prev" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="card-heart" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="card-badges">
+          <span class="badge badge-nuevo">NUEVO</span>
+          <span class="badge badge-3d">RECORRIDO 3D</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-price">€1.489.000</div>
+        <div class="card-specs">
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            5 Camas
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            3 Baños
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">3.230 Sq. Ft.</div>
+        </div>
+        <div class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Avenida Villa España, Málaga
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 2 -->
+    <a class="card" href="propiedad.html">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+        <button class="carousel-btn carousel-prev" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="card-heart" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="card-badges">
+          <span class="badge badge-nuevo">NUEVO</span>
+          <span class="badge badge-3d">RECORRIDO 3D</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-price">€895.000</div>
+        <div class="card-specs">
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            4 Camas
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            3 Baños
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">2.800 Sq. Ft.</div>
+        </div>
+        <div class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Marbella Este, Málaga
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 3 -->
+    <a class="card" href="propiedad.html">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+        <button class="carousel-btn carousel-prev" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="card-heart" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="card-badges">
+          <span class="badge badge-nuevo">NUEVO</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-price">€345.000</div>
+        <div class="card-specs">
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            3 Camas
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            2 Baños
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">1.200 Sq. Ft.</div>
+        </div>
+        <div class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Torremolinos, Málaga
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 4 -->
+    <a class="card" href="propiedad.html">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+        <button class="carousel-btn carousel-prev" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="card-heart" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="card-badges">
+          <span class="badge badge-nuevo">NUEVO</span>
+          <span class="badge badge-3d">RECORRIDO 3D</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-price">€720.000</div>
+        <div class="card-specs">
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            4 Camas
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            3 Baños
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">2.100 Sq. Ft.</div>
+        </div>
+        <div class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Paseo Marítimo, Marbella
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 5 -->
+    <a class="card" href="propiedad.html">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=600&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+        <button class="carousel-btn carousel-prev" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="card-heart" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="card-badges">
+          <span class="badge badge-nuevo">NUEVO</span>
+          <span class="badge badge-3d">RECORRIDO 3D</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-price">€1.250.000</div>
+        <div class="card-specs">
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            5 Camas
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            4 Baños
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">4.500 Sq. Ft.</div>
+        </div>
+        <div class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Los Monteros, Marbella
+        </div>
+      </div>
+    </a>
+
+    <!-- Card 6 -->
+    <a class="card" href="propiedad.html">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=600&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+        <button class="carousel-btn carousel-prev" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="card-heart" onclick="event.preventDefault()">
+          <svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="card-badges">
+          <span class="badge badge-nuevo">NUEVO</span>
+          <span class="badge badge-3d">RECORRIDO 3D</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-price">€278.500</div>
+        <div class="card-specs">
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            2 Camas
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            1 Baño
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-spec">915 Sq. Ft.</div>
+        </div>
+        <div class="card-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Centro Histórico, Málaga
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
