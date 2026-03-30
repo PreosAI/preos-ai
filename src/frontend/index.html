@@ -458,15 +458,15 @@
       <button class="hero-tab" onclick="setTab(this)">Vender</button>
     </div>
 
-    <div class="hero-search">
-      <input type="text" placeholder="Busca por ciudad, dirección o código postal" />
-      <button class="hero-search-btn" aria-label="Buscar">
+    <form class="hero-search" action="buscar.html" method="get" onsubmit="window.location='buscar.html'; return false;">
+      <input type="text" name="q" placeholder="Busca por ciudad, dirección o código postal" />
+      <button type="submit" class="hero-search-btn" aria-label="Buscar">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7"/>
           <line x1="16.5" y1="16.5" x2="22" y2="22"/>
         </svg>
       </button>
-    </div>
+    </form>
   </div>
 </section>
 
