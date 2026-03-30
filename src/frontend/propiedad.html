@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calle Mayor 14, Madrid — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 64px;
+      --tabs-h: 48px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #f9f9f9;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .nav-brand { flex-shrink: 0; text-decoration: none; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ─── TABS BAR ─────────────────────────────────────────── */
+    .tabs-bar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      z-index: 190;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      height: var(--tabs-h);
+      display: flex;
+      align-items: stretch;
+      padding: 0 40px;
+    }
+
+    .tabs-list {
+      display: flex;
+      align-items: stretch;
+      flex: 1;
+    }
+
+    .tab {
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+    .tabs-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .icon-btn:hover { background: #f3f4f6; }
+    .icon-btn svg { width: 18px; height: 18px; color: var(--text); }
+
+    /* ─── PAGE BODY ────────────────────────────────────────── */
+    .page-body {
+      margin-top: calc(var(--nav-h) + var(--tabs-h));
+    }
+
+    /* ─── PHOTO GALLERY ────────────────────────────────────── */
+    .gallery {
+      display: flex;
+      height: 480px;
+      gap: 4px;
+      background: #000;
+    }
+
+    .gallery-main {
+      flex: 0 0 70%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-side {
+      flex: 0 0 calc(30% - 4px);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #c9d6df 0%, #e2ebf0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .img-placeholder svg { width: 40px; height: 40px; color: rgba(0,0,0,0.2); }
+
+    .gallery-count-btn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gallery-tools {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 40px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .gallery-tool-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s;
+    }
+    .gallery-tool-btn:hover { background: #f3f4f6; }
+    .gallery-tool-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* ─── MAIN LAYOUT ──────────────────────────────────────── */
+    .main-layout {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    .main-col { flex: 0 0 65%; min-width: 0; }
+
+    .sidebar-col {
+      flex: 0 0 calc(35% - 32px);
+      min-width: 0;
+      position: sticky;
+      top: calc(var(--nav-h) + var(--tabs-h) + 24px);
+    }
+
+    /* ─── LISTING HEADER ───────────────────────────────────── */
+    .listing-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #16a34a;
+      margin-bottom: 8px;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      background: #16a34a;
+      border-radius: 50%;
+    }
+
+    .listing-price {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .listing-address {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .listing-specs {
+      display: flex;
+      gap: 28px;
+      padding: 18px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+
+    .spec-item { display: flex; align-items: center; gap: 10px; }
+    .spec-icon svg { width: 20px; height: 20px; display: block; color: var(--muted); }
+    .spec-value { font-size: 16px; font-weight: 700; color: var(--text); }
+    .spec-label { font-size: 12px; color: var(--muted); }
+
+    /* ─── SECTIONS ─────────────────────────────────────────── */
+    .section { margin-bottom: 36px; }
+    .section-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+    .section-text { font-size: 14px; line-height: 1.8; color: #374151; }
+
+    /* ─── MAP ──────────────────────────────────────────────── */
+    .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+
+    .map-toggle { display: flex; background: #fff; border-bottom: 1px solid var(--border); }
+
+    .map-tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .map-tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+    .map-placeholder {
+      height: 300px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--muted);
+      gap: 8px;
+    }
+    .map-placeholder svg { width: 24px; height: 24px; color: var(--muted); }
+
+    /* ─── SIDEBAR CARDS ────────────────────────────────────── */
+    .sidebar-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-card-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .sidebar-card-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+
+    .price-range {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 18px;
+    }
+
+    .btn-red {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background .2s;
+      text-decoration: none;
+    }
+    .btn-red:hover { background: var(--red-hover); }
+
+    .btn-outline {
+      display: block;
+      width: 100%;
+      background: none;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background .2s;
+      margin-top: 10px;
+      text-decoration: none;
+    }
+    .btn-outline:hover { background: #f3f4f6; }
+
+    .tour-dates { display: flex; gap: 8px; margin-bottom: 16px; }
+
+    .tour-date {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .tour-date:hover { background: #f3f4f6; }
+    .tour-date.selected { border-color: var(--text); background: var(--text); }
+    .tour-date.selected .tour-date-day,
+    .tour-date.selected .tour-date-num,
+    .tour-date.selected .tour-date-month { color: #fff; }
+
+    .tour-date-day { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; margin-bottom: 2px; }
+    .tour-date-num { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 2px; }
+    .tour-date-month { font-size: 11px; color: var(--muted); }
+
+    .tour-type { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+    .tour-type-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .tour-type-option:hover { border-color: #9ca3af; }
+    .tour-type-option.selected { border-color: var(--text); }
+    .tour-type-option input[type="radio"] { accent-color: var(--text); }
+    .tour-type-label { font-size: 14px; font-weight: 500; color: var(--text); }
+
+    .sidebar-phone { text-align: center; margin-top: 14px; font-size: 13px; color: var(--muted); }
+    .sidebar-phone a { color: var(--text); font-weight: 600; text-decoration: none; }
+    .sidebar-phone a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="/" class="nav-brand" style="text-decoration:none;">
+    <div style="width:120px; height:45px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+      <img src="images/Logo.png" style="height:180px; width:auto;" alt="Preos">
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#">Comprar</a></li>
+    <li><a href="#">Vender</a></li>
+    <li><a href="#">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="#" class="btn-ingresar">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
+<div class="tabs-bar">
+  <div class="tabs-list">
+    <div class="tab active">Descripción general</div>
+    <div class="tab">Calculadora de pagos</div>
+    <div class="tab">Detalles de la propiedad</div>
+    <div class="tab">Escuelas</div>
+  </div>
+  <div class="tabs-actions">
+    <button class="icon-btn" aria-label="Guardar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </button>
+    <button class="icon-btn" aria-label="Compartir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
+<div class="page-body">
+
+  <!-- PHOTO GALLERY -->
+  <div class="gallery">
+    <div class="gallery-main">
+      <div class="img-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <button class="gallery-count-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        26 fotos
+      </button>
+    </div>
+    <div class="gallery-side">
+      <div class="img-placeholder" style="flex:1; min-height:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <div class="img-placeholder" style="flex:1; min-height:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY TOOLS -->
+  <div class="gallery-tools">
+    <button class="gallery-tool-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Recorrido 3D
+    </button>
+    <button class="gallery-tool-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Planos
+    </button>
+    <button class="gallery-tool-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Vista de calle
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-layout">
+
+    <!-- LEFT COLUMN -->
+    <div class="main-col">
+
+      <div class="listing-status">
+        <div class="status-dot"></div>
+        VENTA ACTIVA
+      </div>
+      <div class="listing-price">€1.489.000</div>
+      <div class="listing-address">Calle Mayor 14, Piso 3B · Madrid, 28013</div>
+
+      <div class="listing-specs">
+        <div class="spec-item">
+          <div class="spec-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div>
+            <div class="spec-value">4</div>
+            <div class="spec-label">Habitaciones</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+          </div>
+          <div>
+            <div class="spec-value">3</div>
+            <div class="spec-label">Baños</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div>
+            <div class="spec-value">210 m²</div>
+            <div class="spec-label">Superficie</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="spec-value">2018</div>
+            <div class="spec-label">Año construcción</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Acerca de esta casa</div>
+        <div class="section-text">
+          Espectacular piso en el corazón de Madrid, ubicado en la icónica Calle Mayor. Esta propiedad de lujo ofrece 210 m² de espacios diáfanos y luminosos con acabados de alta calidad. La vivienda cuenta con cuatro amplias habitaciones, tres baños completos con materiales premium, y una cocina de diseño totalmente equipada con electrodomésticos de última generación.
+          <br><br>
+          El salón principal conecta con una terraza privada con vistas a la calle peatonal, ideal para disfrutar del ambiente madrileño. El edificio dispone de ascensor, portero físico, sistema de seguridad 24 horas y plaza de garaje incluida en el precio. Zona excelente con acceso inmediato a transporte público, restaurantes, museos y los principales centros de negocio de la ciudad.
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Mapa</div>
+        <div class="map-container">
+          <div class="map-toggle">
+            <div class="map-tab active">Mapa</div>
+            <div class="map-tab">Satélite</div>
+          </div>
+          <div class="map-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Calle Mayor 14, Madrid
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-col">
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">¿Pensando en vender?</div>
+        <div class="sidebar-card-sub">Precio estimado de venta para propiedades similares en esta zona:</div>
+        <div class="price-range">€1.350.000 – €1.620.000</div>
+        <a href="#" class="btn-red">Habla con un agente</a>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-title">Agenda un recorrido</div>
+
+        <div class="tour-dates">
+          <div class="tour-date selected">
+            <div class="tour-date-day">Lun</div>
+            <div class="tour-date-num">31</div>
+            <div class="tour-date-month">Mar</div>
+          </div>
+          <div class="tour-date">
+            <div class="tour-date-day">Mar</div>
+            <div class="tour-date-num">1</div>
+            <div class="tour-date-month">Abr</div>
+          </div>
+          <div class="tour-date">
+            <div class="tour-date-day">Mié</div>
+            <div class="tour-date-num">2</div>
+            <div class="tour-date-month">Abr</div>
+          </div>
+        </div>
+
+        <div class="tour-type">
+          <label class="tour-type-option selected">
+            <input type="radio" name="tour-type" value="presencial" checked>
+            <span class="tour-type-label">Tour en persona</span>
+          </label>
+          <label class="tour-type-option">
+            <input type="radio" name="tour-type" value="video">
+            <span class="tour-type-label">Tour por video chat</span>
+          </label>
+        </div>
+
+        <a href="#" class="btn-red">Programar recorrido</a>
+        <a href="#" class="btn-outline">Iniciar una oferta</a>
+
+        <div class="sidebar-phone">
+          ¿Preguntas? Llámanos al <a href="tel:+34900123456">900 123 456</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.map-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.map-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.tour-date').forEach(date => {
+    date.addEventListener('click', () => {
+      document.querySelectorAll('.tour-date').forEach(d => d.classList.remove('selected'));
+      date.classList.add('selected');
+    });
+  });
+
+  document.querySelectorAll('.tour-type-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.tour-type-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+</script>
+
+</body>
+</html>
