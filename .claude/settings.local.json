@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n 'Programar recorrido\\\\|Editar datos' /c/Users/guill/preos-ai/src/frontend/*.html)",
+      "Bash(grep -n 'class=\"\"nav-brand\"\"' /c/Users/guill/preos-ai/src/frontend/*.html)"
+    ]
+  }
+}
