@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -385,32 +387,7 @@
     /* ─── MAP ──────────────────────────────────────────────── */
     .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 
-    .map-toggle { display: flex; background: #fff; border-bottom: 1px solid var(--border); }
-
-    .map-tab {
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: color .15s, border-color .15s;
-    }
-    .map-tab.active { color: var(--text); border-bottom-color: var(--text); }
-
-    .map-placeholder {
-      height: 300px;
-      background: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--muted);
-      gap: 8px;
-    }
-    .map-placeholder svg { width: 24px; height: 24px; color: var(--muted); }
-
-    /* ─── MORTGAGE CALCULATOR ──────────────────────────────── */
+/* ─── MORTGAGE CALCULATOR ──────────────────────────────── */
     .calc-result {
       background: #fff;
       border: 1px solid var(--border);
@@ -979,14 +956,7 @@
         <div class="section">
           <div class="section-title">Mapa</div>
           <div class="map-container">
-            <div class="map-toggle">
-              <div class="map-tab active">Mapa</div>
-              <div class="map-tab">Satélite</div>
-            </div>
-            <div class="map-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              Calle Mayor 14, Madrid
-            </div>
+            <div id="prop-map" style="width:100%; height:350px; border-radius:12px;"></div>
           </div>
         </div>
 
@@ -1287,6 +1257,31 @@
 </div>
 
 <script>
+  // ── Property map ──────────────────────────────────────────────
+  const propMap = L.map('prop-map', { zoomControl: true }).setView([36.7213, -4.4214], 15);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(propMap);
+
+  const propIcon = L.divIcon({
+    className: '',
+    html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+      <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 12.6 21.16 13.13 21.66a1.25 1.25 0 0 0 1.74 0C15.4 35.16 28 23.63 28 14 28 6.27 21.73 0 14 0z" fill="#cc1f1f"/>
+      <circle cx="14" cy="14" r="6" fill="#fff"/>
+    </svg>`,
+    iconSize: [28, 36],
+    iconAnchor: [14, 36],
+    popupAnchor: [0, -38],
+  });
+
+  L.marker([36.7213, -4.4214], { icon: propIcon })
+    .addTo(propMap)
+    .bindPopup('<strong>Calle Mayor 14</strong> · €1.489.000')
+    .openPopup();
+
   // ── Tab switching ──────────────────────────────────────────────
   document.querySelectorAll('.tab[data-tab]').forEach(tab => {
     tab.addEventListener('click', () => {
