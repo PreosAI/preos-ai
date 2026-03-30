@@ -141,6 +141,10 @@
       gap: 8px;
     }
 
+    .filter-wrap {
+      position: relative;
+    }
+
     .filter-btn {
       background: none;
       border: 1px solid var(--border);
@@ -153,11 +157,46 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      transition: background .15s, border-color .15s;
+      transition: background .15s, border-color .15s, color .15s;
       white-space: nowrap;
+      font-family: 'Inter', sans-serif;
     }
     .filter-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
-    .filter-btn svg { width: 13px; height: 13px; }
+    .filter-btn svg { width: 13px; height: 13px; transition: transform .2s; }
+    .filter-btn.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+    .filter-btn.open svg { transform: rotate(180deg); }
+
+    /* Filter dropdown */
+    .filter-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      min-width: 200px;
+      z-index: 300;
+      overflow: hidden;
+    }
+    .filter-dropdown.open { display: block; }
+
+    .filter-option {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: background .1s;
+      white-space: nowrap;
+    }
+    .filter-option:hover { background: #f3f4f6; }
+    .filter-option.selected { color: var(--red); font-weight: 600; background: rgba(204,31,31,.04); }
 
     .filters-sort {
       margin-left: auto;
@@ -462,31 +501,63 @@
 
 <!-- ═══ FILTERS BAR ══════════════════════════════════════════ -->
 <div class="filters-bar">
-  <button class="filter-btn">
-    Precio
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-  </button>
-  <button class="filter-btn">
-    Habitaciones
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-  </button>
-  <button class="filter-btn">
-    Tipo de propiedad
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-  </button>
-  <button class="filter-btn">
+
+  <div class="filter-wrap">
+    <button class="filter-btn" id="btn-precio">
+      Precio
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="filter-dropdown" id="dd-precio">
+      <div class="filter-option selected" data-value="0">Cualquier precio</div>
+      <div class="filter-option" data-value="200000">Hasta €200k</div>
+      <div class="filter-option" data-value="400000">€200k – €400k</div>
+      <div class="filter-option" data-value="700000">€400k – €700k</div>
+      <div class="filter-option" data-value="1000000">€700k – €1M</div>
+      <div class="filter-option" data-value="9999999">Más de €1M</div>
+    </div>
+  </div>
+
+  <div class="filter-wrap">
+    <button class="filter-btn" id="btn-hab">
+      Habitaciones
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="filter-dropdown" id="dd-hab">
+      <div class="filter-option selected" data-value="0">Cualquier número</div>
+      <div class="filter-option" data-value="1">1+</div>
+      <div class="filter-option" data-value="2">2+</div>
+      <div class="filter-option" data-value="3">3+</div>
+      <div class="filter-option" data-value="4">4+</div>
+      <div class="filter-option" data-value="5">5+</div>
+    </div>
+  </div>
+
+  <div class="filter-wrap">
+    <button class="filter-btn" id="btn-tipo">
+      Tipo de propiedad
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="filter-dropdown" id="dd-tipo">
+      <div class="filter-option selected" data-value="todos">Todos</div>
+      <div class="filter-option" data-value="piso">Piso</div>
+      <div class="filter-option" data-value="casa">Casa</div>
+      <div class="filter-option" data-value="villa">Villa</div>
+      <div class="filter-option" data-value="atico">Ático</div>
+      <div class="filter-option" data-value="local">Local</div>
+    </div>
+  </div>
+
+  <button class="filter-btn" id="btn-mas">
     Más filtros
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
   </button>
 
   <div class="filters-sort">
     <span>Ordenar por:</span>
-    <select class="sort-select">
-      <option>Recomendados</option>
-      <option>Menor precio</option>
-      <option>Mayor precio</option>
-      <option>Más recientes</option>
-      <option>Mayor superficie</option>
+    <select class="sort-select" id="sort-select">
+      <option value="default">Recomendados</option>
+      <option value="asc">Precio: menor a mayor</option>
+      <option value="desc">Precio: mayor a menor</option>
     </select>
   </div>
 </div>
@@ -503,7 +574,7 @@
     <div class="listings-list">
 
       <!-- Listing 1 -->
-      <a class="h-card" href="propiedad.html">
+      <a class="h-card" href="propiedad.html" data-price="485000" data-beds="3" data-tipo="piso">
         <div class="h-card-img">
           <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
@@ -540,7 +611,7 @@
       </a>
 
       <!-- Listing 2 -->
-      <a class="h-card" href="propiedad.html">
+      <a class="h-card" href="propiedad.html" data-price="295000" data-beds="2" data-tipo="piso">
         <div class="h-card-img">
           <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
@@ -576,7 +647,7 @@
       </a>
 
       <!-- Listing 3 -->
-      <a class="h-card" href="propiedad.html">
+      <a class="h-card" href="propiedad.html" data-price="720000" data-beds="4" data-tipo="atico">
         <div class="h-card-img">
           <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
@@ -613,7 +684,7 @@
       </a>
 
       <!-- Listing 4 -->
-      <a class="h-card" href="propiedad.html">
+      <a class="h-card" href="propiedad.html" data-price="349000" data-beds="3" data-tipo="piso">
         <div class="h-card-img">
           <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
@@ -649,7 +720,7 @@
       </a>
 
       <!-- Listing 5 -->
-      <a class="h-card" href="propiedad.html">
+      <a class="h-card" href="propiedad.html" data-price="1250000" data-beds="5" data-tipo="villa">
         <div class="h-card-img">
           <img src="https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
@@ -685,7 +756,7 @@
       </a>
 
       <!-- Listing 6 -->
-      <a class="h-card" href="propiedad.html">
+      <a class="h-card" href="propiedad.html" data-price="189000" data-beds="1" data-tipo="piso">
         <div class="h-card-img">
           <img src="https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
@@ -818,6 +889,137 @@
   </div>
 
 </div>
+
+<script>
+  // ── Filter state ─────────────────────────────────────────────
+  const state = { precio: 0, precioBand: 'any', beds: 0, tipo: 'todos' };
+
+  // Price band boundaries [min, max] (max=null means open-ended)
+  const priceBands = {
+    0:       [0, Infinity],
+    200000:  [0, 200000],
+    400000:  [200000, 400000],
+    700000:  [400000, 700000],
+    1000000: [700000, 1000000],
+    9999999: [1000000, Infinity],
+  };
+
+  // ── Dropdown toggle ──────────────────────────────────────────
+  const dropdowns = [
+    { btn: document.getElementById('btn-precio'), dd: document.getElementById('dd-precio') },
+    { btn: document.getElementById('btn-hab'),    dd: document.getElementById('dd-hab')    },
+    { btn: document.getElementById('btn-tipo'),   dd: document.getElementById('dd-tipo')   },
+  ];
+
+  dropdowns.forEach(({ btn, dd }) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dd.classList.contains('open');
+      closeAll();
+      if (!isOpen) {
+        dd.classList.add('open');
+        btn.classList.add('open');
+      }
+    });
+  });
+
+  function closeAll() {
+    dropdowns.forEach(({ btn, dd }) => {
+      dd.classList.remove('open');
+      btn.classList.remove('open');
+    });
+  }
+
+  document.addEventListener('click', closeAll);
+  document.querySelectorAll('.filter-dropdown').forEach(dd => {
+    dd.addEventListener('click', e => e.stopPropagation());
+  });
+
+  // ── Precio options ───────────────────────────────────────────
+  document.querySelectorAll('#dd-precio .filter-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#dd-precio .filter-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      const val = parseInt(opt.dataset.value);
+      state.precioBand = val;
+      const isDefault = val === 0;
+      document.getElementById('btn-precio').classList.toggle('active', !isDefault);
+      if (!isDefault) document.getElementById('btn-precio').firstChild.textContent = opt.textContent.trim() + ' ';
+      else document.getElementById('btn-precio').firstChild.textContent = 'Precio ';
+      applyFilters();
+      closeAll();
+    });
+  });
+
+  // ── Habitaciones options ─────────────────────────────────────
+  document.querySelectorAll('#dd-hab .filter-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#dd-hab .filter-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      state.beds = parseInt(opt.dataset.value);
+      const isDefault = state.beds === 0;
+      document.getElementById('btn-hab').classList.toggle('active', !isDefault);
+      const label = isDefault ? 'Habitaciones ' : opt.textContent.trim() + ' hab. ';
+      document.getElementById('btn-hab').firstChild.textContent = label;
+      applyFilters();
+      closeAll();
+    });
+  });
+
+  // ── Tipo options ─────────────────────────────────────────────
+  document.querySelectorAll('#dd-tipo .filter-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#dd-tipo .filter-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      state.tipo = opt.dataset.value;
+      const isDefault = state.tipo === 'todos';
+      document.getElementById('btn-tipo').classList.toggle('active', !isDefault);
+      const label = isDefault ? 'Tipo de propiedad ' : opt.textContent.trim() + ' ';
+      document.getElementById('btn-tipo').firstChild.textContent = label;
+      applyFilters();
+      closeAll();
+    });
+  });
+
+  // ── Sort ─────────────────────────────────────────────────────
+  document.getElementById('sort-select').addEventListener('change', applyFilters);
+
+  // ── Apply filters + sort ─────────────────────────────────────
+  function applyFilters() {
+    const cards = Array.from(document.querySelectorAll('.h-card'));
+    const sortVal = document.getElementById('sort-select').value;
+    const [priceMin, priceMax] = priceBands[state.precioBand] || [0, Infinity];
+
+    // Filter
+    let visible = cards.filter(card => {
+      const price = parseInt(card.dataset.price);
+      const beds  = parseInt(card.dataset.beds);
+      const tipo  = card.dataset.tipo;
+
+      if (price < priceMin || price > priceMax) return false;
+      if (state.beds > 0 && beds < state.beds) return false;
+      if (state.tipo !== 'todos' && tipo !== state.tipo) return false;
+      return true;
+    });
+
+    // Sort
+    visible.sort((a, b) => {
+      const pa = parseInt(a.dataset.price), pb = parseInt(b.dataset.price);
+      if (sortVal === 'asc')  return pa - pb;
+      if (sortVal === 'desc') return pb - pa;
+      return 0;
+    });
+
+    // Re-render: hide all, then append visible in order
+    const list = document.querySelector('.listings-list');
+    cards.forEach(c => { c.style.display = 'none'; });
+    visible.forEach(c => { c.style.display = 'flex'; list.appendChild(c); });
+
+    // Update count
+    const countEl = document.querySelector('.listings-count');
+    countEl.innerHTML = `${visible.length} resultado${visible.length !== 1 ? 's' : ''} <span>en Málaga</span>`;
+  }
+</script>
 
 </body>
 </html>

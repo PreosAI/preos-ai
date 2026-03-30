@@ -123,7 +123,7 @@
       transition: color .15s, border-color .15s;
     }
     .tab:hover { color: var(--text); }
-    .tab.active { color: var(--text); border-bottom-color: var(--text); }
+    .tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
 
     .tabs-actions {
       display: flex;
@@ -244,7 +244,7 @@
       top: calc(var(--nav-h) + var(--tabs-h) + 24px);
     }
 
-    /* ─── LISTING HEADER ───────────────────────────────────── */
+    /* ─── LISTING HEADER (always visible) ─────────────────── */
     .listing-status {
       display: flex;
       align-items: center;
@@ -290,10 +290,97 @@
     .spec-value { font-size: 16px; font-weight: 700; color: var(--text); }
     .spec-label { font-size: 12px; color: var(--muted); }
 
+    /* ─── TAB PANELS ───────────────────────────────────────── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
     /* ─── SECTIONS ─────────────────────────────────────────── */
     .section { margin-bottom: 36px; }
     .section-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
     .section-text { font-size: 14px; line-height: 1.8; color: #374151; }
+
+    /* ─── PREOS ACTIVITY ───────────────────────────────────── */
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .activity-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .activity-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .activity-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ─── HISTORY TABLES ───────────────────────────────────── */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .history-table thead tr {
+      border-bottom: 2px solid var(--border);
+    }
+
+    .history-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .history-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .history-table tr:last-child td { border-bottom: none; }
+
+    .badge-reducido {
+      display: inline-block;
+      background: #fef2f2;
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .badge-listado {
+      display: inline-block;
+      background: #f0fdf4;
+      color: #16a34a;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .change-neg { color: var(--red); font-weight: 600; }
+    .change-neu { color: var(--muted); }
 
     /* ─── MAP ──────────────────────────────────────────────── */
     .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
@@ -322,6 +409,251 @@
       gap: 8px;
     }
     .map-placeholder svg { width: 24px; height: 24px; color: var(--muted); }
+
+    /* ─── MORTGAGE CALCULATOR ──────────────────────────────── */
+    .calc-result {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .calc-monthly-label { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    .calc-monthly-value {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+    .calc-monthly-unit { font-size: 16px; font-weight: 500; color: var(--muted); }
+
+    .calc-disclaimer { font-size: 11px; color: var(--muted); max-width: 180px; text-align: right; line-height: 1.5; }
+
+    .calc-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+      margin-bottom: 28px;
+    }
+
+    .calc-field { display: flex; flex-direction: column; gap: 6px; }
+
+    .calc-field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+
+    .calc-field input,
+    .calc-field select {
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+
+    .calc-field input:focus,
+    .calc-field select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(204,31,31,.08);
+    }
+
+    .calc-field input[type="range"] {
+      height: auto;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      accent-color: var(--red);
+      cursor: pointer;
+      box-shadow: none;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .slider-pct { font-size: 13px; font-weight: 700; color: var(--text); }
+    .slider-amt { font-size: 13px; color: var(--muted); }
+
+    .calc-breakdown {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .calc-breakdown-title {
+      padding: 16px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row-label { color: var(--muted); }
+    .calc-row-value { font-weight: 600; color: var(--text); }
+    .calc-row-total .calc-row-label { color: var(--text); font-weight: 700; }
+    .calc-row-total .calc-row-value { color: var(--red); font-size: 15px; }
+
+    /* ─── PROPERTY DETAILS GRID ────────────────────────────── */
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .details-section {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .details-section-header {
+      padding: 14px 20px;
+      background: #f9fafb;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .details-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .details-row:last-child { border-bottom: none; }
+    .details-row-label { color: var(--muted); }
+    .details-row-value { font-weight: 600; color: var(--text); text-align: right; }
+
+    .energy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fef9c3;
+      color: #854d0e;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* ─── SCHOOLS ──────────────────────────────────────────── */
+    .schools-list { display: flex; flex-direction: column; gap: 14px; }
+
+    .school-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .school-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .school-icon svg { width: 22px; height: 22px; color: var(--muted); }
+
+    .school-info { flex: 1; min-width: 0; }
+
+    .school-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .school-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .school-type {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .school-type-pub { background: #eff6ff; color: #1d4ed8; }
+    .school-type-conc { background: #f0fdf4; color: #16a34a; }
+    .school-type-priv { background: #fdf4ff; color: #7e22ce; }
+
+    .school-dist {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .school-dist svg { width: 12px; height: 12px; }
+
+    .school-rating {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .school-rating-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .school-rating-stars {
+      font-size: 11px;
+      color: #f59e0b;
+      letter-spacing: -1px;
+    }
+
+    .school-rating-label { font-size: 10px; color: var(--muted); }
 
     /* ─── SIDEBAR CARDS ────────────────────────────────────── */
     .sidebar-card {
@@ -447,10 +779,10 @@
 <!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
 <div class="tabs-bar">
   <div class="tabs-list">
-    <div class="tab active">Descripción general</div>
-    <div class="tab">Calculadora de pagos</div>
-    <div class="tab">Detalles de la propiedad</div>
-    <div class="tab">Escuelas</div>
+    <div class="tab active" data-tab="1">Descripción general</div>
+    <div class="tab" data-tab="2">Calculadora de pagos</div>
+    <div class="tab" data-tab="3">Detalles de la propiedad</div>
+    <div class="tab" data-tab="4">Escuelas</div>
   </div>
   <div class="tabs-actions">
     <button class="icon-btn" aria-label="Guardar">
@@ -513,6 +845,7 @@
     <!-- LEFT COLUMN -->
     <div class="main-col">
 
+      <!-- Always-visible listing header -->
       <div class="listing-status">
         <div class="status-dot"></div>
         VENTA ACTIVA
@@ -559,27 +892,342 @@
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Acerca de esta casa</div>
-        <div class="section-text">
-          Espectacular piso en el corazón de Madrid, ubicado en la icónica Calle Mayor. Esta propiedad de lujo ofrece 210 m² de espacios diáfanos y luminosos con acabados de alta calidad. La vivienda cuenta con cuatro amplias habitaciones, tres baños completos con materiales premium, y una cocina de diseño totalmente equipada con electrodomésticos de última generación.
-          <br><br>
-          El salón principal conecta con una terraza privada con vistas a la calle peatonal, ideal para disfrutar del ambiente madrileño. El edificio dispone de ascensor, portero físico, sistema de seguridad 24 horas y plaza de garaje incluida en el precio. Zona excelente con acceso inmediato a transporte público, restaurantes, museos y los principales centros de negocio de la ciudad.
+      <!-- ══ TAB PANEL 1: Descripción general ══════════════════ -->
+      <div class="tab-panel active" id="panel-1">
+
+        <div class="section">
+          <div class="section-title">Actividad en Preos</div>
+          <div class="activity-grid">
+            <div class="activity-card">
+              <div class="activity-value">248</div>
+              <div class="activity-label">Visitas en 30 días</div>
+            </div>
+            <div class="activity-card">
+              <div class="activity-value">18</div>
+              <div class="activity-label">Guardados</div>
+            </div>
+            <div class="activity-card">
+              <div class="activity-value">4</div>
+              <div class="activity-label">Recorridos agendados</div>
+            </div>
+          </div>
         </div>
+
+        <div class="section">
+          <div class="section-title">Acerca de esta casa</div>
+          <div class="section-text">
+            Espectacular piso en el corazón de Madrid, ubicado en la icónica Calle Mayor. Esta propiedad de lujo ofrece 210 m² de espacios diáfanos y luminosos con acabados de alta calidad. La vivienda cuenta con cuatro amplias habitaciones, tres baños completos con materiales premium, y una cocina de diseño totalmente equipada con electrodomésticos de última generación.
+            <br><br>
+            El salón principal conecta con una terraza privada con vistas a la calle peatonal, ideal para disfrutar del ambiente madrileño. El edificio dispone de ascensor, portero físico, sistema de seguridad 24 horas y plaza de garaje incluida en el precio. Zona excelente con acceso inmediato a transporte público, restaurantes, museos y los principales centros de negocio de la ciudad.
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Historial de precios</div>
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Evento</th>
+                <th>Precio</th>
+                <th>Variación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Feb 2024</td>
+                <td><span class="badge-reducido">Precio reducido</span></td>
+                <td>€1.489.000</td>
+                <td class="change-neg">−5,1%</td>
+              </tr>
+              <tr>
+                <td>Ago 2023</td>
+                <td><span class="badge-listado">Listado</span></td>
+                <td>€1.568.000</td>
+                <td class="change-neu">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Historial fiscal (IBI)</div>
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Año</th>
+                <th>Importe abonado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2024</td>
+                <td>€2.847</td>
+              </tr>
+              <tr>
+                <td>2023</td>
+                <td>€2.764</td>
+              </tr>
+              <tr>
+                <td>2022</td>
+                <td>€2.693</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Mapa</div>
+          <div class="map-container">
+            <div class="map-toggle">
+              <div class="map-tab active">Mapa</div>
+              <div class="map-tab">Satélite</div>
+            </div>
+            <div class="map-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Calle Mayor 14, Madrid
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <div class="section">
-        <div class="section-title">Mapa</div>
-        <div class="map-container">
-          <div class="map-toggle">
-            <div class="map-tab active">Mapa</div>
-            <div class="map-tab">Satélite</div>
+      <!-- ══ TAB PANEL 2: Calculadora de pagos ═════════════════ -->
+      <div class="tab-panel" id="panel-2">
+
+        <div class="section">
+          <div class="section-title">Calculadora de hipoteca</div>
+
+          <div class="calc-result">
+            <div>
+              <div class="calc-monthly-label">Cuota mensual estimada</div>
+              <div>
+                <span class="calc-monthly-value" id="monthly-value">–</span>
+                <span class="calc-monthly-unit">&nbsp;/mes</span>
+              </div>
+            </div>
+            <div class="calc-disclaimer">Estimación orientativa. No incluye seguros ni comisiones bancarias.</div>
           </div>
-          <div class="map-placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Calle Mayor 14, Madrid
+
+          <div class="calc-fields">
+
+            <div class="calc-field">
+              <label>Precio de la vivienda</label>
+              <input type="text" id="calc-precio" value="€1.489.000" readonly style="background:#f9fafb; color:var(--muted); cursor:default;">
+            </div>
+
+            <div class="calc-field">
+              <label>Plazo</label>
+              <select id="calc-plazo">
+                <option value="10">10 años</option>
+                <option value="15">15 años</option>
+                <option value="20">20 años</option>
+                <option value="25">25 años</option>
+                <option value="30" selected>30 años</option>
+              </select>
+            </div>
+
+            <div class="calc-field" style="grid-column: span 2;">
+              <label>
+                Entrada
+                <span style="float:right; font-weight:400;">
+                  <span class="slider-pct" id="entrada-pct">20%</span>
+                  &nbsp;=&nbsp;
+                  <span class="slider-amt" id="entrada-amt">€297.800</span>
+                </span>
+              </label>
+              <input type="range" id="calc-entrada" min="5" max="50" value="20" step="1">
+            </div>
+
+            <div class="calc-field">
+              <label>Tipo de interés anual (%)</label>
+              <input type="number" id="calc-interes" value="3.5" min="0.1" max="15" step="0.1">
+            </div>
+
+            <div class="calc-field">
+              <label>Tipo de interés</label>
+              <select id="calc-tipo-interes">
+                <option value="fijo" selected>Fijo</option>
+                <option value="variable">Variable</option>
+                <option value="mixto">Mixto</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="calc-breakdown">
+            <div class="calc-breakdown-title">Desglose mensual</div>
+            <div class="calc-row">
+              <span class="calc-row-label">Capital + intereses</span>
+              <span class="calc-row-value" id="br-hipoteca">—</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-row-label">Seguro de hogar (est.)</span>
+              <span class="calc-row-value">€65</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-row-label">Comunidad (est.)</span>
+              <span class="calc-row-value">€180</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-row-label">IBI mensualizado (est.)</span>
+              <span class="calc-row-value">€237</span>
+            </div>
+            <div class="calc-row calc-row-total">
+              <span class="calc-row-label">Total estimado / mes</span>
+              <span class="calc-row-value" id="br-total">—</span>
+            </div>
           </div>
         </div>
+
+      </div>
+
+      <!-- ══ TAB PANEL 3: Detalles de la propiedad ═════════════ -->
+      <div class="tab-panel" id="panel-3">
+
+        <div class="section">
+          <div class="section-title">Detalles de la propiedad</div>
+          <div class="details-grid">
+
+            <div class="details-section">
+              <div class="details-section-header">Interior</div>
+              <div class="details-row"><span class="details-row-label">Dormitorios</span><span class="details-row-value">4</span></div>
+              <div class="details-row"><span class="details-row-label">Baños completos</span><span class="details-row-value">2</span></div>
+              <div class="details-row"><span class="details-row-label">Aseos</span><span class="details-row-value">1</span></div>
+              <div class="details-row"><span class="details-row-label">Superficie construida</span><span class="details-row-value">210 m²</span></div>
+              <div class="details-row"><span class="details-row-label">Superficie útil</span><span class="details-row-value">192 m²</span></div>
+              <div class="details-row"><span class="details-row-label">Cocina</span><span class="details-row-value">Equipada</span></div>
+              <div class="details-row"><span class="details-row-label">Suelos</span><span class="details-row-value">Parquet</span></div>
+              <div class="details-row"><span class="details-row-label">Calefacción</span><span class="details-row-value">Radiadores</span></div>
+              <div class="details-row"><span class="details-row-label">Aire acondicionado</span><span class="details-row-value">Sí</span></div>
+              <div class="details-row"><span class="details-row-label">Orientación</span><span class="details-row-value">Sur-Este</span></div>
+            </div>
+
+            <div class="details-section">
+              <div class="details-section-header">Exterior y comunidad</div>
+              <div class="details-row"><span class="details-row-label">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
+              <div class="details-row"><span class="details-row-label">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
+              <div class="details-row"><span class="details-row-label">Trastero</span><span class="details-row-value">No</span></div>
+              <div class="details-row"><span class="details-row-label">Piscina</span><span class="details-row-value">Comunitaria</span></div>
+              <div class="details-row"><span class="details-row-label">Jardín</span><span class="details-row-value">Comunitario</span></div>
+              <div class="details-row"><span class="details-row-label">Ascensor</span><span class="details-row-value">Sí</span></div>
+              <div class="details-row"><span class="details-row-label">Portero</span><span class="details-row-value">24 horas</span></div>
+              <div class="details-row"><span class="details-row-label">Seguridad</span><span class="details-row-value">Sistema 24h</span></div>
+              <div class="details-row"><span class="details-row-label">Planta</span><span class="details-row-value">3ª de 6</span></div>
+              <div class="details-row"><span class="details-row-label">Año construcción</span><span class="details-row-value">2018</span></div>
+            </div>
+
+            <div class="details-section" style="grid-column: span 2;">
+              <div class="details-section-header">Información legal y energética</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Referencia catastral</span><span class="details-row-value">9872023VK4897S</span></div>
+                <div class="details-row"><span class="details-row-label">Tipo de inmueble</span><span class="details-row-value">Piso</span></div>
+                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Régimen</span><span class="details-row-value">Libre</span></div>
+                <div class="details-row"><span class="details-row-label">Estado</span><span class="details-row-value">Bueno</span></div>
+                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Eficiencia energética</span><span class="details-row-value"><span class="energy-badge">C</span></span></div>
+                <div class="details-row"><span class="details-row-label">Consumo energético</span><span class="details-row-value">145 kWh/m²·año</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB PANEL 4: Escuelas ══════════════════════════════ -->
+      <div class="tab-panel" id="panel-4">
+
+        <div class="section">
+          <div class="section-title">Colegios cercanos</div>
+          <div class="schools-list">
+
+            <div class="school-card">
+              <div class="school-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="school-info">
+                <div class="school-name">Colegio Internacional de Madrid</div>
+                <div class="school-meta">
+                  <span class="school-type school-type-pub">Público</span>
+                  <span class="school-dist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    0,3 km
+                  </span>
+                </div>
+              </div>
+              <div class="school-rating">
+                <div class="school-rating-value">9.2</div>
+                <div class="school-rating-stars">★★★★★</div>
+                <div class="school-rating-label">Valoración</div>
+              </div>
+            </div>
+
+            <div class="school-card">
+              <div class="school-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="school-info">
+                <div class="school-name">Colegio San Isidro</div>
+                <div class="school-meta">
+                  <span class="school-type school-type-conc">Concertado</span>
+                  <span class="school-dist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    0,5 km
+                  </span>
+                </div>
+              </div>
+              <div class="school-rating">
+                <div class="school-rating-value">8.8</div>
+                <div class="school-rating-stars">★★★★☆</div>
+                <div class="school-rating-label">Valoración</div>
+              </div>
+            </div>
+
+            <div class="school-card">
+              <div class="school-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="school-info">
+                <div class="school-name">Instituto Gran Vía</div>
+                <div class="school-meta">
+                  <span class="school-type school-type-pub">Público</span>
+                  <span class="school-dist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    0,8 km
+                  </span>
+                </div>
+              </div>
+              <div class="school-rating">
+                <div class="school-rating-value">8.1</div>
+                <div class="school-rating-stars">★★★★☆</div>
+                <div class="school-rating-label">Valoración</div>
+              </div>
+            </div>
+
+            <div class="school-card">
+              <div class="school-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="school-info">
+                <div class="school-name">American School of Madrid</div>
+                <div class="school-meta">
+                  <span class="school-type school-type-priv">Privado</span>
+                  <span class="school-dist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    1,2 km
+                  </span>
+                </div>
+              </div>
+              <div class="school-rating">
+                <div class="school-rating-value">9.5</div>
+                <div class="school-rating-stars">★★★★★</div>
+                <div class="school-rating-label">Valoración</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -639,13 +1287,18 @@
 </div>
 
 <script>
-  document.querySelectorAll('.tab').forEach(tab => {
+  // ── Tab switching ──────────────────────────────────────────────
+  document.querySelectorAll('.tab[data-tab]').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const n = tab.dataset.tab;
+      document.querySelectorAll('.tab[data-tab]').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       tab.classList.add('active');
+      document.getElementById('panel-' + n).classList.add('active');
     });
   });
 
+  // ── Map tab toggle ─────────────────────────────────────────────
   document.querySelectorAll('.map-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.map-tab').forEach(t => t.classList.remove('active'));
@@ -653,6 +1306,7 @@
     });
   });
 
+  // ── Tour date / type selection ─────────────────────────────────
   document.querySelectorAll('.tour-date').forEach(date => {
     date.addEventListener('click', () => {
       document.querySelectorAll('.tour-date').forEach(d => d.classList.remove('selected'));
@@ -666,6 +1320,47 @@
       opt.classList.add('selected');
     });
   });
+
+  // ── Mortgage calculator ────────────────────────────────────────
+  const PRICE = 1489000;
+
+  function fmt(n) {
+    return '€' + Math.round(n).toLocaleString('es-ES');
+  }
+
+  function calcMortgage() {
+    const pctSlider = parseInt(document.getElementById('calc-entrada').value);
+    const years     = parseInt(document.getElementById('calc-plazo').value);
+    const rate      = parseFloat(document.getElementById('calc-interes').value);
+
+    const entrada  = PRICE * pctSlider / 100;
+    const principal = PRICE - entrada;
+    const r = rate / 100 / 12;
+    const n = years * 12;
+
+    let monthly;
+    if (r === 0) {
+      monthly = principal / n;
+    } else {
+      monthly = principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    }
+
+    // Update slider labels
+    document.getElementById('entrada-pct').textContent = pctSlider + '%';
+    document.getElementById('entrada-amt').textContent = fmt(entrada);
+
+    // Update result
+    document.getElementById('monthly-value').textContent = fmt(monthly);
+    document.getElementById('br-hipoteca').textContent   = fmt(monthly);
+    document.getElementById('br-total').textContent      = fmt(monthly + 65 + 180 + 237);
+  }
+
+  document.getElementById('calc-entrada').addEventListener('input', calcMortgage);
+  document.getElementById('calc-plazo').addEventListener('change', calcMortgage);
+  document.getElementById('calc-interes').addEventListener('input', calcMortgage);
+
+  // Initial calculation
+  calcMortgage();
 </script>
 
 </body>
