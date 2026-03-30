@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Propiedades en Málaga — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 64px;
+      --filters-h: 52px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #f9f9f9;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+
+    .nav-brand { flex-shrink: 0; text-decoration: none; }
+
+    .nav-search {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+
+    .nav-search input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 16px 0 40px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+      background: #f9f9f9;
+    }
+    .nav-search input:focus { border-color: #9ca3af; background: #fff; }
+    .nav-search input::placeholder { color: var(--muted); }
+
+    .nav-search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .nav-search-icon svg { width: 15px; height: 15px; display: block; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* ─── FILTERS BAR ──────────────────────────────────────── */
+    .filters-bar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      z-index: 190;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      height: var(--filters-h);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .filter-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
+    .filter-btn svg { width: 13px; height: 13px; }
+
+    .filters-sort {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .sort-select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #fff;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* ─── SPLIT LAYOUT ─────────────────────────────────────── */
+    .split-layout {
+      display: flex;
+      height: calc(100vh - var(--nav-h) - var(--filters-h));
+      margin-top: calc(var(--nav-h) + var(--filters-h));
+    }
+
+    /* ─── LEFT: LISTINGS ───────────────────────────────────── */
+    .listings-panel {
+      width: 45%;
+      flex-shrink: 0;
+      overflow-y: auto;
+      background: #f9f9f9;
+      border-right: 1px solid var(--border);
+    }
+
+    .listings-panel::-webkit-scrollbar { width: 5px; }
+    .listings-panel::-webkit-scrollbar-track { background: transparent; }
+    .listings-panel::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+
+    .listings-header {
+      padding: 16px 20px 12px;
+      position: sticky;
+      top: 0;
+      background: #f9f9f9;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .listings-count {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .listings-count span { color: var(--muted); font-weight: 400; }
+
+    .listings-list {
+      padding: 12px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ─── HORIZONTAL CARD ──────────────────────────────────── */
+    .h-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .h-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,.1);
+      transform: translateY(-1px);
+    }
+
+    .h-card-img {
+      width: 38%;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      min-height: 140px;
+    }
+
+    .h-card-img .img-ph {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #c9d6df 0%, #e2ebf0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .h-card-img .img-ph svg { width: 32px; height: 32px; color: rgba(0,0,0,0.2); }
+
+    .h-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-heart {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      background: rgba(0,0,0,0.35);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .15s;
+      z-index: 2;
+    }
+    .card-heart:hover { background: rgba(0,0,0,0.55); }
+    .card-heart svg { width: 14px; height: 14px; }
+
+    .h-card-badges {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+    .badge-nuevo { background: var(--red); color: #fff; }
+    .badge-3d { background: rgba(0,0,0,0.65); color: #fff; }
+
+    .h-card-body {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .h-card-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .h-card-address {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .h-card-specs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #374151;
+      flex-wrap: wrap;
+    }
+
+    .h-card-spec {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .h-card-spec svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
+
+    .h-card-sep {
+      width: 1px;
+      height: 12px;
+      background: var(--border);
+    }
+
+    .h-card-meta {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .h-card-meta svg { width: 11px; height: 11px; color: var(--red); flex-shrink: 0; }
+
+    /* ─── RIGHT: MAP ───────────────────────────────────────── */
+    .map-panel {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #e8f0e8;
+    }
+
+    /* SVG map grid */
+    .map-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Price pins */
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+    }
+
+    .map-pin-bubble {
+      background: var(--red);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform .15s, background .15s;
+      position: relative;
+      font-family: 'Inter', sans-serif;
+    }
+    .map-pin-bubble:hover { transform: scale(1.08); background: var(--red-hover); }
+
+    .map-pin-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--red);
+    }
+
+    .map-pin-bubble.active {
+      background: var(--text);
+      z-index: 10;
+    }
+    .map-pin-bubble.active::after { border-top-color: var(--text); }
+
+    .map-attr {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(255,255,255,0.85);
+      font-size: 10px;
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="/" class="nav-brand" style="text-decoration:none;">
+    <div style="width:110px; height:45px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+      <img src="images/Logo.png" style="height:180px; width:auto;" alt="Preos">
+    </div>
+  </a>
+
+  <div class="nav-search">
+    <div class="nav-search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <input type="text" value="Málaga" placeholder="Busca por ciudad, dirección o código postal">
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#">Comprar</a></li>
+    <li><a href="#">Vender</a></li>
+    <li><a href="#">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="#" class="btn-ingresar">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ FILTERS BAR ══════════════════════════════════════════ -->
+<div class="filters-bar">
+  <button class="filter-btn">
+    Precio
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <button class="filter-btn">
+    Habitaciones
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <button class="filter-btn">
+    Tipo de propiedad
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <button class="filter-btn">
+    Más filtros
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+  </button>
+
+  <div class="filters-sort">
+    <span>Ordenar por:</span>
+    <select class="sort-select">
+      <option>Recomendados</option>
+      <option>Menor precio</option>
+      <option>Mayor precio</option>
+      <option>Más recientes</option>
+      <option>Mayor superficie</option>
+    </select>
+  </div>
+</div>
+
+<!-- ═══ SPLIT LAYOUT ══════════════════════════════════════════ -->
+<div class="split-layout">
+
+  <!-- LEFT: LISTINGS -->
+  <div class="listings-panel">
+    <div class="listings-header">
+      <div class="listings-count">32 resultados <span>en Málaga</span></div>
+    </div>
+
+    <div class="listings-list">
+
+      <!-- Listing 1 -->
+      <a class="h-card" href="propiedad.html">
+        <div class="h-card-img">
+          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+          <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="h-card-badges">
+            <span class="badge badge-nuevo">Nuevo</span>
+            <span class="badge badge-3d">Recorrido 3D</span>
+          </div>
+        </div>
+        <div class="h-card-body">
+          <div>
+            <div class="h-card-price">€ 485.000</div>
+            <div class="h-card-address">Calle Larios 8, Piso 2A · Málaga Centro</div>
+            <div class="h-card-specs">
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                3 hab.
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+                2 baños
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">130 m²</div>
+            </div>
+          </div>
+          <div class="h-card-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Málaga Centro, Málaga
+          </div>
+        </div>
+      </a>
+
+      <!-- Listing 2 -->
+      <a class="h-card" href="propiedad.html">
+        <div class="h-card-img">
+          <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+          <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="h-card-badges">
+            <span class="badge badge-nuevo">Nuevo</span>
+          </div>
+        </div>
+        <div class="h-card-body">
+          <div>
+            <div class="h-card-price">€ 295.000</div>
+            <div class="h-card-address">Av. de Andalucía 45, 3B · Málaga</div>
+            <div class="h-card-specs">
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                2 hab.
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+                1 baño
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">78 m²</div>
+            </div>
+          </div>
+          <div class="h-card-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Av. de Andalucía, Málaga
+          </div>
+        </div>
+      </a>
+
+      <!-- Listing 3 -->
+      <a class="h-card" href="propiedad.html">
+        <div class="h-card-img">
+          <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+          <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="h-card-badges">
+            <span class="badge badge-nuevo">Nuevo</span>
+            <span class="badge badge-3d">Recorrido 3D</span>
+          </div>
+        </div>
+        <div class="h-card-body">
+          <div>
+            <div class="h-card-price">€ 720.000</div>
+            <div class="h-card-address">Paseo Marítimo 12, Ático · Marbella</div>
+            <div class="h-card-specs">
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                4 hab.
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+                3 baños
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">195 m²</div>
+            </div>
+          </div>
+          <div class="h-card-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Marbella Este, Málaga
+          </div>
+        </div>
+      </a>
+
+      <!-- Listing 4 -->
+      <a class="h-card" href="propiedad.html">
+        <div class="h-card-img">
+          <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+          <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="h-card-badges">
+            <span class="badge badge-3d">Recorrido 3D</span>
+          </div>
+        </div>
+        <div class="h-card-body">
+          <div>
+            <div class="h-card-price">€ 349.000</div>
+            <div class="h-card-address">Calle Alcazabilla 3, 1A · Málaga</div>
+            <div class="h-card-specs">
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                3 hab.
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+                2 baños
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">105 m²</div>
+            </div>
+          </div>
+          <div class="h-card-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Centro Histórico, Málaga
+          </div>
+        </div>
+      </a>
+
+      <!-- Listing 5 -->
+      <a class="h-card" href="propiedad.html">
+        <div class="h-card-img">
+          <img src="https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+          <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="h-card-badges">
+            <span class="badge badge-nuevo">Nuevo</span>
+          </div>
+        </div>
+        <div class="h-card-body">
+          <div>
+            <div class="h-card-price">€ 1.250.000</div>
+            <div class="h-card-address">Urb. Los Monteros, Villa 7 · Marbella</div>
+            <div class="h-card-specs">
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                5 hab.
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+                4 baños
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">420 m²</div>
+            </div>
+          </div>
+          <div class="h-card-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Los Monteros, Marbella
+          </div>
+        </div>
+      </a>
+
+      <!-- Listing 6 -->
+      <a class="h-card" href="propiedad.html">
+        <div class="h-card-img">
+          <img src="https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=400&q=75&auto=format&fit=crop" alt="Propiedad" loading="lazy">
+          <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="h-card-badges">
+            <span class="badge badge-nuevo">Nuevo</span>
+            <span class="badge badge-3d">Recorrido 3D</span>
+          </div>
+        </div>
+        <div class="h-card-body">
+          <div>
+            <div class="h-card-price">€ 189.000</div>
+            <div class="h-card-address">Calle Granada 22, Bajo B · Torremolinos</div>
+            <div class="h-card-specs">
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                1 hab.
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+                1 baño
+              </div>
+              <div class="h-card-sep"></div>
+              <div class="h-card-spec">52 m²</div>
+            </div>
+          </div>
+          <div class="h-card-meta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Torremolinos, Málaga
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: MAP -->
+  <div class="map-panel">
+    <!-- SVG map background with grid and roads -->
+    <svg class="map-svg" viewBox="0 0 800 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- Base -->
+      <rect width="800" height="700" fill="#e8f0e8"/>
+      <!-- Water/sea -->
+      <path d="M0 580 Q200 560 400 575 Q600 590 800 565 L800 700 L0 700 Z" fill="#b8d4e8" opacity="0.7"/>
+      <!-- Grid lines (streets) -->
+      <g stroke="#c8d8c8" stroke-width="1" opacity="0.8">
+        <line x1="0" y1="100" x2="800" y2="100"/>
+        <line x1="0" y1="200" x2="800" y2="200"/>
+        <line x1="0" y1="300" x2="800" y2="300"/>
+        <line x1="0" y1="400" x2="800" y2="400"/>
+        <line x1="0" y1="500" x2="800" y2="500"/>
+        <line x1="100" y1="0" x2="100" y2="700"/>
+        <line x1="200" y1="0" x2="200" y2="700"/>
+        <line x1="300" y1="0" x2="300" y2="700"/>
+        <line x1="400" y1="0" x2="400" y2="700"/>
+        <line x1="500" y1="0" x2="500" y2="700"/>
+        <line x1="600" y1="0" x2="600" y2="700"/>
+        <line x1="700" y1="0" x2="700" y2="700"/>
+      </g>
+      <!-- Major roads -->
+      <g stroke="#d4e4c8" stroke-width="4" fill="none">
+        <path d="M0 280 Q200 260 400 270 Q600 280 800 265"/>
+        <path d="M0 450 Q300 430 500 445 Q650 455 800 440"/>
+        <path d="M160 0 Q180 200 170 400 Q165 550 175 700"/>
+        <path d="M450 0 Q430 150 440 350 Q450 500 445 700"/>
+        <path d="M650 0 Q670 200 660 400 Q655 550 665 700"/>
+      </g>
+      <!-- City blocks -->
+      <g fill="#daeada" stroke="#c8d8c8" stroke-width="0.5">
+        <rect x="110" y="110" width="80" height="80" rx="3"/>
+        <rect x="210" y="110" width="80" height="80" rx="3"/>
+        <rect x="310" y="110" width="80" height="80" rx="3"/>
+        <rect x="510" y="110" width="80" height="80" rx="3"/>
+        <rect x="610" y="110" width="80" height="80" rx="3"/>
+        <rect x="110" y="210" width="80" height="60" rx="3"/>
+        <rect x="210" y="210" width="80" height="60" rx="3"/>
+        <rect x="510" y="210" width="80" height="60" rx="3"/>
+        <rect x="610" y="210" width="80" height="60" rx="3"/>
+        <rect x="110" y="310" width="80" height="80" rx="3"/>
+        <rect x="310" y="310" width="80" height="80" rx="3"/>
+        <rect x="510" y="310" width="80" height="80" rx="3"/>
+        <rect x="610" y="310" width="80" height="80" rx="3"/>
+        <rect x="110" y="460" width="80" height="80" rx="3"/>
+        <rect x="210" y="460" width="80" height="80" rx="3"/>
+        <rect x="310" y="460" width="80" height="80" rx="3"/>
+        <rect x="510" y="460" width="80" height="80" rx="3"/>
+      </g>
+      <!-- Park/green area -->
+      <ellipse cx="390" cy="200" rx="60" ry="45" fill="#b8d4a8" opacity="0.8"/>
+      <text x="390" y="204" text-anchor="middle" font-size="9" fill="#5a8a5a" font-family="Inter,sans-serif">Parque</text>
+      <!-- Labels -->
+      <text x="155" y="155" text-anchor="middle" font-size="8" fill="#7a9a7a" font-family="Inter,sans-serif">Centro</text>
+      <text x="555" y="155" text-anchor="middle" font-size="8" fill="#7a9a7a" font-family="Inter,sans-serif">Este</text>
+      <text x="155" y="360" text-anchor="middle" font-size="8" fill="#7a9a7a" font-family="Inter,sans-serif">Sur</text>
+      <text x="400" y="610" text-anchor="middle" font-size="11" fill="#5a84aa" font-family="Inter,sans-serif" font-weight="600">Mar Mediterráneo</text>
+    </svg>
+
+    <!-- Price pins -->
+    <div class="map-pin" style="left:22%; top:38%">
+      <div class="map-pin-bubble active">€485k</div>
+    </div>
+    <div class="map-pin" style="left:38%; top:52%">
+      <div class="map-pin-bubble">€295k</div>
+    </div>
+    <div class="map-pin" style="left:65%; top:30%">
+      <div class="map-pin-bubble">€720k</div>
+    </div>
+    <div class="map-pin" style="left:28%; top:62%">
+      <div class="map-pin-bubble">€349k</div>
+    </div>
+    <div class="map-pin" style="left:75%; top:48%">
+      <div class="map-pin-bubble">€1.25M</div>
+    </div>
+    <div class="map-pin" style="left:50%; top:70%">
+      <div class="map-pin-bubble">€189k</div>
+    </div>
+    <div class="map-pin" style="left:42%; top:22%">
+      <div class="map-pin-bubble">€560k</div>
+    </div>
+    <div class="map-pin" style="left:15%; top:55%">
+      <div class="map-pin-bubble">€415k</div>
+    </div>
+    <div class="map-pin" style="left:58%; top:58%">
+      <div class="map-pin-bubble">€238k</div>
+    </div>
+
+    <div class="map-attr">© Preos Maps</div>
+  </div>
+
+</div>
+
+</body>
+</html>
