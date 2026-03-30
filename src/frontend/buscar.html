@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -408,63 +410,45 @@
       background: #e8f0e8;
     }
 
-    /* SVG map grid */
-    .map-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
+    #map { width: 100%; height: 100%; }
 
-    /* Price pins */
-    .map-pin {
-      position: absolute;
-      transform: translate(-50%, -100%);
+    /* Leaflet popup customisation */
+    .leaflet-popup-content-wrapper {
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      font-family: 'Inter', sans-serif;
+      padding: 0;
     }
-
-    .map-pin-bubble {
-      background: var(--red);
+    .leaflet-popup-content { margin: 0; }
+    .map-popup {
+      padding: 14px 16px;
+      min-width: 180px;
+    }
+    .map-popup-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .map-popup-addr {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .map-popup-link {
+      display: inline-block;
+      background: #cc1f1f;
       color: #fff;
       font-size: 12px;
-      font-weight: 700;
-      padding: 5px 10px;
+      font-weight: 600;
+      padding: 6px 14px;
       border-radius: 999px;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-      cursor: pointer;
-      transition: transform .15s, background .15s;
-      position: relative;
-      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      transition: background .15s;
     }
-    .map-pin-bubble:hover { transform: scale(1.08); background: var(--red-hover); }
-
-    .map-pin-bubble::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 5px solid var(--red);
-    }
-
-    .map-pin-bubble.active {
-      background: var(--text);
-      z-index: 10;
-    }
-    .map-pin-bubble.active::after { border-top-color: var(--text); }
-
-    .map-attr {
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: rgba(255,255,255,0.85);
-      font-size: 10px;
-      color: var(--muted);
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
+    .map-popup-link:hover { background: #b01a1a; }
   </style>
 </head>
 <body>
@@ -797,95 +781,7 @@
 
   <!-- RIGHT: MAP -->
   <div class="map-panel">
-    <!-- SVG map background with grid and roads -->
-    <svg class="map-svg" viewBox="0 0 800 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <!-- Base -->
-      <rect width="800" height="700" fill="#e8f0e8"/>
-      <!-- Water/sea -->
-      <path d="M0 580 Q200 560 400 575 Q600 590 800 565 L800 700 L0 700 Z" fill="#b8d4e8" opacity="0.7"/>
-      <!-- Grid lines (streets) -->
-      <g stroke="#c8d8c8" stroke-width="1" opacity="0.8">
-        <line x1="0" y1="100" x2="800" y2="100"/>
-        <line x1="0" y1="200" x2="800" y2="200"/>
-        <line x1="0" y1="300" x2="800" y2="300"/>
-        <line x1="0" y1="400" x2="800" y2="400"/>
-        <line x1="0" y1="500" x2="800" y2="500"/>
-        <line x1="100" y1="0" x2="100" y2="700"/>
-        <line x1="200" y1="0" x2="200" y2="700"/>
-        <line x1="300" y1="0" x2="300" y2="700"/>
-        <line x1="400" y1="0" x2="400" y2="700"/>
-        <line x1="500" y1="0" x2="500" y2="700"/>
-        <line x1="600" y1="0" x2="600" y2="700"/>
-        <line x1="700" y1="0" x2="700" y2="700"/>
-      </g>
-      <!-- Major roads -->
-      <g stroke="#d4e4c8" stroke-width="4" fill="none">
-        <path d="M0 280 Q200 260 400 270 Q600 280 800 265"/>
-        <path d="M0 450 Q300 430 500 445 Q650 455 800 440"/>
-        <path d="M160 0 Q180 200 170 400 Q165 550 175 700"/>
-        <path d="M450 0 Q430 150 440 350 Q450 500 445 700"/>
-        <path d="M650 0 Q670 200 660 400 Q655 550 665 700"/>
-      </g>
-      <!-- City blocks -->
-      <g fill="#daeada" stroke="#c8d8c8" stroke-width="0.5">
-        <rect x="110" y="110" width="80" height="80" rx="3"/>
-        <rect x="210" y="110" width="80" height="80" rx="3"/>
-        <rect x="310" y="110" width="80" height="80" rx="3"/>
-        <rect x="510" y="110" width="80" height="80" rx="3"/>
-        <rect x="610" y="110" width="80" height="80" rx="3"/>
-        <rect x="110" y="210" width="80" height="60" rx="3"/>
-        <rect x="210" y="210" width="80" height="60" rx="3"/>
-        <rect x="510" y="210" width="80" height="60" rx="3"/>
-        <rect x="610" y="210" width="80" height="60" rx="3"/>
-        <rect x="110" y="310" width="80" height="80" rx="3"/>
-        <rect x="310" y="310" width="80" height="80" rx="3"/>
-        <rect x="510" y="310" width="80" height="80" rx="3"/>
-        <rect x="610" y="310" width="80" height="80" rx="3"/>
-        <rect x="110" y="460" width="80" height="80" rx="3"/>
-        <rect x="210" y="460" width="80" height="80" rx="3"/>
-        <rect x="310" y="460" width="80" height="80" rx="3"/>
-        <rect x="510" y="460" width="80" height="80" rx="3"/>
-      </g>
-      <!-- Park/green area -->
-      <ellipse cx="390" cy="200" rx="60" ry="45" fill="#b8d4a8" opacity="0.8"/>
-      <text x="390" y="204" text-anchor="middle" font-size="9" fill="#5a8a5a" font-family="Inter,sans-serif">Parque</text>
-      <!-- Labels -->
-      <text x="155" y="155" text-anchor="middle" font-size="8" fill="#7a9a7a" font-family="Inter,sans-serif">Centro</text>
-      <text x="555" y="155" text-anchor="middle" font-size="8" fill="#7a9a7a" font-family="Inter,sans-serif">Este</text>
-      <text x="155" y="360" text-anchor="middle" font-size="8" fill="#7a9a7a" font-family="Inter,sans-serif">Sur</text>
-      <text x="400" y="610" text-anchor="middle" font-size="11" fill="#5a84aa" font-family="Inter,sans-serif" font-weight="600">Mar Mediterráneo</text>
-    </svg>
-
-    <!-- Price pins -->
-    <div class="map-pin" style="left:22%; top:38%">
-      <div class="map-pin-bubble active">€485k</div>
-    </div>
-    <div class="map-pin" style="left:38%; top:52%">
-      <div class="map-pin-bubble">€295k</div>
-    </div>
-    <div class="map-pin" style="left:65%; top:30%">
-      <div class="map-pin-bubble">€720k</div>
-    </div>
-    <div class="map-pin" style="left:28%; top:62%">
-      <div class="map-pin-bubble">€349k</div>
-    </div>
-    <div class="map-pin" style="left:75%; top:48%">
-      <div class="map-pin-bubble">€1.25M</div>
-    </div>
-    <div class="map-pin" style="left:50%; top:70%">
-      <div class="map-pin-bubble">€189k</div>
-    </div>
-    <div class="map-pin" style="left:42%; top:22%">
-      <div class="map-pin-bubble">€560k</div>
-    </div>
-    <div class="map-pin" style="left:15%; top:55%">
-      <div class="map-pin-bubble">€415k</div>
-    </div>
-    <div class="map-pin" style="left:58%; top:58%">
-      <div class="map-pin-bubble">€238k</div>
-    </div>
-
-    <div class="map-attr">© Preos Maps</div>
+    <div id="map" style="width:100%; height:100%;"></div>
   </div>
 
 </div>
@@ -1019,6 +915,44 @@
     const countEl = document.querySelector('.listings-count');
     countEl.innerHTML = `${visible.length} resultado${visible.length !== 1 ? 's' : ''} <span>en Málaga</span>`;
   }
+
+  // ── Leaflet map ──────────────────────────────────────────────
+  const map = L.map('map', { zoomControl: true }).setView([36.7213, -4.4214], 10);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  }).addTo(map);
+
+  const redIcon = L.divIcon({
+    className: '',
+    html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+      <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 12.6 21.16 13.13 21.66a1.25 1.25 0 0 0 1.74 0C15.4 35.16 28 23.63 28 14 28 6.27 21.73 0 14 0z" fill="#cc1f1f"/>
+      <circle cx="14" cy="14" r="6" fill="#fff"/>
+    </svg>`,
+    iconSize: [28, 36],
+    iconAnchor: [14, 36],
+    popupAnchor: [0, -38],
+  });
+
+  const properties = [
+    { latlng: [36.7213, -4.4214], price: '€485.000', addr: 'Málaga Centro' },
+    { latlng: [36.5101, -4.8825], price: '€720.000', addr: 'Marbella Este' },
+    { latlng: [36.5089, -4.8857], price: '€1.250.000', addr: 'Marbella Centro' },
+    { latlng: [36.6237, -4.4997], price: '€189.000', addr: 'Torremolinos' },
+    { latlng: [36.4272, -5.1456], price: '€415.000', addr: 'Estepona' },
+    { latlng: [36.7457, -3.8726], price: '€295.000', addr: 'Nerja' },
+  ];
+
+  properties.forEach(({ latlng, price, addr }) => {
+    const popup = `
+      <div class="map-popup">
+        <div class="map-popup-price">${price}</div>
+        <div class="map-popup-addr">${addr}</div>
+        <a href="propiedad.html" class="map-popup-link">Ver propiedad</a>
+      </div>`;
+    L.marker(latlng, { icon: redIcon }).addTo(map).bindPopup(popup, { maxWidth: 220 });
+  });
 </script>
 
 </body>
