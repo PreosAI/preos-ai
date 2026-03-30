@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuración de mi perfil — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 64px;
+      --tabs-h: 48px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #f5f6f8;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+    }
+
+    .nav-brand { flex-shrink: 0; text-decoration: none; }
+
+    .nav-search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .nav-search input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 16px 0 40px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      background: #f9f9f9;
+      transition: border-color .15s;
+    }
+    .nav-search input:focus { border-color: #9ca3af; background: #fff; }
+    .nav-search input::placeholder { color: var(--muted); }
+
+    .nav-search-icon {
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .nav-search-icon svg { width: 15px; height: 15px; display: block; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ─── TABS BAR ─────────────────────────────────────────── */
+    .tabs-bar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      z-index: 190;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      height: var(--tabs-h);
+      display: flex;
+      align-items: stretch;
+      padding: 0 32px;
+    }
+
+    .tab {
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: color .15s, border-color .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+
+    /* ─── PAGE BODY ────────────────────────────────────────── */
+    .page-body {
+      margin-top: calc(var(--nav-h) + var(--tabs-h));
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 36px 32px 80px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    /* ─── PROFILE CARD ─────────────────────────────────────── */
+    .profile-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+    }
+
+    /* Left: avatar */
+    .profile-avatar-col {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--border);
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .edit-photo-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--red);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .edit-photo-link:hover { text-decoration: underline; }
+    .edit-photo-link svg { width: 13px; height: 13px; }
+
+    /* Right: form */
+    .profile-form-col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+      margin-bottom: 28px;
+    }
+
+    .form-grid .span-1 { grid-column: span 1; }
+    .form-grid .span-2 { grid-column: span 2; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+
+    .field input,
+    .field select {
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 18px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(204,31,31,.08);
+    }
+
+    /* Phone field: country code + number side by side */
+    .phone-wrap {
+      display: flex;
+      gap: 8px;
+    }
+
+    .phone-wrap select {
+      flex: 0 0 90px;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+
+    .phone-wrap input {
+      flex: 1;
+    }
+
+    /* Form footer */
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .delete-link {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      padding: 0;
+    }
+    .delete-link:hover { color: #374151; }
+
+    .btn-save {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-save:hover { background: var(--red-hover); }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">
+    <div style="width:120px; height:45px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+      <img src="images/Logo.png" style="height:180px; width:auto;" alt="Preos">
+    </div>
+  </a>
+
+  <div class="nav-search">
+    <div class="nav-search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <input type="text" placeholder="Busca por ciudad, dirección o código postal">
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#">Comprar</a></li>
+    <li><a href="#">Vender</a></li>
+    <li><a href="#">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="ingresar.html" class="btn-ingresar">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
+<div class="tabs-bar">
+  <a href="dashboard.html" class="tab">Panel de propietarios</a>
+  <a href="favoritos.html" class="tab">Mis favoritos</a>
+  <a href="perfil.html" class="tab active">Configuración de mi perfil</a>
+</div>
+
+<!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
+<div class="page-body">
+
+  <div class="page-title">Configuración de mi perfil</div>
+
+  <div class="profile-card">
+
+    <!-- Left: avatar -->
+    <div class="profile-avatar-col">
+      <div class="profile-avatar">
+        <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=220&q=80&auto=format&fit=crop&facepad=3&face=1" alt="Kimberly Sandoval">
+      </div>
+      <a class="edit-photo-link" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar foto
+      </a>
+    </div>
+
+    <!-- Right: form -->
+    <div class="profile-form-col">
+      <form onsubmit="return false;">
+        <div class="form-grid">
+
+          <!-- Row 1: Nombre + Apellido -->
+          <div class="field span-1">
+            <label for="primer-nombre">Primer nombre*</label>
+            <input type="text" id="primer-nombre" value="Kimberly" autocomplete="given-name">
+          </div>
+          <div class="field span-1">
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" value="Sandoval" autocomplete="family-name">
+          </div>
+
+          <!-- Row 2: Email -->
+          <div class="field span-1">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" value="kimberly@e-me.co" autocomplete="email">
+          </div>
+
+          <!-- Row 2: Ubicación -->
+          <div class="field span-1">
+            <label for="ubicacion">Ubicación</label>
+            <input type="text" id="ubicacion" value="Málaga, España" autocomplete="address-level2">
+          </div>
+
+          <!-- Row 3: Teléfono (full width) -->
+          <div class="field span-2">
+            <label for="telefono">Teléfono</label>
+            <div class="phone-wrap">
+              <select aria-label="Prefijo país">
+                <option value="+34" selected>(+34)</option>
+                <option value="+1">(+1)</option>
+                <option value="+44">(+44)</option>
+                <option value="+33">(+33)</option>
+                <option value="+49">(+49)</option>
+                <option value="+39">(+39)</option>
+                <option value="+52">(+52)</option>
+                <option value="+54">(+54)</option>
+              </select>
+              <input type="tel" id="telefono" value="612 345 678" autocomplete="tel-national">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-footer">
+          <button type="button" class="delete-link">Eliminar cuenta</button>
+          <button type="submit" class="btn-save">Actualizar datos</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
