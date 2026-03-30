@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de propietarios — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --green: #16a34a;
+      --nav-h: 64px;
+      --tabs-h: 48px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #f5f6f8;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+    }
+
+    .nav-brand { flex-shrink: 0; text-decoration: none; }
+
+    .nav-search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .nav-search input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 16px 0 40px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      background: #f9f9f9;
+      transition: border-color .15s;
+    }
+    .nav-search input:focus { border-color: #9ca3af; background: #fff; }
+    .nav-search input::placeholder { color: var(--muted); }
+
+    .nav-search-icon {
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .nav-search-icon svg { width: 15px; height: 15px; display: block; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      transition: color .2s;
+      white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--red); }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* ─── TABS BAR ─────────────────────────────────────────── */
+    .tabs-bar {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      z-index: 190;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      height: var(--tabs-h);
+      display: flex;
+      align-items: stretch;
+      padding: 0 32px;
+    }
+
+    .tab {
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+
+    /* ─── PAGE BODY ────────────────────────────────────────── */
+    .page-body {
+      margin-top: calc(var(--nav-h) + var(--tabs-h));
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 32px 32px 60px;
+    }
+
+    /* ─── SECTION TITLE ────────────────────────────────────── */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    /* ─── PROPERTY CARD ────────────────────────────────────── */
+    .property-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+
+    /* Left: info */
+    .prop-left {
+      flex: 0 0 55%;
+      display: flex;
+      gap: 20px;
+      padding: 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    .prop-thumb {
+      width: 140px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .prop-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .prop-thumb .img-ph {
+      width: 140px;
+      height: 130px;
+      background: linear-gradient(135deg, #c9d6df 0%, #e2ebf0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+    }
+    .prop-thumb .img-ph svg { width: 36px; height: 36px; color: rgba(0,0,0,0.2); }
+
+    .prop-info { flex: 1; min-width: 0; }
+
+    .prop-address {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .prop-location {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .prop-location svg { width: 13px; height: 13px; color: var(--red); flex-shrink: 0; }
+
+    .prop-specs {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .prop-spec {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #374151;
+    }
+    .prop-spec svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+    .prop-spec strong { font-weight: 600; color: var(--text); }
+
+    .btn-edit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+    }
+    .btn-edit:hover { background: var(--red-hover); }
+    .btn-edit svg { width: 14px; height: 14px; }
+
+    /* Right: valuation */
+    .prop-right {
+      flex: 1;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .val-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .val-price {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .val-gain {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .val-gain svg { width: 14px; height: 14px; }
+
+    /* Sparkline */
+    .sparkline {
+      margin-bottom: 16px;
+    }
+
+    .val-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--red);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .val-link:hover { text-decoration: underline; }
+    .val-link svg { width: 13px; height: 13px; }
+
+    /* ─── STATS SECTION ────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.04);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .stat-change {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .stat-change svg { width: 12px; height: 12px; }
+    .stat-change.neutral { color: var(--muted); font-weight: 500; }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" class="nav-brand" style="text-decoration:none;">
+    <div style="width:120px; height:45px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+      <img src="images/Logo.png" style="height:180px; width:auto;" alt="Preos">
+    </div>
+  </a>
+
+  <div class="nav-search">
+    <div class="nav-search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <input type="text" placeholder="Busca por ciudad, dirección o código postal">
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#">Comprar</a></li>
+    <li><a href="#">Vender</a></li>
+    <li><a href="#">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="ingresar.html" class="btn-ingresar">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
+<div class="tabs-bar">
+  <div class="tab active">Panel de propietarios</div>
+  <div class="tab">Mis favoritos</div>
+  <div class="tab">Configuración de mi perfil</div>
+</div>
+
+<!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
+<div class="page-body">
+
+  <!-- PROPERTY CARD -->
+  <div class="property-card">
+
+    <!-- Left: property info -->
+    <div class="prop-left">
+      <div class="prop-thumb">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=75&auto=format&fit=crop" alt="Propiedad">
+      </div>
+      <div class="prop-info">
+        <div class="prop-address">8218 2nd Ave NE</div>
+        <div class="prop-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Avenida Villa España, WA 98136
+        </div>
+        <div class="prop-specs">
+          <div class="prop-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <strong>5</strong> Habitaciones
+          </div>
+          <div class="prop-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
+            <strong>3</strong> Baños
+          </div>
+          <div class="prop-spec">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <strong>3.230</strong> Sq. Ft.
+          </div>
+        </div>
+        <a href="#" class="btn-edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editar datos de mi propiedad
+        </a>
+      </div>
+    </div>
+
+    <!-- Right: valuation -->
+    <div class="prop-right">
+      <div>
+        <div class="val-label">Precio estimado de venta</div>
+        <div class="val-price">€1,01 millones — €1,20 millones</div>
+        <div class="val-gain">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +€785k desde que se vendió en el 2000
+        </div>
+      </div>
+
+      <!-- Sparkline -->
+      <div class="sparkline">
+        <svg width="100%" height="56" viewBox="0 0 300 56" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="spark-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#16a34a" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#16a34a" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 48 C30 44 50 40 80 35 C110 30 130 28 160 22 C190 16 210 14 240 10 C260 7 280 5 300 3" stroke="#16a34a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M0 48 C30 44 50 40 80 35 C110 30 130 28 160 22 C190 16 210 14 240 10 C260 7 280 5 300 3 L300 56 L0 56 Z" fill="url(#spark-grad)"/>
+        </svg>
+      </div>
+
+      <a href="#" class="val-link">
+        Ver detalle de estimación
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- STATS SECTION -->
+  <div class="section-title">Últimos 30 días</div>
+
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-label">Estimación Preos</div>
+      <div class="stat-value">€101 millones</div>
+      <div class="stat-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        +€785k
+      </div>
+      <div class="stat-sub">desde que se vendió</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Actividad de venta</div>
+      <div class="stat-value">14 vendidos</div>
+      <div class="stat-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        102.5% venta a lista
+      </div>
+      <div class="stat-sub">en tu zona este mes</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Precio medio de venta</div>
+      <div class="stat-value">€1.230.000</div>
+      <div class="stat-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        +24% desde el mes pasado
+      </div>
+      <div class="stat-sub">propiedades similares</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Días en el mercado</div>
+      <div class="stat-value">18 días</div>
+      <div class="stat-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        −6 días vs. mes anterior
+      </div>
+      <div class="stat-sub">media en tu zona</div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
