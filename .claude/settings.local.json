@@ -4,7 +4,16 @@
       "Bash(grep -n 'Programar recorrido\\\\|Editar datos' /c/Users/guill/preos-ai/src/frontend/*.html)",
       "Bash(grep -n 'class=\"\"nav-brand\"\"' /c/Users/guill/preos-ai/src/frontend/*.html)",
       "Bash(for f:*)",
-      "Bash(do grep:*)"
+      "Bash(do grep:*)",
+      "Bash(find c:/Users/guill/preos-ai -name *.png -o -name *.jpg -o -name *.svg)",
+      "Bash(sed -i 's|<img src=\"\"Images/logo.png\"\" alt=\"\"Preos\"\" height=\"\"56\"\" style=\"\"filter: brightness\\(0\\) invert\\(1\\);\"\">|<img src=\"\"Images/logo.png\"\" alt=\"\"Preos\"\" style=\"\"height: 32px; width: auto; max-width: 130px; object-fit: contain; object-position: left center; filter: brightness\\(0\\) invert\\(1\\);\"\">|g' c:/Users/guill/preos-ai/src/frontend/index.html)",
+      "Bash(sed -i 's|<img src=\"\"Images/logo.png\"\" alt=\"\"Preos\"\" height=\"\"56\"\">|<img src=\"\"Images/logo.png\"\" alt=\"\"Preos\"\" style=\"\"height: 32px; width: auto; max-width: 130px; object-fit: contain; object-position: left center;\"\">|g' c:/Users/guill/preos-ai/src/frontend/buscar.html c:/Users/guill/preos-ai/src/frontend/propiedad.html c:/Users/guill/preos-ai/src/frontend/ingresar.html c:/Users/guill/preos-ai/src/frontend/dashboard.html c:/Users/guill/preos-ai/src/frontend/favoritos.html c:/Users/guill/preos-ai/src/frontend/perfil.html c:/Users/guill/preos-ai/src/frontend/tour.html c:/Users/guill/preos-ai/src/frontend/editar-propiedad.html)",
+      "Bash(python -:*)",
+      "Bash(node -e \":*)",
+      "Bash(python3 -c \":*)",
+      "Bash(python -c \":*)",
+      "Bash(node -e \"require\\(''''sharp''''\\)\")",
+      "Bash(npm install:*)"
     ]
   }
 }
