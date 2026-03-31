@@ -729,6 +729,169 @@
     .sidebar-phone a { color: var(--text); font-weight: 600; text-decoration: none; }
     .sidebar-phone a:hover { text-decoration: underline; }
 
+    /* ─── MODALS ───────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; animation: mFadeIn .2s; }
+    @keyframes mFadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 460px;
+      position: relative;
+      animation: mSlideUp .25s;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    @keyframes mSlideUp { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: #e5e7eb; }
+
+    .modal-title { font-size: 19px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .modal-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 22px; line-height: 1.6; }
+
+    /* Agent modal */
+    .modal-agent {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px; padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-agent-avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: #fef2f2;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: var(--red);
+      flex-shrink: 0;
+    }
+    .modal-agent-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .modal-agent-role { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .contact-options { display: flex; flex-direction: column; gap: 10px; }
+    .contact-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border); border-radius: 12px;
+      background: none; cursor: pointer; text-align: left;
+      text-decoration: none; color: var(--text);
+      transition: border-color .15s, background .15s;
+    }
+    .contact-btn:hover { border-color: #9ca3af; background: #f9fafb; }
+    .contact-btn-icon { font-size: 22px; }
+    .contact-btn-label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+    .contact-btn-value { font-size: 12px; color: var(--muted); }
+
+    /* Share modal */
+    .share-prop-info {
+      background: #f9fafb; border-radius: 10px;
+      padding: 13px 16px; margin-bottom: 18px;
+    }
+    .share-prop-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .share-prop-price { font-size: 13px; color: var(--red); font-weight: 700; }
+
+    .share-options { display: flex; flex-direction: column; gap: 9px; }
+    .share-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      background: none; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: var(--text);
+      text-decoration: none; transition: background .15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .share-btn:hover { background: #f3f4f6; }
+    .share-btn-icon { font-size: 18px; }
+
+    /* ─── LIGHTBOX ──────────────────────────────────────────────── */
+    .lightbox-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.96);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-overlay.open { display: flex; }
+
+    .lightbox-img-wrap {
+      max-width: min(88vw, 1100px);
+      max-height: 80vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lightbox-img {
+      max-width: 100%; max-height: 80vh;
+      object-fit: contain; border-radius: 6px; display: block;
+    }
+
+    .lightbox-close {
+      position: fixed; top: 18px; right: 22px;
+      background: rgba(255,255,255,.14); border: none; border-radius: 50%;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #fff; font-size: 20px;
+      transition: background .15s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,.24); }
+
+    .lightbox-arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.14); border: none; border-radius: 50%;
+      width: 50px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #fff; font-size: 22px;
+      transition: background .15s;
+    }
+    .lightbox-arrow:hover { background: rgba(255,255,255,.26); }
+    .lightbox-prev { left: 18px; }
+    .lightbox-next { right: 18px; }
+
+    .lightbox-counter {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.85); font-size: 13px; font-weight: 500;
+      background: rgba(0,0,0,.45); padding: 5px 16px; border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* ─── TOAST ──────────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 26px; left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1a1a1a; color: #fff;
+      font-size: 13.5px; font-weight: 500;
+      padding: 10px 22px; border-radius: 999px;
+      z-index: 3000; opacity: 0;
+      transition: opacity .22s, transform .22s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* gallery clickable cursor */
+    .gallery-main, .gallery-side > div { cursor: pointer; }
+
     /* ─── HAMBURGER ────────────────────────────────────────── */
     .hamburger {
       display: none;
@@ -848,12 +1011,12 @@
     <div class="tab" data-tab="4">Escuelas</div>
   </div>
   <div class="tabs-actions">
-    <button class="icon-btn" aria-label="Guardar">
+    <button class="icon-btn" id="btn-favorito" aria-label="Guardar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
     </button>
-    <button class="icon-btn" aria-label="Compartir">
+    <button class="icon-btn" id="btn-compartir" aria-label="Compartir">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
         <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
@@ -888,15 +1051,15 @@
 
   <!-- GALLERY TOOLS -->
   <div class="gallery-tools">
-    <button class="gallery-tool-btn">
+    <button class="gallery-tool-btn" id="btn-3d">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
       Recorrido 3D
     </button>
-    <button class="gallery-tool-btn">
+    <button class="gallery-tool-btn" id="btn-planos">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Planos
     </button>
-    <button class="gallery-tool-btn">
+    <button class="gallery-tool-btn" id="btn-calle">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       Vista de calle
     </button>
@@ -1295,7 +1458,7 @@
         <div class="sidebar-card-title">¿Pensando en vender?</div>
         <div class="sidebar-card-sub">Precio estimado de venta para propiedades similares en esta zona:</div>
         <div class="price-range">€1.350.000 – €1.620.000</div>
-        <a href="#" class="btn-red">Habla con un agente</a>
+        <a href="#" class="btn-red" id="btn-agente-sidebar">Habla con un agente</a>
       </div>
 
       <div class="sidebar-card">
@@ -1330,7 +1493,7 @@
           </label>
         </div>
 
-        <a href="tour.html" class="btn-red">Programar recorrido</a>
+        <button class="btn-red" id="btn-programar">Programar recorrido</button>
         <a href="#" class="btn-outline">Iniciar una oferta</a>
 
         <div class="sidebar-phone">
@@ -1341,6 +1504,110 @@
     </div>
   </div>
 </div>
+
+<!-- ═══ LIGHTBOX ════════════════════════════════════════════════ -->
+<div class="lightbox-overlay" id="lightbox">
+  <button class="lightbox-close" id="lb-close">✕</button>
+  <div class="lightbox-img-wrap">
+    <img class="lightbox-img" id="lb-img" src="" alt="">
+  </div>
+  <button class="lightbox-arrow lightbox-prev" id="lb-prev">&#8592;</button>
+  <button class="lightbox-arrow lightbox-next" id="lb-next">&#8594;</button>
+  <div class="lightbox-counter" id="lb-counter">1 / 1</div>
+</div>
+
+<!-- ═══ MODAL: RECORRIDO 3D ════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-3d">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-3d')">✕</button>
+    <div class="modal-title">Recorrido 3D</div>
+    <div id="modal-3d-content" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: PLANOS ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-planos">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-planos')">✕</button>
+    <div class="modal-title">Planos de la propiedad</div>
+    <div class="modal-sub">Planos no disponibles para esta propiedad. Contacta con el agente para más información.</div>
+    <button class="btn-red" style="width:auto;padding:11px 24px;" onclick="closeModal('modal-planos');openModal('modal-agente');">Contactar agente</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL: HABLA CON UN AGENTE ═════════════════════════════ -->
+<div class="modal-overlay" id="modal-agente">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-agente')">✕</button>
+    <div class="modal-agent">
+      <div class="modal-agent-avatar" id="modal-agent-avatar">A</div>
+      <div>
+        <div class="modal-agent-name" id="modal-agent-name">Agente</div>
+        <div class="modal-agent-role">Agente inmobiliario · Preos</div>
+      </div>
+    </div>
+    <div class="modal-title" style="margin-bottom:16px;">¿Cómo quieres contactar?</div>
+    <div class="contact-options">
+      <a href="tel:+34612345678" class="contact-btn">
+        <span class="contact-btn-icon">📞</span>
+        <div>
+          <div class="contact-btn-label">Llamar</div>
+          <div class="contact-btn-value">+34 612 345 678</div>
+        </div>
+      </a>
+      <a id="contact-whatsapp" href="#" class="contact-btn" target="_blank" rel="noopener">
+        <span class="contact-btn-icon">💬</span>
+        <div>
+          <div class="contact-btn-label">WhatsApp</div>
+          <div class="contact-btn-value">Enviar mensaje</div>
+        </div>
+      </a>
+      <a id="contact-email" href="#" class="contact-btn">
+        <span class="contact-btn-icon">✉️</span>
+        <div>
+          <div class="contact-btn-label">Email</div>
+          <div class="contact-btn-value">agentes@preos.ai</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: COMPARTIR ════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-share">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-share')">✕</button>
+    <div class="modal-title">Compartir propiedad</div>
+    <div class="share-prop-info">
+      <div class="share-prop-title" id="share-prop-title">—</div>
+      <div class="share-prop-price" id="share-prop-price">—</div>
+    </div>
+    <div class="share-options">
+      <button class="share-btn" id="share-copy">
+        <span class="share-btn-icon">🔗</span> Copiar enlace
+      </button>
+      <a class="share-btn" id="share-whatsapp" href="#" target="_blank" rel="noopener">
+        <span class="share-btn-icon">💬</span> Compartir por WhatsApp
+      </a>
+      <a class="share-btn" id="share-email-btn" href="#">
+        <span class="share-btn-icon">✉️</span> Compartir por email
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: TOUR CONFIRMADO ══════════════════════════════════ -->
+<div class="modal-overlay" id="modal-tour-confirm">
+  <div class="modal-card" style="text-align:center;padding:40px 32px;">
+    <button class="modal-close" onclick="closeModal('modal-tour-confirm')">✕</button>
+    <div style="font-size:48px;margin-bottom:16px;">✅</div>
+    <div class="modal-title">¡Recorrido agendado!</div>
+    <div class="modal-sub" id="tour-confirm-text">Te contactaremos para confirmar.</div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
 
 <script src="js/properties.js"></script>
 <script>
@@ -1447,18 +1714,28 @@
     const p  = await getPropertyById(id);
     if (!p) return;
 
-    // Gallery images
+    // Store for interactive features
+    window._currentProp = p;
+    window._lbImages    = p.images;
+
+    // Gallery images + lightbox wiring
     const mainPH = document.querySelector('.gallery-main .img-placeholder');
     if (mainPH) {
       mainPH.style.background = 'none';
       mainPH.innerHTML = `<img src="${p.images[0]}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+      mainPH.addEventListener('click', () => openLightbox(0));
     }
     document.querySelectorAll('.gallery-side .img-placeholder').forEach((ph, i) => {
       ph.style.background = 'none';
       ph.innerHTML = `<img src="${p.images[i + 1] || p.images[0]}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+      const idx = (i + 1 < p.images.length) ? i + 1 : 0;
+      ph.addEventListener('click', () => openLightbox(idx));
     });
     const countBtn = document.querySelector('.gallery-count-btn');
-    if (countBtn) countBtn.lastChild.textContent = ` ${p.images.length} fotos`;
+    if (countBtn) {
+      countBtn.lastChild.textContent = ` ${p.images.length} fotos`;
+      countBtn.addEventListener('click', e => { e.stopPropagation(); openLightbox(0); });
+    }
 
     // Listing header
     document.querySelector('.listing-price').textContent   = formatPrice(p.price);
@@ -1487,7 +1764,15 @@
 
     // Mortgage calculator with real price
     PRICE = p.price;
+    document.getElementById('calc-precio').value = formatPrice(p.price);
     calcMortgage();
+
+    // Restore favorites state
+    const _favIds = JSON.parse(localStorage.getItem('favoritos') || '[]');
+    if (_favIds.includes(id)) {
+      const _fsvg = document.querySelector('#btn-favorito svg');
+      if (_fsvg) { _fsvg.setAttribute('fill', 'var(--red)'); _fsvg.setAttribute('stroke', 'var(--red)'); }
+    }
   })();
 </script>
 
@@ -1495,6 +1780,182 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="js/auth-nav.js"></script>
+
+  <!-- ── Interactive features ──────────────────────────────────── -->
+  <script>
+    // ── Modal helpers ────────────────────────────────────────────
+    function openModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+    }
+    document.querySelectorAll('.modal-overlay').forEach(function(m) {
+      m.addEventListener('click', function(e) {
+        if (e.target === m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+      });
+    });
+
+    // ── Toast ────────────────────────────────────────────────────
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 2500);
+    }
+
+    // ── Lightbox ─────────────────────────────────────────────────
+    var _lbIdx = 0;
+
+    function openLightbox(idx) {
+      var imgs = window._lbImages || [];
+      if (!imgs.length) return;
+      _lbIdx = Math.max(0, Math.min(idx, imgs.length - 1));
+      updateLightbox();
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function updateLightbox() {
+      var imgs = window._lbImages || [];
+      if (!imgs.length) return;
+      document.getElementById('lb-img').src = imgs[_lbIdx];
+      document.getElementById('lb-counter').textContent = (_lbIdx + 1) + ' / ' + imgs.length;
+    }
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('lb-prev').addEventListener('click', function() {
+      var imgs = window._lbImages || [];
+      _lbIdx = (_lbIdx - 1 + imgs.length) % imgs.length;
+      updateLightbox();
+    });
+    document.getElementById('lb-next').addEventListener('click', function() {
+      var imgs = window._lbImages || [];
+      _lbIdx = (_lbIdx + 1) % imgs.length;
+      updateLightbox();
+    });
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+    document.addEventListener('keydown', function(e) {
+      var lb = document.getElementById('lightbox');
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') { closeLightbox(); return; }
+      var imgs = window._lbImages || [];
+      if (e.key === 'ArrowLeft') { _lbIdx = (_lbIdx - 1 + imgs.length) % imgs.length; updateLightbox(); }
+      if (e.key === 'ArrowRight') { _lbIdx = (_lbIdx + 1) % imgs.length; updateLightbox(); }
+    });
+
+    // ── Gallery tool buttons ──────────────────────────────────────
+    document.getElementById('btn-3d').addEventListener('click', function() {
+      var p = window._currentProp;
+      var content = document.getElementById('modal-3d-content');
+      if (p && p.has_3d_tour) {
+        content.innerHTML = '<iframe src="https://www.google.com/maps/embed?pb=!4v1234!6m8!1m7" width="100%" height="320" style="border:0;border-radius:8px;" allowfullscreen loading="lazy"></iframe>';
+      } else {
+        content.innerHTML = '<p style="color:var(--muted);font-size:14px;line-height:1.7;padding:6px 0;">Recorrido 3D no disponible para esta propiedad.</p>';
+      }
+      openModal('modal-3d');
+    });
+
+    document.getElementById('btn-planos').addEventListener('click', function() {
+      openModal('modal-planos');
+    });
+
+    document.getElementById('btn-calle').addEventListener('click', function() {
+      var p = window._currentProp;
+      if (p) {
+        window.open('https://www.google.com/maps/@' + p.lat + ',' + p.lng + ',3a,90y,270h,90t/data=!3m6!1e1', '_blank');
+      }
+    });
+
+    // ── Habla con un agente ────────────────────────────────────────
+    function openAgentModal() {
+      var p = window._currentProp;
+      if (p) {
+        var name = p.agent || 'Agente';
+        document.getElementById('modal-agent-name').textContent = name;
+        document.getElementById('modal-agent-avatar').textContent = name.charAt(0).toUpperCase();
+        document.getElementById('contact-whatsapp').href =
+          'https://wa.me/34612345678?text=' + encodeURIComponent('Hola, estoy interesado en la propiedad ' + p.title);
+        document.getElementById('contact-email').href =
+          'mailto:agentes@preos.ai?subject=' + encodeURIComponent('Consulta sobre ' + p.title);
+      }
+      openModal('modal-agente');
+    }
+    document.getElementById('btn-agente-sidebar').addEventListener('click', function(e) {
+      e.preventDefault();
+      openAgentModal();
+    });
+
+    // ── Favorite ──────────────────────────────────────────────────
+    document.getElementById('btn-favorito').addEventListener('click', function() {
+      var user = (typeof firebase !== 'undefined') ? firebase.auth().currentUser : null;
+      if (!user) { window.location.href = 'ingresar.html'; return; }
+      var id = new URLSearchParams(window.location.search).get('id') || 'prop-001';
+      var favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
+      var svg = document.querySelector('#btn-favorito svg');
+      var idx = favs.indexOf(id);
+      if (idx > -1) {
+        favs.splice(idx, 1);
+        if (svg) { svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); }
+        showToast('Eliminado de favoritos');
+      } else {
+        favs.push(id);
+        if (svg) { svg.setAttribute('fill', 'var(--red)'); svg.setAttribute('stroke', 'var(--red)'); }
+        showToast('Guardado en favoritos ❤');
+      }
+      localStorage.setItem('favoritos', JSON.stringify(favs));
+    });
+
+    // ── Share ─────────────────────────────────────────────────────
+    document.getElementById('btn-compartir').addEventListener('click', function() {
+      var p = window._currentProp;
+      if (p) {
+        document.getElementById('share-prop-title').textContent = p.title;
+        document.getElementById('share-prop-price').textContent = formatPrice(p.price);
+        var url = window.location.href;
+        var text = p.title + ' - ' + formatPrice(p.price);
+        document.getElementById('share-whatsapp').href =
+          'https://wa.me/?text=' + encodeURIComponent(text + '\n' + url);
+        document.getElementById('share-email-btn').href =
+          'mailto:?subject=' + encodeURIComponent(p.title) +
+          '&body=' + encodeURIComponent(text + '\n' + url);
+      }
+      openModal('modal-share');
+    });
+    document.getElementById('share-copy').addEventListener('click', function() {
+      var btn = this;
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        btn.innerHTML = '<span class="share-btn-icon">✅</span> ¡Copiado!';
+        setTimeout(function() {
+          btn.innerHTML = '<span class="share-btn-icon">🔗</span> Copiar enlace';
+        }, 2000);
+      });
+    });
+
+    // ── Programar recorrido ───────────────────────────────────────
+    document.getElementById('btn-programar').addEventListener('click', function(e) {
+      e.preventDefault();
+      var user = (typeof firebase !== 'undefined') ? firebase.auth().currentUser : null;
+      if (!user) { window.location.href = 'ingresar.html'; return; }
+      var sel = document.querySelector('.tour-date.selected');
+      var dateText = '';
+      if (sel) {
+        dateText = sel.querySelector('.tour-date-num').textContent +
+                   ' de ' + sel.querySelector('.tour-date-month').textContent;
+      }
+      document.getElementById('tour-confirm-text').textContent =
+        'Recorrido agendado para el ' + dateText + '. Te contactaremos para confirmar.';
+      openModal('modal-tour-confirm');
+    });
+  </script>
+
   <script>
     const _ham = document.getElementById('hamburger');
     const _menu = document.getElementById('mobile-menu');
