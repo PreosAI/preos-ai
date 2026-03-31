@@ -433,7 +433,7 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="ingresar.html">Vender</a></li>
+    <li><a href="buscar.html?modo=vender">Vender</a></li>
     <li><a href="#">Agentes de bienes raíces</a></li>
   </ul>
 
@@ -473,144 +473,8 @@
 <div class="section-wrap">
   <h2 class="section-title">Propiedades que te recomendamos ver</h2>
 
-  <div class="cards-grid">
-
-    <!-- Card 1 -->
-    <a class="card" href="propiedad.html">
-      <div class="card-img-wrap">
-        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=75&auto=format&fit=crop" alt="Propiedad en Málaga" loading="lazy" />
-        <button class="card-heart" aria-label="Guardar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        <div class="card-badges">
-          <span class="badge badge-nuevo">Nuevo</span>
-          <span class="badge badge-3d">Recorrido 3D</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-price">€ 345.000</div>
-        <div class="card-specs">
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            3 hab.
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
-            2 baños
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">120 m²</div>
-        </div>
-        <div class="card-location">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Málaga Centro, Málaga
-        </div>
-      </div>
-    </a>
-
-    <!-- Card 2 -->
-    <a class="card" href="propiedad.html">
-      <div class="card-img-wrap">
-        <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=75&auto=format&fit=crop" alt="Propiedad en Málaga" loading="lazy" />
-        <button class="card-heart" aria-label="Guardar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        <div class="card-badges">
-          <span class="badge badge-nuevo">Nuevo</span>
-          <span class="badge badge-3d">Recorrido 3D</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-price">€ 520.000</div>
-        <div class="card-specs">
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            4 hab.
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
-            3 baños
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">210 m²</div>
-        </div>
-        <div class="card-location">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Marbella Este, Málaga
-        </div>
-      </div>
-    </a>
-
-    <!-- Card 3 -->
-    <a class="card" href="propiedad.html">
-      <div class="card-img-wrap">
-        <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=75&auto=format&fit=crop" alt="Propiedad en Málaga" loading="lazy" />
-        <button class="card-heart" aria-label="Guardar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        <div class="card-badges">
-          <span class="badge badge-nuevo">Nuevo</span>
-          <span class="badge badge-3d">Recorrido 3D</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-price">€ 278.500</div>
-        <div class="card-specs">
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            2 hab.
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
-            1 baño
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">85 m²</div>
-        </div>
-        <div class="card-location">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Torremolinos, Málaga
-        </div>
-      </div>
-    </a>
-
-    <!-- Card 4 -->
-    <a class="card" href="propiedad.html">
-      <div class="card-img-wrap">
-        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=75&auto=format&fit=crop" alt="Propiedad en Málaga" loading="lazy" />
-        <button class="card-heart" aria-label="Guardar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        <div class="card-badges">
-          <span class="badge badge-nuevo">Nuevo</span>
-          <span class="badge badge-3d">Recorrido 3D</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-price">€ 695.000</div>
-        <div class="card-specs">
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            5 hab.
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>
-            4 baños
-          </div>
-          <div class="card-sep"></div>
-          <div class="card-spec">380 m²</div>
-        </div>
-        <div class="card-location">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Benahavís, Málaga
-        </div>
-      </div>
-    </a>
-
+  <div class="cards-grid" id="featured-grid">
+    <!-- Populated dynamically by js/properties.js -->
   </div>
 </div>
 
@@ -618,12 +482,8 @@
 <footer>
   <div class="footer-grid">
     <div>
-      <a href="#" class="footer-brand">
-        <svg width="30" height="30" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="36" height="36" rx="8" fill="#cc1f1f"/>
-          <path d="M18 8L7 18H10V28H16V22H20V28H26V18H29L18 8Z" fill="white"/>
-        </svg>
-        <span class="footer-brand-text">Pre<span>os</span></span>
+      <a href="index.html" class="footer-brand">
+        <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0) invert(1);">
       </a>
       <p class="footer-desc">La plataforma inmobiliaria más fácil de España. Encuentra, compra y vende propiedades con confianza.</p>
     </div>
@@ -631,10 +491,10 @@
     <div class="footer-col">
       <h4>Explorar</h4>
       <ul>
-        <li><a href="#">Comprar</a></li>
-        <li><a href="#">Alquilar</a></li>
-        <li><a href="#">Obra nueva</a></li>
-        <li><a href="#">Locales comerciales</a></li>
+        <li><a href="buscar.html">Comprar</a></li>
+        <li><a href="buscar.html?tipo=alquiler">Alquilar</a></li>
+        <li><a href="buscar.html?tipo=obra-nueva">Obra nueva</a></li>
+        <li><a href="buscar.html?tipo=local">Locales comerciales</a></li>
       </ul>
     </div>
 
@@ -677,5 +537,43 @@
 </script>
 
   <script src="js/logo-path.js"></script>
+  <script src="js/properties.js"></script>
+  <script>
+    // Render first 4 featured properties
+    (async () => {
+      const SVG_BED  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+      const SVG_BATH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>`;
+      const SVG_PIN  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+      const SVG_HEART = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
+      const props = await getAllProperties();
+      const grid  = document.getElementById('featured-grid');
+      grid.innerHTML = props.slice(0, 4).map(p => {
+        const badges = [
+          p.status === 'new' ? `<span class="badge badge-nuevo">Nuevo</span>` : '',
+          p.has_3d_tour      ? `<span class="badge badge-3d">Recorrido 3D</span>` : '',
+        ].join('');
+        return `
+        <a class="card" href="propiedad.html?id=${p.id}">
+          <div class="card-img-wrap">
+            <img src="${p.images[0]}" alt="${p.title}" loading="lazy" />
+            <button class="card-heart" aria-label="Guardar">${SVG_HEART}</button>
+            <div class="card-badges">${badges}</div>
+          </div>
+          <div class="card-body">
+            <div class="card-price">${formatPrice(p.price)}</div>
+            <div class="card-specs">
+              <div class="card-spec">${SVG_BED} ${p.bedrooms} hab.</div>
+              <div class="card-sep"></div>
+              <div class="card-spec">${SVG_BATH} ${p.bathrooms} baño${p.bathrooms !== 1 ? 's' : ''}</div>
+              <div class="card-sep"></div>
+              <div class="card-spec">${p.size_m2} m²</div>
+            </div>
+            <div class="card-location">${SVG_PIN} ${p.location}</div>
+          </div>
+        </a>`;
+      }).join('');
+    })();
+  </script>
 </body>
 </html>

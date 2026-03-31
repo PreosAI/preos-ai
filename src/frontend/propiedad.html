@@ -1254,6 +1254,7 @@
   </div>
 </div>
 
+<script src="js/properties.js"></script>
 <script>
   // ── Property map ──────────────────────────────────────────────
   const propMap = L.map('prop-map', { zoomControl: true }).setView([36.7213, -4.4214], 15);
@@ -1275,10 +1276,7 @@
     popupAnchor: [0, -38],
   });
 
-  L.marker([36.7213, -4.4214], { icon: propIcon })
-    .addTo(propMap)
-    .bindPopup('<strong>Calle Mayor 14</strong> · €1.489.000')
-    .openPopup();
+  // Marker added dynamically after property data loads
 
   // ── Tab switching ──────────────────────────────────────────────
   document.querySelectorAll('.tab[data-tab]').forEach(tab => {
@@ -1315,7 +1313,7 @@
   });
 
   // ── Mortgage calculator ────────────────────────────────────────
-  const PRICE = 1489000;
+  let PRICE = 1489000;
 
   function fmt(n) {
     return '€' + Math.round(n).toLocaleString('es-ES');
@@ -1354,6 +1352,55 @@
 
   // Initial calculation
   calcMortgage();
+
+  // ── Load property data from URL param ──────────────────────────
+  (async () => {
+    const id = new URLSearchParams(window.location.search).get('id') || 'prop-001';
+    const p  = await getPropertyById(id);
+    if (!p) return;
+
+    // Gallery images
+    const mainPH = document.querySelector('.gallery-main .img-placeholder');
+    if (mainPH) {
+      mainPH.style.background = 'none';
+      mainPH.innerHTML = `<img src="${p.images[0]}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+    }
+    document.querySelectorAll('.gallery-side .img-placeholder').forEach((ph, i) => {
+      ph.style.background = 'none';
+      ph.innerHTML = `<img src="${p.images[i + 1] || p.images[0]}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+    });
+    const countBtn = document.querySelector('.gallery-count-btn');
+    if (countBtn) countBtn.lastChild.textContent = ` ${p.images.length} fotos`;
+
+    // Listing header
+    document.querySelector('.listing-price').textContent   = formatPrice(p.price);
+    document.querySelector('.listing-address').textContent = p.title + ' · ' + p.location;
+
+    // Specs
+    const vals = document.querySelectorAll('.spec-value');
+    if (vals[0]) vals[0].textContent = p.bedrooms;
+    if (vals[1]) vals[1].textContent = p.bathrooms;
+    if (vals[2]) vals[2].textContent = p.size_m2 + ' m²';
+    if (vals[3]) vals[3].textContent = p.year_built || '—';
+
+    // Description
+    const descEl = document.querySelector('#panel-1 .section-text');
+    if (descEl) descEl.textContent = p.description;
+
+    // Page title
+    document.title = p.title + ' — Preos';
+
+    // Map marker
+    propMap.setView([p.lat, p.lng], 15);
+    L.marker([p.lat, p.lng], { icon: propIcon })
+      .addTo(propMap)
+      .bindPopup(`<strong>${p.title}</strong> · ${formatPrice(p.price)}`)
+      .openPopup();
+
+    // Mortgage calculator with real price
+    PRICE = p.price;
+    calcMortgage();
+  })();
 </script>
 
   <script src="js/logo-path.js"></script>
