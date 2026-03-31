@@ -449,6 +449,83 @@
       transition: background .15s;
     }
     .map-popup-link:hover { background: #b01a1a; }
+
+    /* ─── HAMBURGER ────────────────────────────────────────── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all .25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      z-index: 199;
+      padding: 16px 20px 24px;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ─── MOBILE ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      body { overflow: auto; height: auto; }
+      nav { padding: 0 16px; gap: 10px; }
+      .nav-search { max-width: none; }
+      .nav-links { display: none; }
+      .nav-right { display: none; }
+      .hamburger { display: flex; }
+
+      .split-layout {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+        margin-top: calc(var(--nav-h) + var(--filters-h));
+      }
+      .listings-panel {
+        width: 100%;
+        overflow: visible;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .map-panel { display: none; }
+
+      .filters-bar { overflow-x: auto; gap: 6px; padding: 0 12px; }
+      .filters-bar::-webkit-scrollbar { display: none; }
+      .filters-sort { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -475,11 +552,20 @@
   </ul>
 
   <div class="nav-right">
-    <a href="dashboard.html" style="font-size:13px; font-weight:500; color:#1a1a1a; text-decoration:none;">Mi cuenta</a>
-    <a href="ingresar.html" class="btn-ingresar">Ingresar</a>
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px; font-weight:500; color:inherit; text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
     <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
   </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html">Comprar</a>
+  <a href="ingresar.html">Vender</a>
+  <a href="#">Agentes de bienes raíces</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
+</div>
 
 <!-- ═══ FILTERS BAR ══════════════════════════════════════════ -->
 <div class="filters-bar">
@@ -751,5 +837,18 @@
 </script>
 
   <script src="js/logo-path.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/auth-nav.js"></script>
+  <script>
+    const _ham = document.getElementById('hamburger');
+    const _menu = document.getElementById('mobile-menu');
+    if (_ham && _menu) {
+      _ham.addEventListener('click', function() {
+        _ham.classList.toggle('open');
+        _menu.classList.toggle('open');
+      });
+    }
+  </script>
 </body>
 </html>
