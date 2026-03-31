@@ -312,6 +312,134 @@
       transition: background .2s;
     }
     .btn-save:hover { background: var(--red-hover); }
+
+    /* ─── HAMBURGER ────────────────────────────────────────── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      margin-left: auto;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 199;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 15px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .mobile-menu a:hover { color: var(--red); }
+
+    /* ─── TOAST ────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── MODAL ────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 32px;
+      width: 380px;
+      max-width: 90vw;
+    }
+    .modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+    .modal-box p { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-modal-cancel {
+      background: none; border: 1.5px solid var(--border); border-radius: 999px;
+      padding: 9px 22px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
+      color: var(--text); cursor: pointer; transition: background .15s;
+    }
+    .btn-modal-cancel:hover { background: #f3f4f6; }
+    .btn-modal-confirm {
+      background: var(--red); color: #fff; border: none; border-radius: 999px;
+      padding: 9px 22px; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-modal-confirm:hover { background: var(--red-hover); }
+
+    /* ─── FOOTER ───────────────────────────────────────────── */
+    footer {
+      background: #111827;
+      color: #9ca3af;
+      padding: 48px 40px 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+    .footer-desc { font-size: 13.5px; line-height: 1.65; margin-top: 16px; }
+    .footer-col h4 { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a { color: #9ca3af; text-decoration: none; font-size: 13px; transition: color .2s; }
+    .footer-col ul a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #1f2937;
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { color: #9ca3af; text-decoration: none; transition: color .2s; }
+    .footer-bottom-links a:hover { color: #fff; }
+
+    @media (max-width: 768px) {
+      .nav-search, .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-right { margin-left: 0; }
+      .profile-card { flex-direction: column; gap: 24px; }
+      footer { padding: 32px 20px 24px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; gap: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -342,7 +470,17 @@
     <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
     <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
   </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html">Comprar</a>
+  <a href="ingresar.html">Vender</a>
+  <a href="#">Agentes de bienes raíces</a>
+  <a href="ingresar.html">Ingresar</a>
+</div>
 
 <!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
 <div class="tabs-bar">
@@ -417,8 +555,8 @@
         </div>
 
         <div class="form-footer">
-          <button type="button" class="delete-link">Eliminar cuenta</button>
-          <button type="submit" class="btn-save">Actualizar datos</button>
+          <button type="button" class="delete-link" id="btn-delete-account">Eliminar cuenta</button>
+          <button type="submit" class="btn-save" id="btn-save">Actualizar datos</button>
         </div>
       </form>
     </div>
@@ -427,9 +565,139 @@
 
 </div>
 
-  <script src="js/logo-path.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="js/auth-nav.js"></script>
+<!-- ═══ DELETE CONFIRM MODAL ════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal-box">
+    <h3>¿Eliminar cuenta?</h3>
+    <p>Esta acción es permanente. Se eliminarán todos tus datos, propiedades y favoritos. No se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="btn-cancel-delete">Cancelar</button>
+      <button class="btn-modal-confirm" id="btn-confirm-delete">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="index.html" class="text-decoration-none">
+        <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0) invert(1);">
+      </a>
+      <p class="footer-desc">La plataforma inmobiliaria más fácil de España. Encuentra, compra y vende propiedades con confianza.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explorar</h4>
+      <ul>
+        <li><a href="buscar.html">Comprar</a></li>
+        <li><a href="buscar.html?tipo=alquiler">Alquilar</a></li>
+        <li><a href="buscar.html?tipo=obra-nueva">Obra nueva</a></li>
+        <li><a href="buscar.html?tipo=local">Locales comerciales</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <ul>
+        <li><a href="#">Quiénes somos</a></li>
+        <li><a href="#">Agentes</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacidad</a></li>
+        <li><a href="#">Términos de uso</a></li>
+        <li><a href="#">Cookies</a></li>
+        <li><a href="#">Aviso legal</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Todos los derechos reservados.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script>
+  // ── Hamburger ──────────────────────────────────────────────────
+  document.getElementById('hamburger').addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+  });
+
+  // ── Toast ──────────────────────────────────────────────────────
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  // ── Firebase pre-fill ──────────────────────────────────────────
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      var displayName = user.displayName || '';
+      var parts = displayName.split(' ');
+      document.getElementById('primer-nombre').value = parts[0] || '';
+      document.getElementById('apellido').value = parts.slice(1).join(' ') || '';
+      document.getElementById('email').value = user.email || '';
+
+      var avatar = document.querySelector('.profile-avatar img');
+      if (user.photoURL && avatar) {
+        avatar.src = user.photoURL;
+      }
+    }
+  });
+
+  // ── Save ───────────────────────────────────────────────────────
+  document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showToast('Perfil actualizado correctamente');
+  });
+
+  // ── Delete account modal ───────────────────────────────────────
+  document.getElementById('btn-delete-account').addEventListener('click', function() {
+    document.getElementById('modal-delete').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+
+  document.getElementById('btn-cancel-delete').addEventListener('click', function() {
+    document.getElementById('modal-delete').classList.remove('open');
+    document.body.style.overflow = '';
+  });
+
+  document.getElementById('btn-confirm-delete').addEventListener('click', function() {
+    var user = firebase.auth().currentUser;
+    if (user) {
+      user.delete().then(function() {
+        window.location.href = 'index.html';
+      }).catch(function() {
+        document.getElementById('modal-delete').classList.remove('open');
+        document.body.style.overflow = '';
+        showToast('Para eliminar la cuenta, vuelve a iniciar sesión primero.');
+      });
+    } else {
+      window.location.href = 'ingresar.html';
+    }
+  });
+
+  document.getElementById('modal-delete').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+</script>
 </body>
 </html>

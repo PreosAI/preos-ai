@@ -411,6 +411,77 @@
       transition: background .2s;
     }
     .btn-continue:hover { background: var(--red-hover); }
+
+    /* ─── SUCCESS PANEL ────────────────────────────────────── */
+    .success-panel {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      padding: 12px 0;
+    }
+    .success-panel.active { display: flex; }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: #dcfce7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-icon svg { width: 32px; height: 32px; color: #16a34a; }
+    .success-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .success-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    #success-detail {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .btn-volver {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background .2s;
+      margin-top: 8px;
+    }
+    .btn-volver:hover { background: var(--red-hover); }
+
+    /* ─── PROP OVERLAY ─────────────────────────────────────── */
+    .prop-info-overlay {
+      position: absolute;
+      bottom: 28px;
+      left: 28px;
+      right: 28px;
+      color: #fff;
+    }
+    .prop-info-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-shadow: 0 1px 4px rgba(0,0,0,.5);
+    }
+    .prop-info-price {
+      font-size: 15px;
+      font-weight: 600;
+      text-shadow: 0 1px 4px rgba(0,0,0,.5);
+    }
   </style>
 </head>
 <body>
@@ -448,8 +519,12 @@
 
   <!-- LEFT: photo -->
   <div class="split-photo">
-    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80&auto=format&fit=crop" alt="Agente mostrando propiedad">
+    <img id="prop-img" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80&auto=format&fit=crop" alt="Propiedad">
     <div class="split-photo-overlay"></div>
+    <div class="prop-info-overlay">
+      <div class="prop-info-title" id="prop-info-title"></div>
+      <div class="prop-info-price" id="prop-info-price"></div>
+    </div>
   </div>
 
   <!-- RIGHT: wizard -->
@@ -524,8 +599,21 @@
 
         <div class="wizard-footer">
           <button class="btn-back" id="btn-step2-back">Atrás</button>
-          <button class="btn-continue" id="btn-step2-continue">Continuar</button>
+          <button class="btn-continue" id="btn-step2-continue">Confirmar recorrido</button>
         </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="success-panel" id="panel-success">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">¡Recorrido confirmado!</div>
+        <div class="success-desc">
+          Recibirás un correo de confirmación con los detalles.<br>
+          <span id="success-detail"></span>
+        </div>
+        <a id="btn-volver-prop" href="propiedad.html" class="btn-volver">Volver a la propiedad</a>
       </div>
 
     </div>
@@ -636,11 +724,46 @@
       slot.classList.add('selected');
     });
   });
+
+  // ── Step 2 confirm ───────────────────────────────────────────
+  document.getElementById('btn-step2-continue').addEventListener('click', () => {
+    var selDate = selectedDate
+      ? selectedDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
+      : 'la fecha seleccionada';
+    var selSlot = document.querySelector('.time-slot.selected');
+    var selTime = selSlot ? selSlot.textContent.trim() : '';
+    var detail = selDate + (selTime ? ' a las ' + selTime : '');
+    document.getElementById('success-detail').textContent = detail;
+
+    document.getElementById('panel-step2').classList.remove('active');
+    document.getElementById('panel-success').classList.add('active');
+    document.getElementById('step-ind-2').className = 'step done';
+  });
 </script>
 
-  <script src="js/logo-path.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="js/auth-nav.js"></script>
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/properties.js"></script>
+<script>
+  // ── Load property from ?id= ──────────────────────────────────
+  (async function() {
+    var params = new URLSearchParams(window.location.search);
+    var propId = params.get('id');
+    if (!propId) return;
+    try {
+      var p = await getPropertyById(propId);
+      if (!p) return;
+      document.getElementById('prop-img').src = p.images[0];
+      document.getElementById('prop-img').alt = p.title;
+      document.getElementById('prop-info-title').textContent = p.title;
+      document.getElementById('prop-info-price').textContent = formatPrice(p.price);
+      document.title = 'Agenda un recorrido — ' + p.title;
+      // Back link
+      document.getElementById('btn-volver-prop').href = 'propiedad.html?id=' + p.id;
+    } catch(e) {}
+  })();
+</script>
 </body>
 </html>

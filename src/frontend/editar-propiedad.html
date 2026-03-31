@@ -473,6 +473,66 @@
       transition: background .2s;
     }
     .btn-continue:hover { background: var(--red-hover); }
+
+    /* ─── TOAST ────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── FOOTER ───────────────────────────────────────────── */
+    footer {
+      background: #111827;
+      color: #9ca3af;
+      padding: 48px 40px 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+    .footer-desc { font-size: 13.5px; line-height: 1.65; margin-top: 16px; }
+    .footer-col h4 { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a { color: #9ca3af; text-decoration: none; font-size: 13px; transition: color .2s; }
+    .footer-col ul a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #1f2937;
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { color: #9ca3af; text-decoration: none; transition: color .2s; }
+    .footer-bottom-links a:hover { color: #fff; }
+
+    @media (max-width: 768px) {
+      .page-body { padding: 20px 16px 40px; }
+      .tabs-bar { padding: 0 16px; overflow-x: auto; }
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid-3 { grid-template-columns: 1fr 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      footer { padding: 32px 20px 24px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; gap: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -689,12 +749,61 @@
 
     <div class="wizard-footer">
       <button class="btn-back" type="button" id="btn-step2-back">Atrás</button>
-      <button class="btn-continue" type="button">Continuar</button>
+      <button class="btn-continue" type="button" id="btn-step2-save">Guardar cambios</button>
     </div>
 
   </div>
 
 </div>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="index.html" class="text-decoration-none">
+        <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0) invert(1);">
+      </a>
+      <p class="footer-desc">La plataforma inmobiliaria más fácil de España. Encuentra, compra y vende propiedades con confianza.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explorar</h4>
+      <ul>
+        <li><a href="buscar.html">Comprar</a></li>
+        <li><a href="buscar.html?tipo=alquiler">Alquilar</a></li>
+        <li><a href="buscar.html?tipo=obra-nueva">Obra nueva</a></li>
+        <li><a href="buscar.html?tipo=local">Locales comerciales</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <ul>
+        <li><a href="#">Quiénes somos</a></li>
+        <li><a href="#">Agentes</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacidad</a></li>
+        <li><a href="#">Términos de uso</a></li>
+        <li><a href="#">Cookies</a></li>
+        <li><a href="#">Aviso legal</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Todos los derechos reservados.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast"></div>
 
 <script>
   // Step navigation
@@ -735,22 +844,70 @@
     Array.from(this.files).forEach(file => {
       const item = document.createElement('div');
       item.className = 'file-item';
-      item.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <span class="file-item-name">${file.name}</span>
-        <button class="file-item-remove" type="button" aria-label="Eliminar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>`;
+      item.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+        '<span class="file-item-name">' + file.name + '</span>' +
+        '<button class="file-item-remove" type="button" aria-label="Eliminar">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>';
       item.querySelector('.file-item-remove').addEventListener('click', () => item.remove());
       list.appendChild(item);
     });
     this.value = '';
   });
+
+  // Toast
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  // Save button
+  document.getElementById('btn-step2-save').addEventListener('click', function() {
+    showToast('Cambios guardados correctamente');
+  });
 </script>
 
-  <script src="js/logo-path.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="js/auth-nav.js"></script>
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/properties.js"></script>
+<script>
+  // ── Pre-fill from ?id= ────────────────────────────────────────
+  (async function() {
+    var params = new URLSearchParams(window.location.search);
+    var propId = params.get('id');
+    if (!propId) return;
+    try {
+      var p = await getPropertyById(propId);
+      if (!p) return;
+      document.title = 'Editar propiedad — ' + p.title;
+      document.getElementById('dormitorios').value = p.bedrooms || '';
+      document.getElementById('banos').value = p.bathrooms || '';
+      document.getElementById('metros').value = p.size_m2 ? p.size_m2 + ' m\xb2' : '';
+      document.getElementById('anio').value = p.year_built || '';
+
+      // Match tipo select
+      var tipoSel = document.getElementById('tipo');
+      for (var i = 0; i < tipoSel.options.length; i++) {
+        if (tipoSel.options[i].text === p.type) {
+          tipoSel.selectedIndex = i;
+          break;
+        }
+      }
+
+      // Update map address
+      var mapAddr = document.querySelector('.map-address');
+      if (mapAddr) {
+        mapAddr.innerHTML =
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#cc1f1f" stroke-width="2" style="vertical-align:middle; margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+          p.location;
+      }
+    } catch(e) {}
+  })();
+</script>
 </body>
 </html>
