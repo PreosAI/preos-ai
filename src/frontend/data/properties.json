@@ -60,7 +60,7 @@
     "status": "new",
     "has_3d_tour": true,
     "images": [
-      "https://images.unsplash.com/photo-1613490493576-7d897d745a3c?w=800&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Exclusiva mansión en primera línea de playa con acceso directo al mar. Diseño moderno con grandes espacios abiertos, piscina infinita, cine en casa y tecnología domótica integrada en cada habitación.",
@@ -151,7 +151,7 @@
     "has_3d_tour": true,
     "images": [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1613490493576-7d897d745a3c?w=800&q=80&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800"
     ],
     "description": "Magnífica villa en las colinas de Mijas con impresionantes vistas al mar y a la Costa del Sol. Gran parcela con jardín maduro, piscina de sal y amplia terraza para entretenimiento al aire libre.",
     "features": ["Piscina de sal", "Vistas al mar", "Jardín maduro", "Garaje", "Bodega", "Terraza panorámica"],
