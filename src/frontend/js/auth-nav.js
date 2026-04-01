@@ -24,6 +24,29 @@ if (!firebase.apps.length) {
    Ensure a .lang-toggle button exists in .nav-right
    (pages that don't hard-code it in HTML will get one injected)
 ──────────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────
+   Sync auth button / Mi cuenta link colour to match nav link colour.
+   On red-background pages the nav links are white; on white-background
+   pages they are dark. Reading the computed colour of an existing nav
+   link and applying it directly avoids any CSS inheritance gap.
+──────────────────────────────────────────────────────────────────── */
+function _syncAuthButtonColor() {
+  var navLink = document.querySelector('.nav-links a');
+  if (!navLink) return;
+  var color = window.getComputedStyle(navLink).color;
+
+  // Logged-in state: the auth-user-btn button
+  var authBtn = document.querySelector('.auth-user-btn');
+  if (authBtn) authBtn.style.color = color;
+
+  // Logged-out state: the plain Mi cuenta anchor
+  var miCuenta = document.getElementById('nav-mi-cuenta');
+  if (miCuenta && !miCuenta.querySelector('.auth-user-btn')) {
+    var link = miCuenta.querySelector('a');
+    if (link) link.style.color = color;
+  }
+}
+
 function _ensureLangToggle() {
   if (document.querySelector('.lang-toggle')) return; // already in HTML
 
@@ -103,6 +126,9 @@ firebase.auth().onAuthStateChanged(function (user) {
 
   // Re-apply translations now that auth DOM has settled
   if (window.PreosLang) window.PreosLang.init();
+
+  // Sync auth display colour to match nav link colour
+  _syncAuthButtonColor();
 });
 
 /* ─────────────────────────────────────────────────────────────────
@@ -111,4 +137,13 @@ firebase.auth().onAuthStateChanged(function (user) {
 document.addEventListener('DOMContentLoaded', function () {
   _ensureLangToggle();
   if (window.PreosLang) window.PreosLang.init();
+
+  // Re-sync auth colour when nav scroll state changes (e.g. red → white on scroll)
+  var _navEl = document.querySelector('nav');
+  if (_navEl) {
+    new MutationObserver(_syncAuthButtonColor).observe(_navEl, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
 });

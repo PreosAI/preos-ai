@@ -714,26 +714,26 @@
 
   <div class="filter-wrap">
     <button class="filter-btn" id="btn-precio">
-      Precio
+      <span class="filter-label" data-i18n="filter_price">Precio</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
     <div class="filter-dropdown" id="dd-precio">
-      <div class="filter-option selected" data-value="0">Cualquier precio</div>
-      <div class="filter-option" data-value="200000">Hasta €200k</div>
-      <div class="filter-option" data-value="400000">€200k – €400k</div>
-      <div class="filter-option" data-value="700000">€400k – €700k</div>
-      <div class="filter-option" data-value="1000000">€700k – €1M</div>
-      <div class="filter-option" data-value="9999999">Más de €1M</div>
+      <div class="filter-option selected" data-value="0" data-i18n="filter_price_any">Cualquier precio</div>
+      <div class="filter-option" data-value="200000" data-i18n="filter_price_to_200k">Hasta €200k</div>
+      <div class="filter-option" data-value="400000" data-i18n="filter_price_200_400">€200k – €400k</div>
+      <div class="filter-option" data-value="700000" data-i18n="filter_price_400_700">€400k – €700k</div>
+      <div class="filter-option" data-value="1000000" data-i18n="filter_price_700_1m">€700k – €1M</div>
+      <div class="filter-option" data-value="9999999" data-i18n="filter_price_over_1m">Más de €1M</div>
     </div>
   </div>
 
   <div class="filter-wrap">
     <button class="filter-btn" id="btn-hab">
-      Habitaciones
+      <span class="filter-label" data-i18n="filter_rooms">Habitaciones</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
     <div class="filter-dropdown" id="dd-hab">
-      <div class="filter-option selected" data-value="0">Cualquier número</div>
+      <div class="filter-option selected" data-value="0" data-i18n="filter_rooms_any">Cualquier número</div>
       <div class="filter-option" data-value="1">1+</div>
       <div class="filter-option" data-value="2">2+</div>
       <div class="filter-option" data-value="3">3+</div>
@@ -744,30 +744,30 @@
 
   <div class="filter-wrap">
     <button class="filter-btn" id="btn-tipo">
-      Tipo de propiedad
+      <span class="filter-label" data-i18n="filter_type">Tipo de propiedad</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
     <div class="filter-dropdown" id="dd-tipo">
-      <div class="filter-option selected" data-value="todos">Todos</div>
-      <div class="filter-option" data-value="piso">Piso</div>
-      <div class="filter-option" data-value="casa">Casa</div>
-      <div class="filter-option" data-value="villa">Villa</div>
-      <div class="filter-option" data-value="atico">Ático</div>
-      <div class="filter-option" data-value="local">Local</div>
+      <div class="filter-option selected" data-value="todos" data-i18n="filter_tipo_all">Todos</div>
+      <div class="filter-option" data-value="piso" data-i18n="filter_tipo_piso">Piso</div>
+      <div class="filter-option" data-value="casa" data-i18n="filter_tipo_casa">Casa</div>
+      <div class="filter-option" data-value="villa" data-i18n="filter_tipo_villa">Villa</div>
+      <div class="filter-option" data-value="atico" data-i18n="filter_tipo_atico">Ático</div>
+      <div class="filter-option" data-value="local" data-i18n="filter_tipo_local">Local</div>
     </div>
   </div>
 
   <button class="filter-btn" id="btn-mas">
-    Más filtros
+    <span class="filter-label" data-i18n="filter_more">Más filtros</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
   </button>
 
   <div class="filters-sort">
-    <span>Ordenar por:</span>
+    <span data-i18n="sort_label">Ordenar por:</span>
     <select class="sort-select" id="sort-select">
-      <option value="default">Recomendados</option>
-      <option value="asc">Precio: menor a mayor</option>
-      <option value="desc">Precio: mayor a menor</option>
+      <option value="default" data-i18n="sort_recommended">Recomendados</option>
+      <option value="asc" data-i18n="sort_price_asc">Precio: menor a mayor</option>
+      <option value="desc" data-i18n="sort_price_desc">Precio: mayor a menor</option>
     </select>
   </div>
 </div>
@@ -838,6 +838,20 @@
   document.querySelectorAll('.filter-dropdown').forEach(dd => dd.addEventListener('click', e => e.stopPropagation()));
 
   // ── Filter option listeners ───────────────────────────────────
+  function _setFilterLabel(btnId, i18nKey, activeText) {
+    var lbl = document.querySelector('#' + btnId + ' .filter-label');
+    if (!lbl) return;
+    if (activeText === null) {
+      // default state: restore data-i18n so lang.js keeps it translated
+      lbl.setAttribute('data-i18n', i18nKey);
+      lbl.textContent = window.PreosLang ? window.PreosLang.t(i18nKey) : lbl.textContent;
+    } else {
+      // active state: show selected option text, remove data-i18n to prevent override
+      lbl.removeAttribute('data-i18n');
+      lbl.textContent = activeText;
+    }
+  }
+
   document.querySelectorAll('#dd-precio .filter-option').forEach(opt => {
     opt.addEventListener('click', () => {
       document.querySelectorAll('#dd-precio .filter-option').forEach(o => o.classList.remove('selected'));
@@ -845,7 +859,7 @@
       state.precioBand = parseInt(opt.dataset.value);
       const isDefault = state.precioBand === 0;
       document.getElementById('btn-precio').classList.toggle('active', !isDefault);
-      document.getElementById('btn-precio').firstChild.textContent = isDefault ? 'Precio ' : opt.textContent.trim() + ' ';
+      _setFilterLabel('btn-precio', 'filter_price', isDefault ? null : opt.textContent.trim());
       applyFilters(); closeAll();
     });
   });
@@ -857,7 +871,7 @@
       state.beds = parseInt(opt.dataset.value);
       const isDefault = state.beds === 0;
       document.getElementById('btn-hab').classList.toggle('active', !isDefault);
-      document.getElementById('btn-hab').firstChild.textContent = isDefault ? 'Habitaciones ' : opt.textContent.trim() + ' hab. ';
+      _setFilterLabel('btn-hab', 'filter_rooms', isDefault ? null : opt.textContent.trim() + ' hab.');
       applyFilters(); closeAll();
     });
   });
@@ -869,9 +883,25 @@
       state.tipo = opt.dataset.value;
       const isDefault = state.tipo === 'todos';
       document.getElementById('btn-tipo').classList.toggle('active', !isDefault);
-      document.getElementById('btn-tipo').firstChild.textContent = isDefault ? 'Tipo de propiedad ' : opt.textContent.trim() + ' ';
+      _setFilterLabel('btn-tipo', 'filter_type', isDefault ? null : opt.textContent.trim());
       applyFilters(); closeAll();
     });
+  });
+
+  // Re-translate active filter button labels when language is switched
+  document.addEventListener('preos:langchange', function() {
+    if (state.precioBand !== 0) {
+      var selOpt = document.querySelector('#dd-precio .filter-option.selected');
+      if (selOpt) _setFilterLabel('btn-precio', 'filter_price', selOpt.textContent.trim());
+    }
+    if (state.beds !== 0) {
+      var selOpt = document.querySelector('#dd-hab .filter-option.selected');
+      if (selOpt) _setFilterLabel('btn-hab', 'filter_rooms', selOpt.textContent.trim() + ' hab.');
+    }
+    if (state.tipo !== 'todos') {
+      var selOpt = document.querySelector('#dd-tipo .filter-option.selected');
+      if (selOpt) _setFilterLabel('btn-tipo', 'filter_type', selOpt.textContent.trim());
+    }
   });
 
   document.getElementById('sort-select').addEventListener('change', applyFilters);
