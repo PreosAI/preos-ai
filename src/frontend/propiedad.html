@@ -1487,7 +1487,7 @@
         <!-- Step 1: Date pills -->
         <div class="tour-dates" id="tour-date-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
         <div style="text-align:right;margin-bottom:12px;">
-          <a id="btn-more-dates" href="#" style="font-size:12px;color:var(--muted);text-decoration:none;" data-i18n="moreDates">Ver más fechas disponibles →</a>
+          <a id="btn-more-dates" href="#" data-base-href="tour.html?id=" style="font-size:12px;color:var(--muted);text-decoration:none;" data-i18n="moreDates">Ver más fechas disponibles →</a>
         </div>
 
         <!-- Step 2: Time slot pills -->
@@ -1727,16 +1727,6 @@
       })(d);
     }
 
-    // Wire "more dates" link
-    var moreDatesBtn = document.getElementById('btn-more-dates');
-    if (moreDatesBtn) {
-      moreDatesBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        var params = new URLSearchParams(window.location.search);
-        var propId = params.get('id') || '';
-        window.location.href = 'tour.html' + (propId ? '?id=' + encodeURIComponent(propId) : '');
-      });
-    }
   })();
 
   // ── Tour time pills ────────────────────────────────────────────
@@ -1824,7 +1814,13 @@
 
     // Fix "Ver más fechas" href now that we know the property ID
     const moreDatesBtn = document.getElementById('btn-more-dates');
-    if (moreDatesBtn) moreDatesBtn.href = 'tour.html?id=' + p.id;
+    if (moreDatesBtn) {
+      moreDatesBtn.href = 'tour.html?id=' + p.id;
+      moreDatesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'tour.html?id=' + p.id;
+      });
+    }
 
     // Track viewed properties
     const viewed = JSON.parse(localStorage.getItem('preos_viewed') || '[]');

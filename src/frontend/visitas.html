@@ -697,7 +697,7 @@
         btn.textContent = lang === 'en' ? 'Cancel visit' : 'Cancelar visita';
         _pendingCancelId = null;
         showToast(lang === 'en' ? 'Visit cancelled.' : 'Visita cancelada.');
-        loadVisits();
+        if (_currentUid) loadBookings(_currentUid);
       })
       .catch(function(err) {
         console.error(err);
@@ -708,19 +708,19 @@
   });
 
   // ── Auth check + load ─────────────────────────────────────────
+  var _currentUid = null;
+
   firebase.auth().onAuthStateChanged(function(user) {
     if (!user) {
       window.location.href = 'ingresar.html?next=visitas.html';
       return;
     }
-    loadVisits();
+    _currentUid = user.uid;
+    loadBookings(user.uid);
   });
 
-  // ── Load visits ────────────────────────────────────────────────
-  function loadVisits() {
-    var user = firebase.auth().currentUser;
-    if (!user) return;
-
+  // ── Load bookings ──────────────────────────────────────────────
+  function loadBookings(uid) {
     document.getElementById('loading-wrap').style.display = 'block';
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('upcoming-section').style.display = 'none';
@@ -731,8 +731,7 @@
     Promise.all([
       getAllProperties(),
       firebase.firestore().collection('bookings')
-        .where('userId', '==', user.uid)
-        .orderBy('createdAt', 'desc')
+        .where('userId', '==', uid)
         .get()
     ]).then(function(results) {
       var allProps = results[0];
@@ -740,46 +739,58 @@
 
       document.getElementById('loading-wrap').style.display = 'none';
 
-      var bookings = [];
-      snapshot.forEach(function(doc) {
-        bookings.push(Object.assign({ _id: doc.id }, doc.data()));
+      var bookings = snapshot.docs.map(function(doc) {
+        return Object.assign({ id: doc.id }, doc.data());
       });
 
-      if (bookings.length === 0) {
-        document.getElementById('empty-state').style.display = 'flex';
-        return;
-      }
-
-      var today    = new Date().toISOString().slice(0, 10);
-      var upcoming = bookings.filter(function(b) {
-        return b.date >= today && b.status !== 'cancelled' && b.status !== 'completed';
-      });
-      var past = bookings.filter(function(b) {
-        return b.date < today || b.status === 'cancelled' || b.status === 'completed';
+      // Sort newest first in JS — avoids needing a Firestore composite index
+      bookings.sort(function(a, b) {
+        return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
       });
 
-      if (upcoming.length > 0) {
-        document.getElementById('upcoming-section').style.display = 'block';
-        upcoming.forEach(function(b) {
-          document.getElementById('upcoming-list').appendChild(buildCard(b, allProps, true));
-        });
-      }
-
-      if (past.length > 0) {
-        document.getElementById('past-section').style.display = 'block';
-        past.forEach(function(b) {
-          document.getElementById('past-list').appendChild(buildCard(b, allProps, false));
-        });
-      }
-
-      if (upcoming.length === 0 && past.length === 0) {
-        document.getElementById('empty-state').style.display = 'flex';
-      }
+      renderBookings(bookings, allProps);
     }).catch(function(err) {
-      console.error('Visits error:', err);
+      console.error('Firestore error:', err);
       document.getElementById('loading-wrap').style.display = 'none';
       document.getElementById('empty-state').style.display = 'flex';
     });
+  }
+
+  // ── Render all bookings ────────────────────────────────────────
+  function renderBookings(bookings, allProps) {
+    if (!bookings || bookings.length === 0) {
+      document.getElementById('empty-state').style.display = 'flex';
+      return;
+    }
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var todayISO = today.toISOString().slice(0, 10);
+
+    var upcoming = bookings.filter(function(b) {
+      return b.date >= todayISO && b.status !== 'cancelled' && b.status !== 'completed';
+    });
+    var past = bookings.filter(function(b) {
+      return b.date < todayISO || b.status === 'cancelled' || b.status === 'completed';
+    });
+
+    if (upcoming.length > 0) {
+      document.getElementById('upcoming-section').style.display = 'block';
+      upcoming.forEach(function(b) {
+        document.getElementById('upcoming-list').appendChild(buildCard(b, allProps, true));
+      });
+    }
+
+    if (past.length > 0) {
+      document.getElementById('past-section').style.display = 'block';
+      past.forEach(function(b) {
+        document.getElementById('past-list').appendChild(buildCard(b, allProps, false));
+      });
+    }
+
+    if (upcoming.length === 0 && past.length === 0) {
+      document.getElementById('empty-state').style.display = 'flex';
+    }
   }
 
   // ── Build a booking card ───────────────────────────────────────
@@ -787,17 +798,31 @@
     var lang = localStorage.getItem('preos-lang') || 'es';
     var prop = allProps ? allProps.find(function(p) { return p.id === booking.propertyId; }) : null;
 
-    var thumb = prop && prop.images && prop.images[0]
-      ? prop.images[0]
-      : 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200&q=60&auto=format';
-    var title = prop ? (prop.title || prop.location || booking.propertyId) : ('Propiedad #' + booking.propertyId);
+    var thumbHTML = (prop && prop.images && prop.images[0])
+      ? '<img class="visit-thumb" src="' + prop.images[0] + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">' +
+        '<div class="visit-thumb" style="display:none;background:#f0f0f0;"></div>'
+      : '<div class="visit-thumb" style="background:#f0f0f0;"></div>';
 
-    var dateStr = formatDate(booking.date, lang);
+    var propTitle = prop
+      ? ((lang === 'en' && prop.title_en) ? prop.title_en : (prop.title || prop.location || booking.propertyId))
+      : ('Propiedad #' + booking.propertyId);
+
+    // Format date using toLocaleDateString
+    var dateStr = '';
+    if (booking.date) {
+      try {
+        var d = new Date(booking.date + 'T12:00:00');
+        dateStr = d.toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES', {
+          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        });
+        // Capitalise first letter
+        dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      } catch(e) { dateStr = booking.date; }
+    }
+
     var timeStr = booking.time ? ' · ' + booking.time : '';
-
     var badgeClass = 'badge-' + (booking.status || 'pending');
     var badgeText  = getBadgeText(booking.status, lang);
-
     var canAct = booking.status === 'pending' || booking.status === 'confirmed';
 
     var card = document.createElement('div');
@@ -807,38 +832,36 @@
     if (isUpcoming && canAct) {
       actionsHTML =
         '<div class="visit-actions">' +
-          '<button class="btn-action btn-change-date" data-id="' + booking._id + '" data-propid="' + booking.propertyId + '">' +
+          '<button class="btn-action btn-change-date">' +
             (lang === 'en' ? 'Change date' : 'Cambiar fecha') +
           '</button>' +
-          '<button class="btn-action btn-cancel" data-id="' + booking._id + '">' +
+          '<button class="btn-action btn-cancel">' +
             (lang === 'en' ? 'Cancel' : 'Cancelar visita') +
           '</button>' +
         '</div>';
     }
 
     card.innerHTML =
-      '<img class="visit-thumb" src="' + thumb + '" alt="' + title + '" ' +
-        'onerror="this.src=\'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200&q=60&auto=format\'">' +
+      thumbHTML +
       '<div class="visit-info">' +
-        '<a class="visit-title" href="propiedad.html?id=' + booking.propertyId + '">' + title + '</a>' +
+        '<a class="visit-title" href="propiedad.html?id=' + booking.propertyId + '">' + propTitle + '</a>' +
         '<div class="visit-datetime">' + dateStr + timeStr + '</div>' +
         '<span class="visit-badge ' + badgeClass + '">' + badgeText + '</span>' +
       '</div>' +
       actionsHTML;
 
-    // Wire buttons
     var changeBtn = card.querySelector('.btn-change-date');
     if (changeBtn) {
       changeBtn.addEventListener('click', function() {
         window.location.href = 'tour.html?id=' + encodeURIComponent(booking.propertyId) +
-          '&reschedule=' + encodeURIComponent(booking._id);
+          '&reschedule=' + encodeURIComponent(booking.id);
       });
     }
 
     var cancelBtn = card.querySelector('.btn-cancel');
     if (cancelBtn) {
       cancelBtn.addEventListener('click', function() {
-        _pendingCancelId = booking._id;
+        _pendingCancelId = booking.id;
         document.getElementById('modal-cancel').classList.add('open');
         document.body.style.overflow = 'hidden';
       });
