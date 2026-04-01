@@ -194,6 +194,15 @@ window.PreosLang = (function () {
       footer_company: 'EMPRESA',
       footer_legal:   'LEGAL',
 
+      search_placeholder:           'Ciudad, barrio o dirección...',
+      search_results_in:            'propiedades en',
+      search_no_results_title:      'No encontramos propiedades en',
+      search_no_results_sub:        'Prueba con una ciudad cercana o amplía tu búsqueda',
+      search_all_properties:        'Ver todas las propiedades',
+      search_cities_label:          'Ciudades',
+      search_neighbourhoods_label:  'Barrios',
+      search_properties_label:      'Propiedades',
+
       // Backward-compat dotted keys used by data-i18n attributes on existing pages
       'nav.comprar':        'Comprar',
       'nav.vender':         'Vender',
@@ -389,6 +398,15 @@ window.PreosLang = (function () {
       footer_explore: 'EXPLORE',
       footer_company: 'COMPANY',
       footer_legal:   'LEGAL',
+
+      search_placeholder:           'City, neighbourhood or address...',
+      search_results_in:            'properties in',
+      search_no_results_title:      'No properties found in',
+      search_no_results_sub:        'Try a nearby city or broaden your search',
+      search_all_properties:        'See all properties',
+      search_cities_label:          'Cities',
+      search_neighbourhoods_label:  'Neighbourhoods',
+      search_properties_label:      'Properties',
 
       // Backward-compat dotted keys
       'nav.comprar':        'Buy',

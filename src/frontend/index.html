@@ -205,6 +205,61 @@
     .hero-search-btn:hover { background: var(--red-hover); }
     .hero-search-btn svg { width: 22px; height: 22px; }
 
+    /* Hero search suggestions */
+    .hero-search-container { position: relative; width: 100%; max-width: 780px; }
+    .hero-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0 16px 0 24px;
+      height: 56px;
+      font-size: 15px;
+      color: #374151;
+      background: transparent;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    .hero-search-input::placeholder { color: #9ca3af; }
+    .hero-suggestions {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.2);
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .hero-suggestions .suggestions-label {
+      padding: 10px 20px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .hero-suggestions .suggestion-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      height: 48px;
+      cursor: pointer;
+      transition: background .1s;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .hero-suggestions .suggestion-row:hover,
+    .hero-suggestions .suggestion-row.active { background: #FFF5F5; }
+    .hero-suggestions .suggestion-row.active .suggestion-main { color: #E51B27; }
+    .hero-suggestions .suggestion-icon { flex-shrink: 0; color: #E51B27; display:flex; }
+    .hero-suggestions .suggestion-icon.house-icon { color: var(--muted); }
+    .hero-suggestions .suggestion-main { flex: 1; font-weight: 500; }
+    .hero-suggestions .suggestion-main strong { color: #E51B27; }
+    .hero-suggestions .suggestion-secondary { font-size: 13px; color: var(--muted); }
+    .hero-suggestions .all-search { border-top: 1px solid #f3f4f6; color: var(--muted); }
+
     /* ─── PROPERTIES SECTION ───────────────────────────────── */
     .section-wrap {
       background: #fff;
@@ -612,15 +667,21 @@
       <button class="hero-tab" onclick="setTab(this)" data-i18n="hero.vender">Vender</button>
     </div>
 
-    <form class="hero-search" action="buscar.html" method="get" onsubmit="var v=this.querySelector('input').value.trim();window.location=v?'buscar.html?q='+encodeURIComponent(v):'buscar.html';return false;">
-      <input type="text" name="q" placeholder="Busca por ciudad, dirección o código postal" data-i18n-placeholder="hero.search" />
-      <button type="submit" class="hero-search-btn" aria-label="Buscar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7"/>
-          <line x1="16.5" y1="16.5" x2="22" y2="22"/>
-        </svg>
-      </button>
-    </form>
+    <div class="hero-search-container" id="heroSearchContainer">
+      <div class="hero-search">
+        <input type="text" id="heroSearchInput" class="hero-search-input"
+               placeholder="Busca por ciudad, dirección o código postal"
+               data-i18n-placeholder="hero.search"
+               autocomplete="off" spellcheck="false" />
+        <button type="button" class="hero-search-btn" id="heroSearchBtn" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+          </svg>
+        </button>
+      </div>
+      <div class="hero-suggestions" id="heroSuggestions" style="display:none"></div>
+    </div>
   </div>
 </section>
 
@@ -768,6 +829,111 @@
         _menu.classList.toggle('open');
       });
     }
+  </script>
+  <script>
+    // Hero search autocomplete
+    (function() {
+      var inp  = document.getElementById('heroSearchInput');
+      var btn  = document.getElementById('heroSearchBtn');
+      var box  = document.getElementById('heroSuggestions');
+      var _t   = null;
+      var _idx = -1;
+
+      var SVG_PIN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+      var SVG_HOUSE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+
+      function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      function normS(s) { return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+      function boldM(text, q) {
+        var ni = normS(text), nq = normS(q), i = ni.indexOf(nq);
+        if (i === -1) return esc(text);
+        return esc(text.slice(0,i)) + '<strong>' + esc(text.slice(i, i+q.length)) + '</strong>' + esc(text.slice(i+q.length));
+      }
+
+      function navigate(q) {
+        if (q) window.location.href = 'buscar.html?q=' + encodeURIComponent(q);
+        else window.location.href = 'buscar.html';
+      }
+
+      function renderHeroSuggestions(suggs, q) {
+        if (!suggs.length) { box.style.display = 'none'; return; }
+        var html = '';
+        var lastType = null;
+        for (var i = 0; i < suggs.length; i++) {
+          var s = suggs[i];
+          if (s.type === 'all') {
+            html += '<div class="suggestion-row all-search" data-val="' + esc(s.text) + '">'
+              + '<span class="suggestion-icon">' + SVG_PIN + '</span>'
+              + '<span class="suggestion-main">Buscar "<strong>' + esc(s.text) + '</strong>" en toda España</span>'
+              + '</div>';
+            continue;
+          }
+          if (s.type !== lastType) {
+            lastType = s.type;
+            var lbl = s.type === 'city' ? 'Ciudades' : s.type === 'neighbourhood' ? 'Barrios' : 'Propiedades';
+            html += '<div class="suggestions-label">' + lbl + '</div>';
+          }
+          var icon = s.type === 'property'
+            ? '<span class="suggestion-icon house-icon">' + SVG_HOUSE + '</span>'
+            : '<span class="suggestion-icon">' + SVG_PIN + '</span>';
+          html += '<div class="suggestion-row" data-val="' + esc(s.text) + '">'
+            + icon
+            + '<span class="suggestion-main">' + boldM(s.text, q) + '</span>'
+            + (s.secondary ? '<span class="suggestion-secondary">' + esc(s.secondary) + '</span>' : '')
+            + '</div>';
+        }
+        box.innerHTML = html;
+        box.style.display = 'block';
+        _idx = -1;
+
+        box.querySelectorAll('.suggestion-row').forEach(function(row) {
+          row.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            navigate(row.getAttribute('data-val'));
+          });
+        });
+      }
+
+      if (!inp) return;
+
+      inp.addEventListener('input', function() {
+        clearTimeout(_t);
+        var val = inp.value;
+        _t = setTimeout(function() {
+          if (val.trim() && typeof getSuggestions === 'function') {
+            getSuggestions(val).then(function(s) { renderHeroSuggestions(s, val); });
+          } else {
+            box.style.display = 'none';
+          }
+        }, 200);
+      });
+
+      inp.addEventListener('keydown', function(e) {
+        var rows = box.querySelectorAll('.suggestion-row');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          _idx = Math.min(_idx + 1, rows.length - 1);
+          rows.forEach(function(r, i) { r.classList.toggle('active', i === _idx); });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          _idx = Math.max(_idx - 1, -1);
+          rows.forEach(function(r, i) { r.classList.toggle('active', i === _idx); });
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          var val = _idx >= 0 && rows[_idx] ? rows[_idx].getAttribute('data-val') : inp.value;
+          navigate(val);
+        } else if (e.key === 'Escape') {
+          box.style.display = 'none';
+        }
+      });
+
+      btn.addEventListener('click', function() { navigate(inp.value); });
+
+      document.addEventListener('click', function(e) {
+        var c = document.getElementById('heroSearchContainer');
+        if (c && !c.contains(e.target)) box.style.display = 'none';
+      });
+    })();
   </script>
 </body>
 </html>

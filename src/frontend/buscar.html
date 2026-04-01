@@ -78,6 +78,141 @@
     }
     .nav-search-icon svg { width: 15px; height: 15px; display: block; }
 
+    /* ─── AUTOCOMPLETE SEARCH ────────────────────────────────── */
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 480px;
+    }
+    .search-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0 36px 0 40px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+      background: #f9f9f9;
+    }
+    .search-input:focus { border-color: #E51B27; background: #fff; box-shadow: 0 0 0 3px rgba(229,27,39,.08); }
+    .search-input::placeholder { color: var(--muted); }
+    .search-icon-left {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      display: flex;
+    }
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 50%;
+      transition: color .15s, background .15s;
+    }
+    .search-clear:hover { color: var(--text); background: #f3f4f6; }
+    .search-suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .suggestions-label {
+      padding: 8px 16px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .suggestion-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      height: 44px;
+      cursor: pointer;
+      transition: background .1s;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .suggestion-row:hover, .suggestion-row.active { background: #FFF5F5; }
+    .suggestion-row.active .suggestion-main { color: #E51B27; }
+    .suggestion-icon { flex-shrink: 0; width: 16px; height: 16px; color: #E51B27; display: flex; align-items: center; justify-content: center; }
+    .suggestion-icon.house-icon { color: var(--muted); }
+    .suggestion-main { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .suggestion-main strong { color: #E51B27; }
+    .suggestion-secondary { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+    .suggestion-row.all-search { border-top: 1px solid #f3f4f6; color: var(--muted); font-style: italic; }
+    .suggestion-row.all-search .suggestion-main { font-weight: 400; }
+    @media (max-width: 768px) {
+      .suggestion-row { height: 52px; }
+    }
+
+    /* ─── EMPTY STATE ───────────────────────────────────────── */
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .empty-icon { font-size: 40px; line-height: 1; }
+    .empty-title { font-size: 16px; font-weight: 700; color: var(--text); max-width: 320px; }
+    .empty-sub { font-size: 14px; color: var(--muted); max-width: 280px; line-height: 1.6; }
+    .empty-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .empty-chip {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      transition: border-color .15s, color .15s;
+    }
+    .empty-chip:hover { border-color: #E51B27; color: #E51B27; }
+    .empty-all-btn {
+      background: #E51B27;
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+      font-family: 'Inter', sans-serif;
+      transition: opacity .2s;
+    }
+    .empty-all-btn:hover { opacity: .9; }
+
     .nav-links {
       display: flex;
       align-items: center;
@@ -536,13 +671,18 @@
     <img class="site-logo" src="Images/logo.png" alt="Preos" style="height: 36px; width: auto;">
   </a>
 
-  <div class="nav-search">
-    <div class="nav-search-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
+  <div class="search-container" id="searchContainer">
+    <div class="search-input-wrap">
+      <span class="search-icon-left">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      </span>
+      <input type="text" id="searchInput" class="search-input"
+             placeholder="Ciudad, barrio o dirección..."
+             data-i18n-placeholder="search_placeholder"
+             autocomplete="off" spellcheck="false" />
+      <button class="search-clear" id="searchClear" style="display:none" aria-label="Borrar">✕</button>
     </div>
-    <input type="text" value="Málaga" placeholder="Busca por ciudad, dirección o código postal">
+    <div class="search-suggestions" id="searchSuggestions" style="display:none"></div>
   </div>
 
   <ul class="nav-links">
@@ -737,9 +877,11 @@
   document.getElementById('sort-select').addEventListener('change', applyFilters);
 
   // ── Render listings ───────────────────────────────────────────
-  function renderListings(props) {
-    const sortVal = document.getElementById('sort-select').value;
-    const sorted  = [...props].sort((a, b) => {
+  var SVG_PIN_SMALL = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+
+  function renderListings(props, query, sortValOverride) {
+    const sortVal = sortValOverride || document.getElementById('sort-select').value;
+    const sorted = [...props].sort((a, b) => {
       if (sortVal === 'asc')  return a.price - b.price;
       if (sortVal === 'desc') return b.price - a.price;
       return 0;
@@ -747,6 +889,12 @@
 
     const list    = document.querySelector('.listings-list');
     const countEl = document.querySelector('.listings-count');
+
+    if (sorted.length === 0) {
+      list.innerHTML = renderEmptyState(query || '', _allPropsCache || []);
+      if (countEl) countEl.innerHTML = '0 resultados';
+      return;
+    }
 
     list.innerHTML = sorted.map(p => {
       const badges = [
@@ -773,12 +921,15 @@
               <div class="h-card-spec">${p.size_m2} m²</div>
             </div>
           </div>
-          <div class="h-card-meta">${SVG_PIN} ${p.location}</div>
+          <div class="h-card-meta">${SVG_PIN_SMALL} ${p.location}</div>
         </div>
       </a>`;
     }).join('');
 
-    countEl.innerHTML = `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} <span>en Málaga</span>`;
+    const area = query ? (sorted[0].city || query) : 'Málaga';
+    const t = window.PreosLang ? window.PreosLang.strings[localStorage.getItem('preos-lang') || 'es'] : {};
+    const inLabel = (t && t.search_results_in) || 'propiedades en';
+    if (countEl) countEl.innerHTML = `${sorted.length} <span>${inLabel} ${area}</span>`;
   }
 
   // ── Render map markers ────────────────────────────────────────
@@ -798,17 +949,9 @@
   }
 
   // ── Apply filters + sort ──────────────────────────────────────
-  async function applyFilters() {
-    const [priceMin, priceMax] = priceBands[state.precioBand] || [0, Infinity];
-    const filters = {
-      type:        state.tipo !== 'todos' ? (tipoMap[state.tipo] || state.tipo) : 'todos',
-      minPrice:    priceMin,
-      maxPrice:    priceMax === Infinity ? 0 : priceMax,
-      minBedrooms: state.beds,
-    };
-    const results = await searchProperties(filters);
-    renderListings(results);
-    renderMapMarkers(results);
+  function applyFilters() {
+    const query = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
+    runSearch(query);
   }
 
   // ── Leaflet map ───────────────────────────────────────────────
@@ -831,35 +974,242 @@
     popupAnchor: [0, -38],
   });
 
-  // ── Initial load ──────────────────────────────────────────────
-  getAllProperties().then(props => {
-    allProps = props;
-    renderListings(props);
-    renderMapMarkers(props);
+  // ── Search helpers ────────────────────────────────────────────
+  var _debounceTimer = null;
+  var _activeIdx = -1;
 
-    // Pre-fill search from URL ?q= param and filter results
-    var _qParam = new URLSearchParams(window.location.search).get('q');
-    if (_qParam) {
-      var _navInput = document.querySelector('.nav-search input');
-      if (_navInput) _navInput.value = _qParam;
-      var _qLower = _qParam.toLowerCase();
-      var _filtered = props.filter(function(p) {
-        return (p.title && p.title.toLowerCase().indexOf(_qLower) !== -1) ||
-               (p.location && p.location.toLowerCase().indexOf(_qLower) !== -1);
-      });
-      var _show = _filtered.length > 0 ? _filtered : props;
-      renderListings(_show);
-      renderMapMarkers(_show);
-      allProps = _show;
-      var _countEl = document.querySelector('.listings-count');
-      if (_countEl && _filtered.length > 0) {
-        _countEl.innerHTML = _filtered.length + ' resultado' + (_filtered.length !== 1 ? 's' : '') + ' <span>para "' + _qParam + '"</span>';
+  const SVG_PIN_SUGG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  const SVG_HOUSE_SUGG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+
+  function normSearch(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function boldMatch(text, query) {
+    if (!query) return escHtml(text);
+    const ni = normSearch(text);
+    const nq = normSearch(query);
+    const idx = ni.indexOf(nq);
+    if (idx === -1) return escHtml(text);
+    return escHtml(text.slice(0, idx)) +
+           '<strong>' + escHtml(text.slice(idx, idx + query.length)) + '</strong>' +
+           escHtml(text.slice(idx + query.length));
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function renderSuggestions(suggestions, query) {
+    const box = document.getElementById('searchSuggestions');
+    if (!suggestions.length) { box.style.display = 'none'; return; }
+
+    const t = window.PreosLang ? window.PreosLang.strings[localStorage.getItem('preos-lang') || 'es'] : {};
+    const citiesLabel = (t && t.search_cities_label) || 'Ciudades';
+    const nbhdsLabel  = (t && t.search_neighbourhoods_label) || 'Barrios';
+    const propsLabel  = (t && t.search_properties_label) || 'Propiedades';
+
+    let html = '';
+    let lastType = null;
+
+    for (let i = 0; i < suggestions.length; i++) {
+      const s = suggestions[i];
+      if (s.type === 'all') {
+        html += `<div class="suggestion-row all-search" data-idx="${i}" data-value="${escHtml(s.text)}">
+          <span class="suggestion-icon">${SVG_PIN_SUGG}</span>
+          <span class="suggestion-main">Buscar "<strong>${escHtml(s.text)}</strong>" en toda España</span>
+        </div>`;
+        continue;
       }
+      if (s.type !== lastType) {
+        lastType = s.type;
+        const label = s.type === 'city' ? citiesLabel : s.type === 'neighbourhood' ? nbhdsLabel : propsLabel;
+        html += `<div class="suggestions-label">${label}</div>`;
+      }
+      const icon = s.type === 'property'
+        ? `<span class="suggestion-icon house-icon">${SVG_HOUSE_SUGG}</span>`
+        : `<span class="suggestion-icon">${SVG_PIN_SUGG}</span>`;
+      html += `<div class="suggestion-row" data-idx="${i}" data-value="${escHtml(s.text)}">
+        ${icon}
+        <span class="suggestion-main">${boldMatch(s.text, query)}</span>
+        ${s.secondary ? `<span class="suggestion-secondary">${escHtml(s.secondary)}</span>` : ''}
+      </div>`;
+    }
+
+    box.innerHTML = html;
+    box.style.display = 'block';
+    _activeIdx = -1;
+
+    box.querySelectorAll('.suggestion-row').forEach(function(row) {
+      row.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        var val = row.getAttribute('data-value');
+        document.getElementById('searchInput').value = val;
+        hideSuggestions();
+        triggerSearch(val);
+      });
+    });
+  }
+
+  function hideSuggestions() {
+    document.getElementById('searchSuggestions').style.display = 'none';
+    _activeIdx = -1;
+  }
+
+  function triggerSearch(query) {
+    var clr = document.getElementById('searchClear');
+    if (clr) clr.style.display = query ? 'block' : 'none';
+    runSearch(query);
+  }
+
+  function runSearch(query) {
+    const sortVal = document.getElementById('sort-select').value;
+    const [priceMin, priceMax] = priceBands[state.precioBand] || [0, Infinity];
+    const filters = {
+      query:       query || '',
+      type:        state.tipo !== 'todos' ? (tipoMap[state.tipo] || state.tipo) : 'todos',
+      minPrice:    priceMin,
+      maxPrice:    priceMax === Infinity ? 0 : priceMax,
+      minBedrooms: state.beds,
+    };
+    searchProperties(filters).then(function(results) {
+      renderListings(results, query, sortVal);
+      renderMapMarkers(results);
+      allProps = results.length ? results : _allPropsCache;
+      if (results.length > 1) {
+        const lats = results.map(p => p.lat).filter(Boolean);
+        const lngs = results.map(p => p.lng).filter(Boolean);
+        if (lats.length) {
+          const bounds = [
+            [Math.min(...lats) - 0.02, Math.min(...lngs) - 0.02],
+            [Math.max(...lats) + 0.02, Math.max(...lngs) + 0.02]
+          ];
+          map.fitBounds(bounds, { padding: [40, 40] });
+        }
+      } else if (results.length === 1 && results[0].lat) {
+        map.setView([results[0].lat, results[0].lng], 14);
+      }
+    });
+  }
+
+  // ── No-results empty state ────────────────────────────────────
+  function renderEmptyState(query, allPropsForChips) {
+    const t = window.PreosLang ? window.PreosLang.strings[localStorage.getItem('preos-lang') || 'es'] : {};
+    const noTitle = (t.search_no_results_title || 'No encontramos propiedades en') + ' "' + query + '"';
+    const noSub   = t.search_no_results_sub || 'Prueba con una ciudad cercana o amplía tu búsqueda';
+    const allBtn  = t.search_all_properties || 'Ver todas las propiedades';
+
+    // Pick 3 cities with most properties
+    const cityCounts = {};
+    (allPropsForChips || []).forEach(function(p) {
+      if (p.city) cityCounts[p.city] = (cityCounts[p.city] || 0) + 1;
+    });
+    const topCities = Object.entries(cityCounts)
+      .sort((a, b) => b[1] - a[1]).slice(0, 3).map(e => e[0]);
+
+    const chips = topCities.map(c =>
+      `<button class="empty-chip" onclick="document.getElementById('searchInput').value='${c}';triggerSearch('${c}')">${c}</button>`
+    ).join('');
+
+    return `<div class="empty-state">
+      <div class="empty-icon">🏠❓</div>
+      <div class="empty-title">${noTitle}</div>
+      <div class="empty-sub">${noSub}</div>
+      ${chips ? `<div class="empty-chips">${chips}</div>` : ''}
+      <button class="empty-all-btn" onclick="document.getElementById('searchInput').value='';document.getElementById('searchClear').style.display='none';runSearch('')">${allBtn}</button>
+    </div>`;
+  }
+
+  // ── Initial load ──────────────────────────────────────────────
+  var allProps = [];
+  var _allPropsCache = [];
+
+  getAllProperties().then(function(props) {
+    _allPropsCache = props;
+    allProps = props;
+
+    const _qParam = new URLSearchParams(window.location.search).get('q');
+    if (_qParam) {
+      const inp = document.getElementById('searchInput');
+      if (inp) inp.value = _qParam;
+      const clr = document.getElementById('searchClear');
+      if (clr) clr.style.display = 'block';
+      triggerSearch(_qParam);
+    } else {
+      renderListings(props, '', document.getElementById('sort-select').value);
+      renderMapMarkers(props);
     }
   });
 
-  // Store all props for bounds filtering
-  var allProps = [];
+  // ── Search input event wiring ──────────────────────────────────
+  var _searchInput = document.getElementById('searchInput');
+  var _searchClear = document.getElementById('searchClear');
+
+  if (_searchInput) {
+    _searchInput.addEventListener('input', function() {
+      var val = this.value;
+      _searchClear.style.display = val ? 'block' : 'none';
+      clearTimeout(_debounceTimer);
+      _debounceTimer = setTimeout(function() {
+        if (val.trim().length > 0) {
+          getSuggestions(val).then(function(suggs) {
+            renderSuggestions(suggs, val);
+          });
+        } else {
+          hideSuggestions();
+          runSearch('');
+        }
+      }, 200);
+    });
+
+    _searchInput.addEventListener('keydown', function(e) {
+      const box = document.getElementById('searchSuggestions');
+      const rows = box ? box.querySelectorAll('.suggestion-row') : [];
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        _activeIdx = Math.min(_activeIdx + 1, rows.length - 1);
+        rows.forEach(function(r, i) { r.classList.toggle('active', i === _activeIdx); });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        _activeIdx = Math.max(_activeIdx - 1, -1);
+        rows.forEach(function(r, i) { r.classList.toggle('active', i === _activeIdx); });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (_activeIdx >= 0 && rows[_activeIdx]) {
+          var val = rows[_activeIdx].getAttribute('data-value');
+          _searchInput.value = val;
+        }
+        hideSuggestions();
+        triggerSearch(_searchInput.value);
+      } else if (e.key === 'Escape') {
+        hideSuggestions();
+      }
+    });
+
+    _searchInput.addEventListener('focus', function() {
+      if (this.value.trim()) {
+        getSuggestions(this.value).then(function(suggs) {
+          renderSuggestions(suggs, _searchInput.value);
+        });
+      }
+    });
+  }
+
+  if (_searchClear) {
+    _searchClear.addEventListener('click', function() {
+      _searchInput.value = '';
+      _searchClear.style.display = 'none';
+      hideSuggestions();
+      runSearch('');
+    });
+  }
+
+  document.addEventListener('click', function(e) {
+    var container = document.getElementById('searchContainer');
+    if (container && !container.contains(e.target)) {
+      hideSuggestions();
+    }
+  });
 
   // ── Map bounds filter ─────────────────────────────────────────
   map.on('moveend', function() {
@@ -868,7 +1218,9 @@
     var inView = allProps.filter(function(p) {
       return p.lat && p.lng && bounds.contains([p.lat, p.lng]);
     });
-    renderListings(inView.length > 0 ? inView : allProps);
+    if (inView.length > 0 && inView.length < allProps.length) {
+      renderListings(inView, document.getElementById('searchInput').value, document.getElementById('sort-select').value);
+    }
   });
 </script>
 
@@ -887,7 +1239,7 @@
     }
 
     // Save search to localStorage on Enter
-    var _navSearchInput = document.querySelector('.nav-search input');
+    var _navSearchInput = document.getElementById('searchInput');
     if (_navSearchInput) {
       _navSearchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
