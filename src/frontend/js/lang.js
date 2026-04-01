@@ -19,7 +19,7 @@ window.PreosLang = (function () {
       nav_buy:                'Comprar',
       nav_sell:               'Vender',
       nav_agents:             'Agentes de bienes raíces',
-      nav_why:                'Por qué Preos',
+      nav_why:                '¿Por qué Preos?',
       nav_signin:             'Ingresar',
       nav_myaccount:          'Mi cuenta',
       nav_myfavs:             'Mis favoritos',
@@ -37,7 +37,66 @@ window.PreosLang = (function () {
       banner_savings_label:   'de ahorro medio por operación',
       banner_savings_caption: 'Sin comisiones ocultas ni letra pequeña',
 
-      // Why Preos section
+      // Why Preos page — hero
+      why_hero_title: 'El mercado inmobiliario lleva décadas sin cambiar. Nosotros lo cambiamos.',
+      why_hero_sub:   'Agentes asalariados, tecnología transparente, y hasta un 70% menos en comisiones.',
+      why_hero_cta1:  'Ver propiedades',
+      why_hero_cta2:  'Vender con Preos',
+
+      // Why Preos page — savings banner
+      why_savings_stat:    '€17.500',
+      why_savings_label:   'Ahorro medio en una vivienda de €500.000 en Costa del Sol',
+      why_savings_caption: 'Frente a una agencia tradicional con comisión del 6%',
+
+      // Why Preos page — pillars section
+      why_pillars_title:  'Una forma diferente de trabajar',
+      why_p1_title: 'Precio justo',
+      why_p1_desc:  '1,5–2% para propiedades exclusivas Preos. Sin letra pequeña, sin honorarios ocultos.',
+      why_p2_title: 'Transparencia total',
+      why_p2_desc:  'Datos verificados, precios reales y el proceso siempre visible.',
+      why_p3_title: 'Agentes de tu lado',
+      why_p3_desc:  'Nuestros agentes cobran sueldo fijo. Su objetivo es tu satisfacción, no cerrar la venta más rápida.',
+
+      // Why Preos page — comparison table
+      why_compare_title:       'Tradicional vs. Preos',
+      why_compare_aspect:      'Aspecto',
+      why_compare_traditional: 'Agencia tradicional',
+      why_compare_preos:       'Preos',
+      why_row1_aspect:  'Comisión',
+      why_row1_trad:    '5–8% (hasta €40.000)',
+      why_row1_preos:   '1,5–2% exclusivas / ~2,5% co-agencia',
+      why_row2_aspect:  'Incentivo agente',
+      why_row2_trad:    'Cerrar rápido, cobrar más',
+      why_row2_preos:   'Salario fijo + satisfacción',
+      why_row3_aspect:  'Transparencia',
+      why_row3_trad:    'Opaca, sin datos reales',
+      why_row3_preos:   'Precios verificados y visibles',
+      why_row4_aspect:  'Disponibilidad',
+      why_row4_trad:    'Horario limitado',
+      why_row4_preos:   'Chat y llamada 24/7',
+      why_row5_aspect:  'Tecnología',
+      why_row5_trad:    'Webs anticuadas',
+      why_row5_preos:   'Plataforma IA',
+
+      // Why Preos page — calculator
+      why_calc_title:       '¿Cuánto ahorras con Preos?',
+      why_calc_label:       'Precio de la propiedad',
+      why_calc_trad_label:  'Comisión tradicional (6%)',
+      why_calc_preos_label: 'Comisión Preos (1,75%)',
+      why_calc_save_label:  'Tu ahorro',
+
+      // Why Preos page — agents
+      why_agents_title:    'Nuestros agentes',
+      why_agents_sub:      'Profesionales certificados con salario fijo. Trabajan para ti, no para la comisión.',
+      why_agents_badge:    'Salario fijo',
+
+      // Why Preos page — final CTA
+      why_cta_title:    'Empieza hoy. Sin compromiso.',
+      why_cta_sub:      'Explora propiedades, habla con un agente o solicita una valoración gratuita. Sin presión.',
+      why_cta_btn1:     'Ver propiedades',
+      why_cta_btn2:     'Vender',
+
+      // Why Preos section (used on other pages)
       why_eyebrow:  'Por qué Preos',
       why_title:    'Compramos diferente',
       why_subtitle: 'Una plataforma construida desde cero para ponerse del lado del comprador.',
@@ -132,7 +191,66 @@ window.PreosLang = (function () {
       banner_savings_label:   'average savings per transaction',
       banner_savings_caption: 'No hidden fees, no small print',
 
-      // Why Preos section
+      // Why Preos page — hero
+      why_hero_title: "Real estate hasn't changed in decades. We're changing it.",
+      why_hero_sub:   'Salaried agents, transparent technology, and up to 70% less in fees.',
+      why_hero_cta1:  'See properties',
+      why_hero_cta2:  'Sell with Preos',
+
+      // Why Preos page — savings banner
+      why_savings_stat:    '€17,500',
+      why_savings_label:   'Average saving on a €500,000 home in Costa del Sol',
+      why_savings_caption: 'Compared to a traditional agency charging 6%',
+
+      // Why Preos page — pillars section
+      why_pillars_title:  'A different way to work',
+      why_p1_title: 'Fair pricing',
+      why_p1_desc:  '1.5–2% for Preos exclusive listings. No hidden fees, no surprises.',
+      why_p2_title: 'Total transparency',
+      why_p2_desc:  'Verified data, real prices, and your process visible at every step.',
+      why_p3_title: 'Agents on your side',
+      why_p3_desc:  'Our agents earn a fixed salary. Their goal is your satisfaction, not the fastest sale.',
+
+      // Why Preos page — comparison table
+      why_compare_title:       'Traditional vs. Preos',
+      why_compare_aspect:      'Aspect',
+      why_compare_traditional: 'Traditional agency',
+      why_compare_preos:       'Preos',
+      why_row1_aspect:  'Commission',
+      why_row1_trad:    '5–8% (up to €40,000)',
+      why_row1_preos:   '1.5–2% exclusive / ~2.5% co-agency',
+      why_row2_aspect:  'Agent incentive',
+      why_row2_trad:    'Close fast, earn more',
+      why_row2_preos:   'Fixed salary + satisfaction',
+      why_row3_aspect:  'Transparency',
+      why_row3_trad:    'Opaque, no real data',
+      why_row3_preos:   'Verified prices, always visible',
+      why_row4_aspect:  'Availability',
+      why_row4_trad:    'Limited hours',
+      why_row4_preos:   'Chat & call 24/7',
+      why_row5_aspect:  'Technology',
+      why_row5_trad:    'Outdated websites',
+      why_row5_preos:   'AI-powered platform',
+
+      // Why Preos page — calculator
+      why_calc_title:       'How much do you save with Preos?',
+      why_calc_label:       'Property price',
+      why_calc_trad_label:  'Traditional commission (6%)',
+      why_calc_preos_label: 'Preos commission (1.75%)',
+      why_calc_save_label:  'Your saving',
+
+      // Why Preos page — agents
+      why_agents_title:    'Our agents',
+      why_agents_sub:      'Certified professionals on a fixed salary. They work for you, not for a cut.',
+      why_agents_badge:    'Fixed salary',
+
+      // Why Preos page — final CTA
+      why_cta_title:    'Start today. No commitment.',
+      why_cta_sub:      'Browse properties, talk to an agent, or request a free valuation. No pressure.',
+      why_cta_btn1:     'See properties',
+      why_cta_btn2:     'Sell',
+
+      // Why Preos section (used on other pages)
       why_eyebrow:  'Why Preos',
       why_title:    'A smarter way to buy',
       why_subtitle: 'A platform built from the ground up to put the buyer first — always.',
