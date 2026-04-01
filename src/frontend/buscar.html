@@ -1432,7 +1432,7 @@
       <a class="h-card" href="propiedad.html?id=${p.id}"
          data-price="${p.price}" data-beds="${p.bedrooms}" data-tipo="${p.type.toLowerCase()}">
         <div class="h-card-img">
-          <img src="${p.images[0]}" alt="${cardTitle}" loading="lazy">
+          <img src="${(p.images && p.images[0]) || 'Images/logo.png'}" alt="${cardTitle}" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">${SVG_HEART}</button>
           <div class="h-card-badges">${badges}</div>
         </div>
@@ -1799,9 +1799,24 @@
 
     function updateMapToggleVisibility() {
       var btn = document.getElementById('mobileMapToggle');
-      if (btn) btn.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+      if (!btn) return;
+      var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                      || window.navigator.standalone === true;
+      var isNarrow = window.innerWidth <= 900 || screen.width <= 900;
+      var isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+      var shouldShow = isNarrow || (isStandalone && isTouchDevice);
+      btn.style.display = shouldShow ? 'flex' : 'none';
     }
     window.addEventListener('resize', updateMapToggleVisibility);
+    document.addEventListener('DOMContentLoaded', updateMapToggleVisibility);
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(updateMapToggleVisibility, 100);
+      setTimeout(updateMapToggleVisibility, 500);
+      setTimeout(updateMapToggleVisibility, 1000);
+    });
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') updateMapToggleVisibility();
+    });
     updateMapToggleVisibility();
 
     function toggleMobileMap() {
@@ -1866,7 +1881,7 @@
       var props = window._currentResults || [];
       strip.innerHTML = props.map(function(p) {
         var title = lang === 'en' ? (p.title_en || p.title) : p.title;
-        var img = (p.images && p.images[0]) || '';
+        var img = (p.images && p.images[0]) || 'Images/logo.png';
         var price = '€' + Number(p.price).toLocaleString('es-ES');
         var beds = p.bedrooms + (lang === 'en' ? ' bed' : ' hab.');
         var baths = p.bathrooms + (lang === 'en' ? (p.bathrooms === 1 ? ' bath' : ' baths') : (p.bathrooms === 1 ? ' baño' : ' baños'));
