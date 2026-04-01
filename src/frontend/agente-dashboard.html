@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CRM Agente — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-b: #E51B27;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f5f6f8;
+      --nav-h: 64px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ────────────���──────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+    }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+    .btn-ingresar {
+      background: var(--red); color: #fff; border: none; padding: 7px 20px;
+      border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+      text-decoration: none; display: inline-block; white-space: nowrap;
+    }
+    .lang-toggle { font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; user-select: none; }
+
+    /* ── CRM LAYOUT ────────────────────────���───────────────── */
+    .crm-wrap {
+      display: flex;
+      flex: 1;
+      margin-top: var(--nav-h);
+      min-height: calc(100vh - var(--nav-h));
+    }
+
+    /* ── SIDEBAR ───────────────────────────────────────────── */
+    .crm-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: var(--nav-h);
+      height: calc(100vh - var(--nav-h));
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 20px 20px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .crm-nav {
+      padding: 8px 0;
+      flex: 1;
+    }
+
+    .crm-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      border-left: 3px solid transparent;
+      transition: background .12s, color .12s;
+      font-family: 'Inter', sans-serif;
+    }
+    .crm-nav-item:hover { background: #fafafa; }
+    .crm-nav-item.active {
+      color: var(--red-b);
+      background: #fff5f5;
+      border-left-color: var(--red-b);
+      font-weight: 600;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red-b);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 8px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .nav-badge.hidden { display: none; }
+
+    /* ── MAIN ──────────────────────────────���───────────────── */
+    .crm-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .crm-header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .crm-header-title { font-size: 16px; font-weight: 700; }
+    .crm-agent-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .crm-agent-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--red); color: #fff; display: flex; align-items: center;
+      justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+
+    .crm-content {
+      flex: 1;
+      padding: 24px 28px;
+      overflow-y: auto;
+    }
+
+    /* ── SECTIONS ─────────────────────────────────��────────── */
+    .crm-section { display: none; }
+    .crm-section.active { display: block; }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    /* ── LEAD CARDS ────────────────────────────────────────── */
+    .leads-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .lead-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .lead-card.fading { opacity: 0; transition: opacity .3s; }
+
+    .lead-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .lead-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 24px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .lead-field { color: var(--text); }
+    .lead-field strong { color: var(--muted); font-weight: 500; font-size: 11px; display: block; margin-bottom: 1px; }
+    .lead-field a { color: var(--red); text-decoration: none; }
+    .lead-field a:hover { text-decoration: underline; }
+    .lead-field-full { grid-column: span 2; }
+
+    .lead-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .btn-lead {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      transition: background .12s;
+    }
+    .btn-lead:hover { background: #f3f4f6; }
+    .btn-lead-call  { border-color: #93c5fd; color: #1d4ed8; }
+    .btn-lead-call:hover  { background: #eff6ff; }
+    .btn-lead-wa    { border-color: #86efac; color: #15803d; }
+    .btn-lead-wa:hover    { background: #f0fdf4; }
+
+    .lead-card-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .lead-meta-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 5px;
+    }
+
+    .pipeline-select {
+      width: 100%;
+      height: 34px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #fff;
+      cursor: pointer;
+      outline: none;
+    }
+    .pipeline-select:focus { border-color: var(--red); }
+
+    .notes-wrap { position: relative; }
+    .notes-textarea {
+      width: 100%;
+      height: 60px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      resize: vertical;
+      outline: none;
+    }
+    .notes-textarea:focus { border-color: var(--red); }
+    .notes-saved {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      font-size: 11px;
+      color: #15803d;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    /* ── PIPELINE BADGES ────────────────────────��──────────── */
+    .p-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .p-badge-nuevo      { background: #fee2e2; color: #991b1b; }
+    .p-badge-contactado { background: #fef3c7; color: #92400e; }
+    .p-badge-visita     { background: #dbeafe; color: #1e40af; }
+    .p-badge-oferta     { background: #ede9fe; color: #5b21b6; }
+    .p-badge-cerrado    { background: #d1fae5; color: #065f46; }
+    .p-badge-cancelled  { background: #f3f4f6; color: #6b7280; }
+    .lead-time { font-size: 12px; color: var(--muted); }
+
+    /* ── FILTER BAR ────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-btn {
+      padding: 5px 14px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .filter-btn:hover { color: var(--text); border-color: #9ca3af; }
+    .filter-btn.active { background: var(--red-b); color: #fff; border-color: var(--red-b); }
+
+    /* ── PROPERTY CARDS ────────────────────��───────────────── */
+    .prop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .prop-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      transition: box-shadow .15s;
+    }
+    .prop-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+    .prop-card-img { width: 100%; height: 130px; object-fit: cover; background: #f0f0f0; display: block; }
+    .prop-card-body { padding: 12px 14px; }
+    .prop-card-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .prop-card-sub { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .prop-card-stats { display: flex; gap: 10px; font-size: 12px; }
+    .prop-card-price { font-weight: 700; color: var(--text); }
+    .prop-card-leads { color: var(--red); font-weight: 600; }
+
+    /* ── EMPTY STATE ───────────────────────────��───────────── */
+    .crm-empty {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+    }
+    .crm-empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .crm-empty-text { font-size: 15px; font-weight: 600; color: var(--text); }
+    .crm-empty-sub  { font-size: 13px; margin-top: 4px; }
+
+    /* ── SPINNER ─────────────────────────���─────────────────── */
+    .crm-spinner-wrap { text-align: center; padding: 60px 0; }
+    .crm-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeOut { to { opacity: 0; height: 0; padding: 0; margin: 0; overflow: hidden; } }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    footer { background: #111827; color: #9ca3af; padding: 32px 40px 24px; margin-top: auto; }
+    .footer-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+    .footer-bottom-links { display: flex; gap: 16px; }
+    .footer-bottom-links a { color: #9ca3af; text-decoration: none; }
+    .footer-bottom-links a:hover { color: #fff; }
+
+    /* ── MOBILE ─────────────────────���──────────────────────── */
+    @media (max-width: 768px) {
+      .crm-wrap { flex-direction: column; }
+      .crm-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+      }
+      .crm-nav { display: flex; flex-direction: row; padding: 0; overflow-x: auto; }
+      .crm-nav-item { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+      .crm-nav-item.active { border-bottom-color: var(--red-b); border-left-color: transparent; }
+      .sidebar-brand { display: none; }
+      .crm-header { padding: 0 16px; }
+      .crm-content { padding: 16px; }
+      .lead-fields { grid-template-columns: 1fr; }
+      .lead-field-full { grid-column: span 1; }
+      .lead-card-bottom { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════��════════════════════════════ -->
+<nav>
+  <a href="index.html">
+    <img class="site-logo" src="Images/logo.png" alt="Preos" style="height:36px;width:auto;">
+  </a>
+  <div class="nav-right">
+    <span id="nav-mi-cuenta">
+      <a href="ingresar.html" style="font-size:13px;font-weight:500;color:inherit;text-decoration:none;">Mi cuenta</a>
+    </span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+</nav>
+
+<!-- ═══ CRM LAYOUT ════════════════════════���══════════════════ -->
+<div class="crm-wrap">
+
+  <!-- Sidebar -->
+  <aside class="crm-sidebar">
+    <div class="sidebar-brand">CRM AGENTE</div>
+    <nav class="crm-nav">
+      <button class="crm-nav-item active" data-section="leads-nuevos">
+        📥 Leads nuevos
+        <span class="nav-badge hidden" id="badge-nuevos">0</span>
+      </button>
+      <button class="crm-nav-item" data-section="todos">
+        📋 Todos los leads
+        <span class="nav-badge hidden" id="badge-todos">0</span>
+      </button>
+      <button class="crm-nav-item" data-section="propiedades">
+        🏠 Propiedades
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <div class="crm-main">
+
+    <div class="crm-header">
+      <div class="crm-header-title">CRM Agente</div>
+      <div class="crm-agent-info">
+        <div class="crm-agent-avatar" id="agent-avatar">A</div>
+        <span id="agent-name">Agente</span>
+      </div>
+    </div>
+
+    <div class="crm-content">
+
+      <!-- Loading -->
+      <div class="crm-spinner-wrap" id="crm-loading">
+        <div class="crm-spinner"></div>
+        <div style="font-size:13px;color:var(--muted);">Cargando leads...</div>
+      </div>
+
+      <!-- ── Section: Leads nuevos ─────────────────────── -->
+      <div class="crm-section" id="section-leads-nuevos">
+        <div class="section-title">📥 Leads nuevos</div>
+        <div class="section-subtitle" id="subtitle-nuevos">Leads pendientes sin gestionar</div>
+        <div class="leads-list" id="list-nuevos"></div>
+      </div>
+
+      <!-- ── Section: Todos los leads ─────────────────── -->
+      <div class="crm-section" id="section-todos">
+        <div class="section-title">📋 Todos los leads</div>
+        <div class="section-subtitle" id="subtitle-todos">Todos los leads</div>
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-btn active" data-filter="all">Todos</button>
+          <button class="filter-btn" data-filter="nuevo">Nuevo</button>
+          <button class="filter-btn" data-filter="contactado">Contactado</button>
+          <button class="filter-btn" data-filter="visita">Visita</button>
+          <button class="filter-btn" data-filter="oferta">Oferta</button>
+          <button class="filter-btn" data-filter="cerrado">Cerrado</button>
+          <button class="filter-btn" data-filter="cancelled">Cancelado</button>
+        </div>
+        <div class="leads-list" id="list-todos"></div>
+      </div>
+
+      <!-- ── Section: Propiedades ──────────────────────── -->
+      <div class="crm-section" id="section-propiedades">
+        <div class="section-title">🏠 Propiedades</div>
+        <div class="section-subtitle">Propiedades con actividad de leads</div>
+        <div class="prop-grid" id="prop-grid"></div>
+      </div>
+
+    </div><!-- .crm-content -->
+  </div><!-- .crm-main -->
+</div><!-- .crm-wrap -->
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Panel interno — solo para agentes.</span>
+    <div class="footer-bottom-links">
+      <a href="index.html">Inicio</a>
+      <a href="buscar.html">Propiedades</a>
+    </div>
+  </div>
+</footer>
+
+<!--
+  UPDATED FIRESTORE RULES — paste in Firebase Console > Firestore > Rules:
+
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /bookings/{bookingId} {
+        allow create: if true;
+        allow read: if request.auth != null &&
+          (request.auth.uid == resource.data.userId ||
+           request.auth.token.email.matches('.*@preos\\.ai'));
+        allow update: if request.auth != null &&
+          (request.auth.uid == resource.data.userId ||
+           request.auth.token.email.matches('.*@preos\\.ai'));
+        allow delete: if false;
+        // Agent-only: allow listing ALL bookings
+        allow list: if request.auth != null &&
+          request.auth.token.email.matches('.*@preos\\.ai');
+      }
+    }
+  }
+-->
+
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/properties.js"></script>
+<script src="js/lang.js"></script>
+<script>
+  /* ─── State ──────────────────────────────────────────────── */
+  var _allBookings = [];
+  var _allProps    = [];
+  var _currentFilter = 'all';
+
+  /* ─── Access control ───────────────────��─────────────────── */
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'ingresar.html'; return; }
+    if (!user.email || !user.email.endsWith('@preos.ai')) {
+      window.location.href = 'index.html'; return;
+    }
+    initCRM(user);
+  });
+
+  /* ─── Init ───────────────────────────────��───────────────── */
+  function initCRM(user) {
+    // Header agent info
+    var firstName = (user.displayName || user.email).split(' ')[0];
+    document.getElementById('agent-name').textContent = firstName;
+    var avatarEl = document.getElementById('agent-avatar');
+    if (user.photoURL) {
+      avatarEl.innerHTML = '<img src="' + user.photoURL + '" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">';
+    } else {
+      avatarEl.textContent = firstName.charAt(0).toUpperCase();
+    }
+    loadData();
+  }
+
+  /* ─── Load all data ──────────────────────────────────────── */
+  function loadData() {
+    document.getElementById('crm-loading').style.display = 'block';
+    Promise.all([
+      getAllProperties(),
+      firebase.firestore().collection('bookings').get()
+    ]).then(function(results) {
+      _allProps    = results[0];
+      var snap     = results[1];
+      _allBookings = snap.docs.map(function(doc) {
+        return Object.assign({ id: doc.id }, doc.data());
+      });
+      // Sort newest first in JS
+      _allBookings.sort(function(a, b) {
+        return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
+      });
+      document.getElementById('crm-loading').style.display = 'none';
+      updateBadges();
+      renderActiveSection();
+    }).catch(function(err) {
+      console.error('CRM load error:', err);
+      document.getElementById('crm-loading').style.display = 'none';
+      document.getElementById('crm-loading').innerHTML =
+        '<div style="text-align:center;padding:48px;color:var(--muted);">Error cargando datos. Recarga la página.</div>';
+    });
+  }
+
+  /* ─── Sidebar navigation ────────────────────────────���────── */
+  document.querySelectorAll('.crm-nav-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.crm-nav-item').forEach(function(i) { i.classList.remove('active'); });
+      item.classList.add('active');
+      renderActiveSection();
+    });
+  });
+
+  function renderActiveSection() {
+    var active = document.querySelector('.crm-nav-item.active');
+    var section = active ? active.getAttribute('data-section') : 'leads-nuevos';
+    document.querySelectorAll('.crm-section').forEach(function(s) { s.classList.remove('active'); });
+    var el = document.getElementById('section-' + section);
+    if (el) el.classList.add('active');
+    if (section === 'leads-nuevos')  renderLeadsNuevos();
+    else if (section === 'todos')    renderTodos();
+    else if (section === 'propiedades') renderPropiedades();
+  }
+
+  /* ─── Badge counts ────────────────────────────���──────────── */
+  function updateBadges() {
+    var nuevos = _allBookings.filter(function(b) {
+      return b.status === 'pending' && (!b.agentStatus || b.agentStatus === 'nuevo');
+    }).length;
+    var badgeEl = document.getElementById('badge-nuevos');
+    if (nuevos > 0) { badgeEl.textContent = nuevos; badgeEl.classList.remove('hidden'); }
+    else badgeEl.classList.add('hidden');
+
+    var todosEl = document.getElementById('badge-todos');
+    todosEl.textContent = _allBookings.length;
+    if (_allBookings.length > 0) todosEl.classList.remove('hidden');
+
+    // Update global crm badge in navbar too
+    var navBadge = document.getElementById('crm-unread-badge');
+    if (navBadge && nuevos > 0) { navBadge.textContent = nuevos; navBadge.style.display = 'inline-block'; }
+    else if (navBadge) navBadge.style.display = 'none';
+  }
+
+  /* ─── Section: Leads nuevos ────────────────────────��─────── */
+  function renderLeadsNuevos() {
+    var list = document.getElementById('list-nuevos');
+    list.innerHTML = '';
+    var leads = _allBookings.filter(function(b) {
+      return b.status === 'pending' && (!b.agentStatus || b.agentStatus === 'nuevo');
+    });
+    document.getElementById('subtitle-nuevos').textContent =
+      leads.length + ' lead' + (leads.length !== 1 ? 's' : '') + ' pendiente' + (leads.length !== 1 ? 's' : '') + ' sin gestionar';
+    if (leads.length === 0) {
+      list.innerHTML = '<div class="crm-empty"><div class="crm-empty-icon">🎉</div><div class="crm-empty-text">¡Todo al día!</div><div class="crm-empty-sub">No hay leads nuevos pendientes.</div></div>';
+      return;
+    }
+    leads.forEach(function(b) { list.appendChild(buildLeadCard(b, true)); });
+  }
+
+  /* ─── Section: Todos los leads ───────────────────────────── */
+  function renderTodos() {
+    var list = document.getElementById('list-todos');
+    list.innerHTML = '';
+    var filtered = filterBookings(_currentFilter);
+    document.getElementById('subtitle-todos').textContent = _allBookings.length + ' leads en total';
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="crm-empty"><div class="crm-empty-icon">📋</div><div class="crm-empty-text">No hay leads en esta categoría.</div></div>';
+      return;
+    }
+    filtered.forEach(function(b) { list.appendChild(buildLeadCard(b, false)); });
+  }
+
+  function filterBookings(filter) {
+    if (filter === 'all') return _allBookings;
+    if (filter === 'cancelled') return _allBookings.filter(function(b) { return b.status === 'cancelled'; });
+    return _allBookings.filter(function(b) {
+      return (b.agentStatus || 'nuevo') === filter && b.status !== 'cancelled';
+    });
+  }
+
+  // Filter bar
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _currentFilter = btn.getAttribute('data-filter');
+      renderTodos();
+    });
+  });
+
+  /* ─── Section: Propiedades ────────────────────────────────�� */
+  function renderPropiedades() {
+    var grid = document.getElementById('prop-grid');
+    grid.innerHTML = '';
+    _allProps.forEach(function(p) {
+      var leadCount = _allBookings.filter(function(b) { return b.propertyId === p.id; }).length;
+      var card = document.createElement('a');
+      card.href = 'propiedad.html?id=' + p.id;
+      card.target = '_blank';
+      card.className = 'prop-card';
+      var imgSrc = p.images && p.images[0] ? p.images[0] : '';
+      card.innerHTML =
+        (imgSrc ? '<img class="prop-card-img" src="' + imgSrc + '" alt="' + p.title + '">' : '<div class="prop-card-img" style="background:#f0f0f0;"></div>') +
+        '<div class="prop-card-body">' +
+          '<div class="prop-card-title">' + (p.title || p.id) + '</div>' +
+          '<div class="prop-card-sub">' + (p.city || p.location || '') + '</div>' +
+          '<div class="prop-card-stats">' +
+            '<span class="prop-card-price">' + formatPrice(p.price) + '</span>' +
+            (leadCount > 0 ? '<span class="prop-card-leads">· ' + leadCount + ' lead' + (leadCount !== 1 ? 's' : '') + '</span>' : '') +
+          '</div>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+    if (_allProps.length === 0) {
+      grid.innerHTML = '<div class="crm-empty"><div class="crm-empty-text">No hay propiedades cargadas.</div></div>';
+    }
+  }
+
+  /* ─── Build lead card ────────────────────────────────────── */
+  var PIPELINE_LABELS = {
+    nuevo: 'Nuevo', contactado: 'Contactado', visita: 'Visita programada',
+    oferta: 'Oferta enviada', cerrado: 'Cerrado ✓'
+  };
+
+  function buildLeadCard(booking, inNuevosSection) {
+    var prop = _allProps.find(function(p) { return p.id === booking.propertyId; });
+    var propTitle = prop ? (prop.title || prop.location) : booking.propertyId;
+    var propCity  = prop ? (prop.city || prop.location || '') : '';
+
+    // Time ago
+    var timeAgo = '';
+    if (booking.createdAt && booking.createdAt.seconds) {
+      var diffH = Math.floor((Date.now() / 1000 - booking.createdAt.seconds) / 3600);
+      if (diffH < 1)       timeAgo = 'Hace menos de 1 hora';
+      else if (diffH < 24) timeAgo = 'Hace ' + diffH + (diffH === 1 ? ' hora' : ' horas');
+      else { var d = Math.floor(diffH / 24); timeAgo = 'Hace ' + d + (d === 1 ? ' día' : ' días'); }
+    }
+
+    // Visit date
+    var visitStr = '';
+    if (booking.date) {
+      try {
+        var vd = new Date(booking.date + 'T12:00:00');
+        var days = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+        var months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        visitStr = days[vd.getDay()] + ' ' + vd.getDate() + ' ' + months[vd.getMonth()];
+      } catch(e) { visitStr = booking.date; }
+    }
+    if (booking.time) visitStr += (visitStr ? ' · ' : '') + booking.time;
+
+    var agentStatus = booking.agentStatus || 'nuevo';
+    var isCancelled = booking.status === 'cancelled';
+    var badgeClass  = isCancelled ? 'p-badge-cancelled' : ('p-badge-' + agentStatus);
+    var badgeLabel  = isCancelled ? 'Cancelado' : (PIPELINE_LABELS[agentStatus] || agentStatus);
+
+    // Phone for WhatsApp
+    var phoneDigits = (booking.phone || '').replace(/\D/g, '');
+    var waMsg = encodeURIComponent('Hola ' + (booking.name || '') + ', soy agente de Preos y me pongo en contacto por tu solicitud de visita.');
+
+    // Pipeline select
+    var pipelineHTML = '<select class="pipeline-select">';
+    Object.keys(PIPELINE_LABELS).forEach(function(val) {
+      pipelineHTML += '<option value="' + val + '"' + (val === agentStatus ? ' selected' : '') + '>' + PIPELINE_LABELS[val] + '</option>';
+    });
+    pipelineHTML += '</select>';
+
+    var card = document.createElement('div');
+    card.className = 'lead-card';
+    card.setAttribute('data-id', booking.id);
+
+    card.innerHTML =
+      '<div class="lead-card-top">' +
+        '<span class="p-badge ' + badgeClass + '">' + badgeLabel + '</span>' +
+        '<span class="lead-time">' + timeAgo + '</span>' +
+      '</div>' +
+      '<div class="lead-fields">' +
+        '<div class="lead-field"><strong>Nombre</strong>' + (booking.name || '—') + '</div>' +
+        '<div class="lead-field"><strong>Teléfono</strong>' + (booking.phone || '—') + '</div>' +
+        '<div class="lead-field"><strong>Email</strong>' + (booking.userEmail || '—') + '</div>' +
+        '<div class="lead-field"><strong>Fecha visita</strong>' + (visitStr || '—') + '</div>' +
+        '<div class="lead-field lead-field-full"><strong>Propiedad</strong>' +
+          '<a href="propiedad.html?id=' + booking.propertyId + '" target="_blank">' + propTitle + (propCity ? ' — ' + propCity : '') + '</a>' +
+        '</div>' +
+        (booking.message ? '<div class="lead-field lead-field-full"><strong>Mensaje</strong><em>' + booking.message + '</em></div>' : '') +
+      '</div>' +
+      '<div class="lead-card-actions">' +
+        (booking.phone ? '<a href="tel:' + booking.phone + '" class="btn-lead btn-lead-call">📞 Llamar</a>' : '') +
+        (phoneDigits ? '<a href="https://wa.me/' + phoneDigits + '?text=' + waMsg + '" target="_blank" class="btn-lead btn-lead-wa">💬 WhatsApp</a>' : '') +
+        '<a href="propiedad.html?id=' + booking.propertyId + '" target="_blank" class="btn-lead">🏠 Ver propiedad</a>' +
+      '</div>' +
+      (!isCancelled ?
+        '<div class="lead-card-bottom">' +
+          '<div>' +
+            '<div class="lead-meta-label">Pipeline</div>' +
+            pipelineHTML +
+          '</div>' +
+          '<div>' +
+            '<div class="lead-meta-label">Notas</div>' +
+            '<div class="notes-wrap">' +
+              '<textarea class="notes-textarea" placeholder="Notas sobre este lead...">' + (booking.agentNotes || '') + '</textarea>' +
+              '<span class="notes-saved" style="display:none;">Guardado ✓</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      : '');
+
+    // Pipeline change handler
+    if (!isCancelled) {
+      var select = card.querySelector('.pipeline-select');
+      select.addEventListener('change', function() {
+        var newVal = this.value;
+        firebase.firestore().collection('bookings').doc(booking.id).update({
+          agentStatus: newVal,
+          agentUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function() {
+          var b = _allBookings.find(function(x) { return x.id === booking.id; });
+          if (b) b.agentStatus = newVal;
+          updateBadges();
+          // Remove from "leads nuevos" when status moves away from nuevo
+          if (inNuevosSection && newVal !== 'nuevo') {
+            card.classList.add('fading');
+            setTimeout(function() {
+              card.remove();
+              renderLeadsNuevos();
+            }, 300);
+          }
+        }).catch(function(err) { console.error('Pipeline error:', err); });
+      });
+
+      // Notes auto-save on blur
+      var textarea = card.querySelector('.notes-textarea');
+      var savedEl  = card.querySelector('.notes-saved');
+      textarea.addEventListener('blur', function() {
+        var val = this.value;
+        firebase.firestore().collection('bookings').doc(booking.id).update({ agentNotes: val })
+          .then(function() {
+            var b = _allBookings.find(function(x) { return x.id === booking.id; });
+            if (b) b.agentNotes = val;
+            savedEl.style.display = 'inline';
+            setTimeout(function() { savedEl.style.display = 'none'; }, 2000);
+          }).catch(function(err) { console.error('Notes error:', err); });
+      });
+    }
+
+    return card;
+  }
+</script>
+<script src="js/analytics.js"></script>
+</body>
+</html>

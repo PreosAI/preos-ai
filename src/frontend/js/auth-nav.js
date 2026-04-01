@@ -86,16 +86,25 @@ firebase.auth().onAuthStateChanged(function (user) {
     const myVisitsLabel   = window.PreosLang ? window.PreosLang.t('myVisits')        : 'Mis visitas';
     const signOutLabel    = window.PreosLang ? window.PreosLang.t('nav_signout')     : 'Cerrar sesión';
 
+    const isAgent = !!(user.email && user.email.endsWith('@preos.ai'));
+    const agentCrmHTML = isAgent
+      ? `<a href="agente-dashboard.html" id="nav-crm-link" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:13px;color:#cc1f1f;text-decoration:none;white-space:nowrap;font-weight:600;">
+          🔐 CRM Agente
+          <span id="crm-unread-badge" style="display:none;background:#E51B27;color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;margin-left:8px;min-width:18px;text-align:center;"></span>
+        </a>`
+      : '';
+
     miCuenta.innerHTML = `
       <div class="auth-user-menu" style="position:relative;display:inline-block;">
         <button class="auth-user-btn" style="background:none;border:none;cursor:pointer;font-size:13px;font-weight:500;color:inherit;display:flex;align-items:center;gap:4px;padding:0;">
           ${avatarHTML}${firstName}
           <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" style="opacity:.5;margin-left:2px;"><path d="M1 3l4 4 4-4"/></svg>
         </button>
-        <div class="auth-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);min-width:160px;z-index:999;">
+        <div class="auth-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);min-width:180px;z-index:999;">
           <a href="dashboard.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myAccountLabel}</a>
           <a href="favoritos.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myFavsLabel}</a>
           <a href="visitas.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myVisitsLabel}</a>
+          ${agentCrmHTML}
           <hr style="margin:4px 0;border:none;border-top:1px solid #f0f0f0;">
           <button id="btn-cerrar-sesion" style="width:100%;background:none;border:none;cursor:pointer;padding:10px 16px;font-size:13px;color:#cc1f1f;text-align:left;white-space:nowrap;">${signOutLabel}</button>
         </div>
@@ -119,6 +128,9 @@ firebase.auth().onAuthStateChanged(function (user) {
       });
     });
 
+    // Agent: load unread badge count
+    if (isAgent) loadUnreadCount();
+
   } else {
     // Not logged in
     ingresarBtn.style.display = '';
@@ -132,6 +144,25 @@ firebase.auth().onAuthStateChanged(function (user) {
   // Sync auth display colour to match nav link colour
   _syncAuthButtonColor();
 });
+
+/* ─────────────────────────────────────────────────────────────────
+   Agent: unread lead count badge
+──────────────────────────────────────────────────────────────────── */
+function loadUnreadCount() {
+  if (typeof firebase === 'undefined' || typeof firebase.firestore !== 'function') return;
+  firebase.firestore().collection('bookings').get().then(function(snap) {
+    var count = 0;
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      if (d.status === 'pending' && (!d.agentStatus || d.agentStatus === 'nuevo')) count++;
+    });
+    var badge = document.getElementById('crm-unread-badge');
+    if (badge && count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'inline-block';
+    }
+  }).catch(function() {});
+}
 
 /* ─────────────────────────────────────────────────────────────────
    On DOMContentLoaded: inject toggle if needed, init lang
