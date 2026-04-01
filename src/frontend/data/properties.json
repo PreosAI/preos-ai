@@ -13,6 +13,7 @@
     "lng": -5.0518,
     "type": "Villa",
     "status": "new",
+    "obra_nueva": false,
     "has_3d_tour": true,
     "images": [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80&auto=format&fit=crop",
@@ -20,7 +21,7 @@
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Espectacular villa de lujo con vistas panorámicas al mar Mediterráneo y a la montaña. Amplia piscina privada, jardín tropical y garaje para tres vehículos. Acabados de alta calidad en toda la propiedad con materiales importados y domótica integrada.",
-    "features": ["Piscina", "Garaje triple", "Jardín", "Aire acondicionado", "Seguridad 24h", "Terraza", "Domótica"],
+    "features": ["pool", "garage", "garden", "terrace", "air_conditioning", "sea_views", "home_automation"],
     "agent": "Carlos López",
     "listed_date": "2026-03-01",
     "year_built": 2019
@@ -39,13 +40,14 @@
     "lng": -4.4214,
     "type": "Apartamento",
     "status": "new",
+    "obra_nueva": false,
     "has_3d_tour": false,
     "images": [
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Precioso piso en el corazón de Málaga, a pocos pasos de la Calle Larios y el Museo Picasso. Amplio salón con luz natural, cocina moderna totalmente equipada y terraza con vistas a la ciudad histórica.",
-    "features": ["Terraza", "Aire acondicionado", "Ascensor", "Portero automático", "Cocina equipada"],
+    "features": ["terrace", "air_conditioning", "elevator"],
     "agent": "Ana Martínez",
     "listed_date": "2026-02-15",
     "year_built": 2005
@@ -64,13 +66,14 @@
     "lng": -4.8857,
     "type": "Villa",
     "status": "new",
+    "obra_nueva": true,
     "has_3d_tour": true,
     "images": [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Exclusiva mansión en primera línea de playa con acceso directo al mar. Diseño moderno con grandes espacios abiertos, piscina infinita, cine en casa y tecnología domótica integrada en cada habitación.",
-    "features": ["Piscina infinita", "Primera línea playa", "Garaje", "Domótica", "Cine en casa", "Jacuzzi", "Bodega"],
+    "features": ["pool", "beachfront", "garage", "home_automation", "sea_views", "air_conditioning"],
     "agent": "Roberto Fernández",
     "listed_date": "2026-01-10",
     "year_built": 2021
@@ -89,12 +92,13 @@
     "lng": -4.4997,
     "type": "Apartamento",
     "status": null,
+    "obra_nueva": false,
     "has_3d_tour": false,
     "images": [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Acogedor apartamento a 200 metros de la playa de La Carihuela. Ideal como primera vivienda o inversión turística con alta rentabilidad. Comunidad con piscina y jardines cuidados.",
-    "features": ["Piscina comunitaria", "A 200m playa", "Terraza", "Parking", "Ascensor"],
+    "features": ["pool", "terrace", "elevator", "sea_views"],
     "agent": "Laura Gómez",
     "listed_date": "2026-02-28",
     "year_built": 1998
@@ -113,13 +117,14 @@
     "lng": -5.1456,
     "type": "Adosado",
     "status": null,
+    "obra_nueva": false,
     "has_3d_tour": true,
     "images": [
       "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Elegante adosado en exclusiva urbanización privada con seguridad 24 horas. Amplio jardín privado, garaje doble y piscina comunitaria. A 5 minutos de las mejores playas de la Costa del Sol.",
-    "features": ["Jardín privado", "Garaje doble", "Piscina comunitaria", "Seguridad 24h", "Aire acondicionado"],
+    "features": ["garden", "garage", "pool", "air_conditioning"],
     "agent": "Miguel Ruiz",
     "listed_date": "2026-03-05",
     "year_built": 2015
@@ -138,12 +143,13 @@
     "lng": -3.8726,
     "type": "Apartamento",
     "status": "new",
+    "obra_nueva": false,
     "has_3d_tour": false,
     "images": [
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Encantador apartamento a pocos pasos del Balcón de Europa. Terraza con vistas al mar, cocina renovada y baños modernos. El lugar perfecto para disfrutar de la Costa del Sol oriental.",
-    "features": ["Terraza con vistas", "A 5 min playa", "Renovado", "Aire acondicionado", "Ascensor"],
+    "features": ["terrace", "air_conditioning", "elevator", "sea_views"],
     "agent": "Sofía Herrera",
     "listed_date": "2026-02-20",
     "year_built": 2002
@@ -162,13 +168,14 @@
     "lng": -4.6375,
     "type": "Villa",
     "status": null,
+    "obra_nueva": false,
     "has_3d_tour": true,
     "images": [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800"
     ],
     "description": "Magnífica villa en las colinas de Mijas con impresionantes vistas al mar y a la Costa del Sol. Gran parcela con jardín maduro, piscina de sal y amplia terraza para entretenimiento al aire libre.",
-    "features": ["Piscina de sal", "Vistas al mar", "Jardín maduro", "Garaje", "Bodega", "Terraza panorámica"],
+    "features": ["pool", "sea_views", "garden", "garage", "terrace"],
     "agent": "Carlos López",
     "listed_date": "2026-01-25",
     "year_built": 2012
@@ -185,12 +192,13 @@
     "lng": -4.5159,
     "type": "Apartamento",
     "status": null,
+    "obra_nueva": false,
     "has_3d_tour": false,
     "images": [
       "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Luminoso apartamento en primera línea de playa con vistas directas al Mediterráneo. Acceso a piscina comunitaria y paseo marítimo. Excelente oportunidad de inversión con alta rentabilidad turística.",
-    "features": ["Primera línea playa", "Piscina comunitaria", "Vistas al mar", "Terraza", "Parking"],
+    "features": ["beachfront", "pool", "sea_views", "terrace"],
     "agent": "Ana Martínez",
     "listed_date": "2026-03-10",
     "year_built": 2000
@@ -209,12 +217,13 @@
     "lng": -4.6225,
     "type": "Adosado",
     "status": null,
+    "obra_nueva": false,
     "has_3d_tour": false,
     "images": [
       "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Fantástica casa adosada en tranquila urbanización con piscina comunitaria. Planta baja con jardín privado, tres dormitorios y dos baños completos. A 10 minutos a pie de la playa y el centro comercial.",
-    "features": ["Jardín privado", "Piscina comunitaria", "Garaje", "Cerca de la playa", "Aire acondicionado"],
+    "features": ["garden", "pool", "garage", "air_conditioning"],
     "agent": "Miguel Ruiz",
     "listed_date": "2026-02-05",
     "year_built": 2008
@@ -231,12 +240,13 @@
     "lng": -5.1629,
     "type": "Villa",
     "status": null,
+    "obra_nueva": false,
     "has_3d_tour": true,
     "images": [
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Impresionante cortijo andaluz completamente restaurado con materiales de alta calidad, respetando el estilo tradicional. Vistas espectaculares a la sierra y al famoso Tajo de Ronda. Amplia finca con olivares y huerto.",
-    "features": ["Finca con olivares", "Piscina", "Vistas al Tajo", "Cortijo histórico", "Huerto", "Bodega"],
+    "features": ["pool", "garden", "sea_views"],
     "agent": "Roberto Fernández",
     "listed_date": "2026-02-12",
     "year_built": 1890

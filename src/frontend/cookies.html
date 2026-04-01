@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Cookies — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #cc1f1f;
+      --red-brand: #E51B27;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 64px;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: #fff; }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      height: var(--nav-h); display: flex; align-items: center;
+      padding: 0 32px; gap: 16px;
+    }
+    .navbar-brand { flex-shrink: 0; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; margin-left: auto; }
+    .nav-links a { text-decoration: none; font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; transition: color .2s; }
+    .nav-links a:hover { color: var(--red); }
+    .nav-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+    .btn-ingresar { background: var(--red); color: #fff; border: none; padding: 7px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; white-space: nowrap; transition: background .2s; }
+    .btn-ingresar:hover { background: #b01a1a; }
+    .lang-toggle { font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; user-select: none; white-space: nowrap; }
+    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; margin-left: auto; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
+    .mobile-menu { display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--border); z-index: 199; padding: 16px 20px 24px; flex-direction: column; gap: 4px; box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .legal-page { max-width: 800px; margin: 0 auto; padding: calc(var(--nav-h) + 48px) 24px 64px; }
+    .legal-page h1 { font-size: 32px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .legal-page .subtitle { font-size: 15px; color: var(--muted); margin-bottom: 32px; }
+    .toc { background: #f9f9f9; border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 40px; }
+    .toc h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 12px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--red-brand); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .toc a:hover { text-decoration: underline; }
+    .legal-section { margin-bottom: 40px; }
+    .legal-section h2 { font-size: 16px; font-weight: 700; color: var(--red-brand); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--red-brand); }
+    .legal-section p, .legal-section li { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 8px; }
+    .legal-section ul, .legal-section ol { padding-left: 20px; }
+    .legal-section a { color: var(--red-brand); }
+    .cookie-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .cookie-table th { background: #f3f4f6; color: var(--text); font-weight: 600; text-align: left; padding: 10px 12px; border: 1px solid var(--border); }
+    .cookie-table td { padding: 10px 12px; border: 1px solid var(--border); vertical-align: top; }
+    .legal-note { background: #fff8f8; border: 1px solid #fecaca; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: var(--muted); margin-top: 40px; }
+    footer { background: #1a1a1a; color: #f3f4f6; padding: 48px 40px 24px; margin-top: 64px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+    .footer-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+    .footer-col a { color: #d1d5db; text-decoration: none; font-size: 13px; transition: color .2s; }
+    .footer-col a:hover { color: #fff; }
+    .footer-desc { font-size: 13px; color: #9ca3af; margin-top: 8px; line-height: 1.6; }
+    .footer-bottom { border-top: 1px solid #374151; padding-top: 20px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #6b7280; flex-wrap: wrap; gap: 8px; }
+    .footer-bottom-links { display: flex; gap: 16px; }
+    .footer-bottom-links a { color: #6b7280; text-decoration: none; transition: color .2s; }
+    .footer-bottom-links a:hover { color: #d1d5db; }
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links, .nav-right { display: none; }
+      .hamburger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .cookie-table { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="navbar-brand" href="index.html">
+    <img class="site-logo" src="Images/logo.png" alt="Preos" style="height: 36px; width: auto;">
+  </a>
+  <ul class="nav-links">
+    <li><a href="buscar.html" data-i18n="nav_buy">Comprar</a></li>
+    <li><a href="vender.html" data-i18n="nav_sell">Vender</a></li>
+    <li><a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a></li>
+    <li><a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px; font-weight:500; color:inherit; text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle">ES&nbsp;|&nbsp;EN</div>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html">Comprar</a>
+  <a href="vender.html">Vender</a>
+  <a href="agentes.html">Agentes Preos</a>
+  <a href="por-que-preos.html">¿Por qué Preos?</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
+</div>
+
+<div class="legal-page">
+  <h1>Política de Cookies</h1>
+  <p class="subtitle">Última actualización: enero 2026</p>
+
+  <div class="toc">
+    <h2>Índice</h2>
+    <ol>
+      <li><a href="#que-son">¿Qué son las cookies?</a></li>
+      <li><a href="#cookies-usamos">Cookies que utilizamos</a></li>
+      <li><a href="#gestion">Gestión de cookies</a></li>
+      <li><a href="#consentimiento">Consentimiento</a></li>
+      <li><a href="#actualizacion">Última actualización</a></li>
+    </ol>
+  </div>
+
+  <div class="legal-section" id="que-son">
+    <h2>1. ¿Qué son las cookies?</h2>
+    <p>Las cookies son pequeños archivos de texto que los sitios web almacenan en el dispositivo del usuario al visitar una página. Permiten que el sitio recuerde información sobre su visita (como preferencias de idioma o el estado de la sesión), lo que puede facilitar su próxima visita y hacer que el sitio le resulte más útil.</p>
+  </div>
+
+  <div class="legal-section" id="cookies-usamos">
+    <h2>2. Cookies que utilizamos</h2>
+    <p>Actualmente, Preos utiliza exclusivamente cookies de carácter funcional y de sesión, necesarias para el correcto funcionamiento de la plataforma. No utilizamos cookies publicitarias.</p>
+
+    <table class="cookie-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Proveedor</th>
+          <th>Finalidad</th>
+          <th>Tipo</th>
+          <th>Consentimiento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Firebase Auth Session</td>
+          <td>Google Firebase</td>
+          <td>Gestión de la sesión de autenticación del usuario</td>
+          <td>Sesión / funcional</td>
+          <td>No requerido (necesario para el servicio)</td>
+        </tr>
+        <tr>
+          <td>preos-lang</td>
+          <td>Preos</td>
+          <td>Almacenar la preferencia de idioma del usuario (ES/EN)</td>
+          <td>Persistente / funcional</td>
+          <td>No requerido (preferencia del usuario)</td>
+        </tr>
+        <tr>
+          <td>preos_last_search</td>
+          <td>Preos</td>
+          <td>Recordar la última búsqueda realizada por el usuario</td>
+          <td>Persistente / funcional</td>
+          <td>No requerido (mejora de experiencia)</td>
+        </tr>
+        <tr>
+          <td>Cookies de analítica (futuras)</td>
+          <td>Por determinar</td>
+          <td>Análisis de uso de la plataforma para su mejora</td>
+          <td>Analítica</td>
+          <td>Requerido (opt-in previo)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:12px;">En este momento, <strong>Preos no utiliza ninguna cookie publicitaria</strong> ni comparte datos con redes de publicidad.</p>
+  </div>
+
+  <div class="legal-section" id="gestion">
+    <h2>3. Gestión de cookies</h2>
+    <p>Puede configurar su navegador para bloquear o eliminar cookies en cualquier momento. Tenga en cuenta que desactivar las cookies funcionales puede afectar al funcionamiento de algunas partes de la plataforma.</p>
+
+    <p><strong>Instrucciones por navegador:</strong></p>
+    <ul>
+      <li><strong>Google Chrome:</strong> Configuración → Privacidad y seguridad → Cookies y otros datos de sitios.</li>
+      <li><strong>Mozilla Firefox:</strong> Opciones → Privacidad y seguridad → Cookies y datos del sitio.</li>
+      <li><strong>Safari (macOS / iOS):</strong> Preferencias → Privacidad → Gestionar datos del sitio web.</li>
+      <li><strong>Microsoft Edge:</strong> Configuración → Privacidad, búsqueda y servicios → Cookies y permisos del sitio.</li>
+    </ul>
+  </div>
+
+  <div class="legal-section" id="consentimiento">
+    <h2>4. Consentimiento</h2>
+    <p>Las cookies funcionales son <strong>estrictamente necesarias</strong> para el funcionamiento del servicio y no requieren consentimiento previo conforme al artículo 22.2 de la Ley 34/2002 de Servicios de la Sociedad de la Información (LSSI-CE).</p>
+    <p>Cuando en el futuro Preos implemente cookies de analítica u otras cookies no esenciales, le solicitaremos su consentimiento explícito mediante un banner o panel de preferencias de cookies antes de activarlas.</p>
+  </div>
+
+  <div class="legal-section" id="actualizacion">
+    <h2>5. Última actualización</h2>
+    <p>Esta Política de Cookies fue actualizada por última vez en <strong>enero de 2026</strong>. Cualquier cambio sustancial será comunicado a los usuarios con antelación suficiente.</p>
+  </div>
+
+  <div class="legal-note">
+    Este documento es vinculante en su versión en español.
+  </div>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <img src="Images/logo.png" alt="Preos" style="height:32px; filter:brightness(0) invert(1); margin-bottom:12px;">
+      <p class="footer-desc">La plataforma inmobiliaria más fácil de España.</p>
+    </div>
+    <div class="footer-col">
+      <h4>EXPLORAR</h4>
+      <ul>
+        <li><a href="buscar.html">Comprar</a></li>
+        <li><a href="vender.html">Vender</a></li>
+        <li><a href="agentes.html">Agentes Preos</a></li>
+        <li><a href="por-que-preos.html">¿Por qué Preos?</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>EMPRESA</h4>
+      <ul>
+        <li><a href="#">Quiénes somos</a></li>
+        <li><a href="agentes.html">Agentes</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>LEGAL</h4>
+      <ul>
+        <li><a href="privacidad.html">Privacidad</a></li>
+        <li><a href="terminos.html">Términos de uso</a></li>
+        <li><a href="cookies.html">Cookies</a></li>
+        <li><a href="aviso-legal.html">Aviso legal</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Todos los derechos reservados.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/lang.js"></script>
+<script>
+  const _ham = document.getElementById('hamburger');
+  const _menu = document.getElementById('mobile-menu');
+  if (_ham && _menu) {
+    _ham.addEventListener('click', function() {
+      _ham.classList.toggle('open');
+      _menu.classList.toggle('open');
+    });
+  }
+</script>
+</body>
+</html>

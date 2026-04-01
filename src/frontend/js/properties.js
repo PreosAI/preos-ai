@@ -46,13 +46,34 @@ function scoreProperty(p, query) {
 
 async function searchProperties(filters = {}) {
   const props = await getAllProperties();
-  const { query, type, minPrice, maxPrice, minBedrooms } = filters;
+  const {
+    query, type, minPrice, maxPrice, minBedrooms,
+    minSize, maxSize, features, has3dTour, status,
+    yearBuiltMin, yearBuiltMax, bathrooms
+  } = filters;
 
   let results = props.filter(p => {
     if (type && type !== 'todos' && p.type.toLowerCase() !== type.toLowerCase()) return false;
     if (minPrice && p.price < minPrice) return false;
     if (maxPrice && maxPrice > 0 && p.price > maxPrice) return false;
     if (minBedrooms && minBedrooms > 0 && p.bedrooms < minBedrooms) return false;
+    if (bathrooms && bathrooms > 0 && (p.bathrooms || 0) < bathrooms) return false;
+    if (minSize && minSize > 0 && (p.size_m2 || 0) < minSize) return false;
+    if (maxSize && maxSize > 0 && (p.size_m2 || 0) > maxSize) return false;
+    if (has3dTour) { if (!p.has_3d_tour) return false; }
+    if (status && status !== 'all') {
+      if (status === 'obra_nueva' && !p.obra_nueva) return false;
+      if (status === 'resale' && (p.obra_nueva || p.status === 'bank')) return false;
+      if (status === 'bank' && p.status !== 'bank') return false;
+    }
+    if (yearBuiltMin && yearBuiltMin > 0 && (p.year_built || 0) < yearBuiltMin) return false;
+    if (yearBuiltMax && yearBuiltMax > 0 && (p.year_built || 9999) > yearBuiltMax) return false;
+    if (features && features.length > 0) {
+      const pFeats = p.features || [];
+      for (const f of features) {
+        if (!pFeats.includes(f)) return false;
+      }
+    }
     return true;
   });
 

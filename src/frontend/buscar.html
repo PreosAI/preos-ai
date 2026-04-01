@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Propiedades en Málaga — Preos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -276,6 +278,108 @@
       align-items: center;
       padding: 0 24px;
       gap: 8px;
+    }
+
+    /* ─── EXPANDED FILTERS PANEL ───────────────────────────── */
+    .filters-expanded {
+      display: none;
+      position: fixed;
+      top: calc(var(--nav-h) + var(--filters-h));
+      left: 0; right: 0;
+      z-index: 189;
+      background: #fafafa;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease;
+    }
+    .filters-expanded.open {
+      display: block;
+      max-height: 600px;
+    }
+    .filters-expanded-inner {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      padding: 24px 24px 0;
+    }
+    .filter-group-title {
+      color: #E51B27;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .filter-more-badge {
+      background: #E51B27;
+      color: white;
+      border-radius: 999px;
+      font-size: 11px;
+      padding: 1px 6px;
+      margin-left: 4px;
+    }
+    .filter-apply-btn {
+      background: #E51B27;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      transition: opacity .2s;
+    }
+    .filter-apply-btn:hover { opacity: .88; }
+    .filter-clear-btn {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 10px 16px;
+      text-decoration: underline;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+    }
+    .filter-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .filter-checkbox-row input[type="checkbox"] { cursor: pointer; accent-color: #E51B27; }
+    .filters-expanded-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 20px;
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .filter-select-sm {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #fff;
+      cursor: pointer;
+      outline: none;
+    }
+    .filter-size-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-size-row span { font-size: 12px; color: var(--muted); }
+    /* Expanded panel shifts split-layout when open */
+    .split-layout.panel-open {
+      margin-top: calc(var(--nav-h) + var(--filters-h) + var(--expanded-h, 0px));
+      height: calc(100vh - var(--nav-h) - var(--filters-h) - var(--expanded-h, 0px));
     }
 
     .filter-wrap {
@@ -660,6 +764,9 @@
       .filters-bar { overflow-x: auto; gap: 6px; padding: 0 12px; }
       .filters-bar::-webkit-scrollbar { display: none; }
       .filters-sort { display: none; }
+
+      .filters-expanded-inner { grid-template-columns: 1fr; gap: 16px; }
+      .filter-size-row { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -688,7 +795,7 @@
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
     <li><a href="vender.html">Vender</a></li>
-    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
+    <li><a href="agentes.html">Agentes Preos</a></li>
     <li><a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a></li>
   </ul>
 
@@ -704,7 +811,7 @@
 <div class="mobile-menu" id="mobile-menu">
   <a href="buscar.html">Comprar</a>
   <a href="vender.html">Vender</a>
-  <a href="agentes.html">Agentes de bienes raíces</a>
+  <a href="agentes.html">Agentes Preos</a>
   <a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a>
   <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
 </div>
@@ -712,7 +819,7 @@
 <!-- ═══ FILTERS BAR ══════════════════════════════════════════ -->
 <div class="filters-bar">
 
-  <div class="filter-wrap">
+  <div class="filter-wrap" id="wrap-precio">
     <button class="filter-btn" id="btn-precio">
       <span class="filter-label" data-i18n="filter_price">Precio</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -724,10 +831,15 @@
       <div class="filter-option" data-value="700000" data-i18n="filter_price_400_700">€400k – €700k</div>
       <div class="filter-option" data-value="1000000" data-i18n="filter_price_700_1m">€700k – €1M</div>
       <div class="filter-option" data-value="9999999" data-i18n="filter_price_over_1m">Más de €1M</div>
+      <div style="padding:10px 16px 12px; border-top:1px solid var(--border); display:flex; gap:8px; align-items:center;">
+        <input type="number" id="price-custom-min" placeholder="Min €" style="width:90px;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+        <span style="color:var(--muted);font-size:12px;">–</span>
+        <input type="number" id="price-custom-max" placeholder="Max €" style="width:90px;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+      </div>
     </div>
   </div>
 
-  <div class="filter-wrap">
+  <div class="filter-wrap" id="wrap-hab">
     <button class="filter-btn" id="btn-hab">
       <span class="filter-label" data-i18n="filter_rooms">Habitaciones</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -742,7 +854,7 @@
     </div>
   </div>
 
-  <div class="filter-wrap">
+  <div class="filter-wrap" id="wrap-tipo">
     <button class="filter-btn" id="btn-tipo">
       <span class="filter-label" data-i18n="filter_type">Tipo de propiedad</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -759,6 +871,7 @@
 
   <button class="filter-btn" id="btn-mas">
     <span class="filter-label" data-i18n="filter_more">Más filtros</span>
+    <span class="filter-more-badge" id="more-filters-badge" style="display:none">0</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
   </button>
 
@@ -772,8 +885,102 @@
   </div>
 </div>
 
+<!-- ═══ EXPANDED FILTERS PANEL ════════════════════════════════ -->
+<div class="filters-expanded" id="filters-expanded">
+  <div class="filters-expanded-inner">
+
+    <!-- Bathrooms -->
+    <div>
+      <div class="filter-group-title" data-i18n="filter_bathrooms">Baños</div>
+      <select class="filter-select-sm" id="exp-bathrooms">
+        <option value="0" data-i18n="filter_baths_any">Cualquier número</option>
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+        <option value="4">4+</option>
+      </select>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <div class="filter-group-title" data-i18n="filter_status">Estado</div>
+      <select class="filter-select-sm" id="exp-status">
+        <option value="all" data-i18n="filter_status_all">Todos</option>
+        <option value="obra_nueva" data-i18n="filter_status_nueva">Obra nueva</option>
+        <option value="resale" data-i18n="filter_status_resale">Segunda mano</option>
+        <option value="bank" data-i18n="filter_status_bank">Banco</option>
+      </select>
+    </div>
+
+    <!-- Size m² -->
+    <div>
+      <div class="filter-group-title" data-i18n="filter_size">Superficie (m²)</div>
+      <div class="filter-size-row">
+        <select class="filter-select-sm" id="exp-size-min">
+          <option value="0" data-i18n="filter_size_any">Sin límite</option>
+          <option value="50">50 m²</option>
+          <option value="75">75 m²</option>
+          <option value="100">100 m²</option>
+          <option value="150">150 m²</option>
+          <option value="200">200 m²</option>
+          <option value="300">300 m²</option>
+        </select>
+        <span>–</span>
+        <select class="filter-select-sm" id="exp-size-max">
+          <option value="0" data-i18n="filter_size_any">Sin límite</option>
+          <option value="100">100 m²</option>
+          <option value="150">150 m²</option>
+          <option value="200">200 m²</option>
+          <option value="300">300 m²</option>
+          <option value="500">500 m²</option>
+          <option value="1000">1000 m²</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Year built -->
+    <div>
+      <div class="filter-group-title" data-i18n="filter_year_built">Año de construcción</div>
+      <select class="filter-select-sm" id="exp-year">
+        <option value="any" data-i18n="filter_year_any">Cualquier año</option>
+        <option value="before_2000" data-i18n="filter_year_before_2000">Antes de 2000</option>
+        <option value="2000_2010" data-i18n="filter_year_2000_2010">2000–2010</option>
+        <option value="2010_2020" data-i18n="filter_year_2010_2020">2010–2020</option>
+        <option value="after_2020" data-i18n="filter_year_after_2020">Después de 2020</option>
+      </select>
+    </div>
+
+    <!-- Features -->
+    <div>
+      <div class="filter-group-title" data-i18n="filter_features">Características</div>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="pool"> <span data-i18n="feat_pool">Piscina</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="garage"> <span data-i18n="feat_garage">Garaje</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="garden"> <span data-i18n="feat_garden">Jardín</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="terrace"> <span data-i18n="feat_terrace">Terraza</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="elevator"> <span data-i18n="feat_elevator">Ascensor</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="air_conditioning"> <span data-i18n="feat_ac">Aire acondicionado</span></label>
+    </div>
+
+    <!-- More features + 3D Tour -->
+    <div>
+      <div class="filter-group-title" style="margin-bottom:8px;">&nbsp;</div>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="sea_views"> <span data-i18n="feat_sea_views">Vistas al mar</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="beachfront"> <span data-i18n="feat_beachfront">Primera línea de playa</span></label>
+      <label class="filter-checkbox-row"><input type="checkbox" data-feature="home_automation"> <span data-i18n="feat_home_auto">Domótica</span></label>
+      <div style="margin-top:12px;">
+        <label class="filter-checkbox-row"><input type="checkbox" id="exp-3d-tour"> <span data-i18n="filter_3d_tour">Con Recorrido 3D</span></label>
+      </div>
+    </div>
+
+  </div>
+  <div class="filters-expanded-footer">
+    <button class="filter-apply-btn" id="btn-apply-filters" data-i18n="filter_apply">Aplicar filtros</button>
+    <button class="filter-clear-btn" id="btn-clear-filters" data-i18n="filter_clear">Limpiar</button>
+  </div>
+</div>
+
 <!-- ═══ SPLIT LAYOUT ══════════════════════════════════════════ -->
-<div class="split-layout">
+<div class="split-layout" id="split-layout">
 
   <!-- LEFT: LISTINGS -->
   <div class="listings-panel">
@@ -800,7 +1007,16 @@
   const SVG_PIN   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
   // ── Filter state ──────────────────────────────────────────────
-  const state = { precioBand: 0, beds: 0, tipo: 'todos' };
+  const state = {
+    precioBand: 0, beds: 0, tipo: 'todos',
+    // expanded filters
+    priceCustomMin: 0, priceCustomMax: 0,
+    bathrooms: 0, status: 'all',
+    minSize: 0, maxSize: 0,
+    yearRange: 'any',
+    features: [],
+    has3dTour: false,
+  };
 
   const priceBands = {
     0:       [0, Infinity],
@@ -809,6 +1025,14 @@
     700000:  [400000, 700000],
     1000000: [700000, 1000000],
     9999999: [1000000, Infinity],
+  };
+
+  const yearRangeMap = {
+    any:          [0, 0],
+    before_2000:  [0, 1999],
+    '2000_2010':  [2000, 2010],
+    '2010_2020':  [2010, 2020],
+    after_2020:   [2021, 0],
   };
 
   // Map dropdown tipo values to JSON type values
@@ -906,6 +1130,148 @@
 
   document.getElementById('sort-select').addEventListener('change', applyFilters);
 
+  // ── Expanded filter panel ─────────────────────────────────────
+  var _expandedOpen = false;
+
+  function updateMoreBadge() {
+    var count = 0;
+    if (state.bathrooms > 0) count++;
+    if (state.status !== 'all') count++;
+    if (state.minSize > 0 || state.maxSize > 0) count++;
+    if (state.features.length > 0) count += state.features.length;
+    if (state.yearRange !== 'any') count++;
+    if (state.has3dTour) count++;
+    if (state.priceCustomMin > 0 || state.priceCustomMax > 0) count++;
+    var badge = document.getElementById('more-filters-badge');
+    var btnMas = document.getElementById('btn-mas');
+    if (badge) {
+      badge.style.display = count > 0 ? 'inline' : 'none';
+      badge.textContent = count;
+    }
+    if (btnMas) btnMas.classList.toggle('active', count > 0 || _expandedOpen);
+  }
+
+  function openExpandedPanel() {
+    var panel = document.getElementById('filters-expanded');
+    if (!panel) return;
+    panel.classList.add('open');
+    panel.style.display = 'block';
+    _expandedOpen = true;
+    updateMoreBadge();
+    // Adjust split layout
+    requestAnimationFrame(function() {
+      var h = panel.offsetHeight;
+      var sl = document.getElementById('split-layout');
+      if (sl) {
+        sl.style.marginTop = 'calc(var(--nav-h) + var(--filters-h) + ' + h + 'px)';
+        sl.style.height = 'calc(100vh - var(--nav-h) - var(--filters-h) - ' + h + 'px)';
+      }
+    });
+  }
+
+  function closeExpandedPanel() {
+    var panel = document.getElementById('filters-expanded');
+    if (!panel) return;
+    panel.classList.remove('open');
+    _expandedOpen = false;
+    updateMoreBadge();
+    var sl = document.getElementById('split-layout');
+    if (sl) {
+      sl.style.marginTop = '';
+      sl.style.height = '';
+    }
+    setTimeout(function() {
+      if (!panel.classList.contains('open')) panel.style.display = 'none';
+    }, 300);
+  }
+
+  document.getElementById('btn-mas').addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (_expandedOpen) closeExpandedPanel();
+    else openExpandedPanel();
+  });
+
+  document.getElementById('btn-apply-filters').addEventListener('click', function() {
+    // Read expanded filter values into state
+    state.bathrooms = parseInt(document.getElementById('exp-bathrooms').value) || 0;
+    state.status    = document.getElementById('exp-status').value || 'all';
+    state.minSize   = parseInt(document.getElementById('exp-size-min').value) || 0;
+    state.maxSize   = parseInt(document.getElementById('exp-size-max').value) || 0;
+    state.yearRange = document.getElementById('exp-year').value || 'any';
+    state.has3dTour = document.getElementById('exp-3d-tour').checked;
+    state.features  = [];
+    document.querySelectorAll('.filter-checkbox-row input[data-feature]:checked').forEach(function(cb) {
+      state.features.push(cb.getAttribute('data-feature'));
+    });
+    // Custom price
+    var cMin = parseInt(document.getElementById('price-custom-min').value) || 0;
+    var cMax = parseInt(document.getElementById('price-custom-max').value) || 0;
+    state.priceCustomMin = cMin;
+    state.priceCustomMax = cMax;
+    updateMoreBadge();
+    applyFilters();
+    closeExpandedPanel();
+  });
+
+  document.getElementById('btn-clear-filters').addEventListener('click', function() {
+    // Reset expanded filters
+    state.bathrooms = 0;
+    state.status = 'all';
+    state.minSize = 0; state.maxSize = 0;
+    state.yearRange = 'any';
+    state.has3dTour = false;
+    state.features = [];
+    state.priceCustomMin = 0; state.priceCustomMax = 0;
+    // Reset UI
+    document.getElementById('exp-bathrooms').value = '0';
+    document.getElementById('exp-status').value = 'all';
+    document.getElementById('exp-size-min').value = '0';
+    document.getElementById('exp-size-max').value = '0';
+    document.getElementById('exp-year').value = 'any';
+    document.getElementById('exp-3d-tour').checked = false;
+    document.getElementById('price-custom-min').value = '';
+    document.getElementById('price-custom-max').value = '';
+    document.querySelectorAll('.filter-checkbox-row input[data-feature]').forEach(function(cb) {
+      cb.checked = false;
+    });
+    updateMoreBadge();
+    applyFilters();
+  });
+
+  // Close expanded panel on outside click
+  document.addEventListener('click', function(e) {
+    if (_expandedOpen) {
+      var panel = document.getElementById('filters-expanded');
+      var btnMas = document.getElementById('btn-mas');
+      if (panel && btnMas && !panel.contains(e.target) && !btnMas.contains(e.target)) {
+        closeExpandedPanel();
+      }
+    }
+  });
+
+  // ── Price custom inputs ───────────────────────────────────────
+  ['price-custom-min', 'price-custom-max'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', function() {
+        var cMin = parseInt(document.getElementById('price-custom-min').value) || 0;
+        var cMax = parseInt(document.getElementById('price-custom-max').value) || 0;
+        if (cMin > 0 || cMax > 0) {
+          // deselect preset band options
+          document.querySelectorAll('#dd-precio .filter-option').forEach(function(o) {
+            o.classList.remove('selected');
+          });
+          state.precioBand = 0;
+          document.getElementById('btn-precio').classList.add('active');
+          _setFilterLabel('btn-precio', 'filter_price', '€' + (cMin || '?') + ' – €' + (cMax || '?'));
+          state.priceCustomMin = cMin;
+          state.priceCustomMax = cMax;
+          applyFilters();
+        }
+      });
+    }
+  });
+
   // ── Render listings ───────────────────────────────────────────
   var SVG_PIN_SMALL = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
@@ -928,6 +1294,11 @@
 
   document.addEventListener('preos:langchange', updateResultsCount);
 
+  // Re-render cards on language switch so badge/spec text updates
+  document.addEventListener('preos:langchange', function() {
+    applyFilters();
+  });
+
   function renderListings(props, query, sortValOverride) {
     const sortVal = sortValOverride || document.getElementById('sort-select').value;
     const sorted = [...props].sort((a, b) => {
@@ -948,10 +1319,12 @@
       return;
     }
 
+    const T = (k) => (window.PreosLang ? window.PreosLang.t(k) : (window.PreosLang && window.PreosLang.strings && window.PreosLang.strings.es && window.PreosLang.strings.es[k])) || k;
     list.innerHTML = sorted.map(p => {
+      const bathLabel = p.bathrooms === 1 ? T('card_bathrooms_singular') : T('card_bathrooms_plural');
       const badges = [
-        p.status === 'new' ? `<span class="badge badge-nuevo">Nuevo</span>` : '',
-        p.has_3d_tour      ? `<span class="badge badge-3d">Recorrido 3D</span>` : '',
+        (p.status === 'new' || p.obra_nueva) ? `<span class="badge badge-nuevo">${T('card_new')}</span>` : '',
+        p.has_3d_tour      ? `<span class="badge badge-3d">${T('card_3d_tour')}</span>` : '',
       ].join('');
       return `
       <a class="h-card" href="propiedad.html?id=${p.id}"
@@ -966,9 +1339,9 @@
             <div class="h-card-price">${formatPrice(p.price)}</div>
             <div class="h-card-address">${p.title}</div>
             <div class="h-card-specs">
-              <div class="h-card-spec">${p.bedrooms} hab.</div>
+              <div class="h-card-spec">${p.bedrooms} ${T('card_bedrooms')}</div>
               <div class="h-card-sep"></div>
-              <div class="h-card-spec">${p.bathrooms} baño${p.bathrooms !== 1 ? 's' : ''}</div>
+              <div class="h-card-spec">${p.bathrooms} ${bathLabel}</div>
               <div class="h-card-sep"></div>
               <div class="h-card-spec">${p.size_m2} m²</div>
             </div>
@@ -1116,13 +1489,30 @@
 
   function runSearch(query) {
     const sortVal = document.getElementById('sort-select').value;
-    const [priceMin, priceMax] = priceBands[state.precioBand] || [0, Infinity];
+    let priceMin, priceMax;
+    if (state.priceCustomMin > 0 || state.priceCustomMax > 0) {
+      priceMin = state.priceCustomMin || 0;
+      priceMax = state.priceCustomMax || 0;
+    } else {
+      const band = priceBands[state.precioBand] || [0, Infinity];
+      priceMin = band[0];
+      priceMax = band[1] === Infinity ? 0 : band[1];
+    }
+    const [yearMin, yearMax] = yearRangeMap[state.yearRange] || [0, 0];
     const filters = {
-      query:       query || '',
-      type:        state.tipo !== 'todos' ? (tipoMap[state.tipo] || state.tipo) : 'todos',
-      minPrice:    priceMin,
-      maxPrice:    priceMax === Infinity ? 0 : priceMax,
-      minBedrooms: state.beds,
+      query:        query || '',
+      type:         state.tipo !== 'todos' ? (tipoMap[state.tipo] || state.tipo) : 'todos',
+      minPrice:     priceMin,
+      maxPrice:     priceMax,
+      minBedrooms:  state.beds,
+      bathrooms:    state.bathrooms,
+      minSize:      state.minSize,
+      maxSize:      state.maxSize,
+      features:     state.features,
+      has3dTour:    state.has3dTour,
+      status:       state.status,
+      yearBuiltMin: yearMin,
+      yearBuiltMax: yearMax,
     };
     searchProperties(filters).then(function(results) {
       renderListings(results, query, sortVal);
