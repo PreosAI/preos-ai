@@ -1797,12 +1797,12 @@
     const mainPH = document.querySelector('.gallery-main .img-placeholder');
     if (mainPH) {
       mainPH.style.background = 'none';
-      mainPH.innerHTML = `<img src="${p.images[0]}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+      mainPH.innerHTML = `<img src="${p.images[0]}" alt="${p.title_en || p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
       mainPH.addEventListener('click', () => openLightbox(0));
     }
     document.querySelectorAll('.gallery-side .img-placeholder').forEach((ph, i) => {
       ph.style.background = 'none';
-      ph.innerHTML = `<img src="${p.images[i + 1] || p.images[0]}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+      ph.innerHTML = `<img src="${p.images[i + 1] || p.images[0]}" alt="${p.title_en || p.title}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
       const idx = (i + 1 < p.images.length) ? i + 1 : 0;
       ph.addEventListener('click', () => openLightbox(idx));
     });
@@ -1812,9 +1812,19 @@
       countBtn.addEventListener('click', e => { e.stopPropagation(); openLightbox(0); });
     }
 
-    // Listing header
-    document.querySelector('.listing-price').textContent   = formatPrice(p.price);
-    document.querySelector('.listing-address').textContent = p.title + ' · ' + p.location;
+    // Listing header + description (language-aware, re-runs on lang toggle)
+    function renderPropDetails() {
+      const propLang = localStorage.getItem('preos-lang') || 'es';
+      const propTitle = propLang === 'en' ? (p.title_en || p.title) : p.title;
+      const propDesc  = propLang === 'en' ? (p.description_en || p.description) : p.description;
+      document.querySelector('.listing-price').textContent   = formatPrice(p.price);
+      document.querySelector('.listing-address').textContent = propTitle + ' · ' + p.location;
+      const descEl = document.querySelector('#panel-1 .section-text');
+      if (descEl) descEl.textContent = propDesc;
+      document.title = propTitle + ' — Preos';
+    }
+    renderPropDetails();
+    document.addEventListener('preos:langchange', renderPropDetails);
 
     // Specs
     const vals = document.querySelectorAll('.spec-value');
@@ -1823,18 +1833,11 @@
     if (vals[2]) vals[2].textContent = p.size_m2 + ' m²';
     if (vals[3]) vals[3].textContent = p.year_built || '—';
 
-    // Description
-    const descEl = document.querySelector('#panel-1 .section-text');
-    if (descEl) descEl.textContent = p.description;
-
-    // Page title
-    document.title = p.title + ' — Preos';
-
     // Map marker
     propMap.setView([p.lat, p.lng], 15);
     L.marker([p.lat, p.lng], { icon: propIcon })
       .addTo(propMap)
-      .bindPopup(`<strong>${p.title}</strong> · ${formatPrice(p.price)}`)
+      .bindPopup(`<strong>${(localStorage.getItem('preos-lang') === 'en' ? (p.title_en || p.title) : p.title)}</strong> · ${formatPrice(p.price)}`)
       .openPopup();
 
     // Mortgage calculator with real price

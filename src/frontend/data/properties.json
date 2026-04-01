@@ -2,6 +2,7 @@
   {
     "id": "prop-001",
     "title": "Villa con piscina en Benahavís",
+    "title_en": "Villa with Pool in Benahavís",
     "price": 695000,
     "bedrooms": 5,
     "bathrooms": 4,
@@ -21,6 +22,7 @@
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Espectacular villa de lujo con vistas panorámicas al mar Mediterráneo y a la montaña. Amplia piscina privada, jardín tropical y garaje para tres vehículos. Acabados de alta calidad en toda la propiedad con materiales importados y domótica integrada.",
+    "description_en": "Spectacular luxury villa with panoramic views over the Mediterranean Sea and the mountains. Spacious private pool, tropical garden and a three-car garage. Premium finishes throughout, with imported materials and fully integrated smart home technology.",
     "features": ["pool", "garage", "garden", "terrace", "air_conditioning", "sea_views", "home_automation"],
     "agent": "Carlos López",
     "listed_date": "2026-03-01",
@@ -29,6 +31,7 @@
   {
     "id": "prop-002",
     "title": "Piso luminoso en Málaga Centro",
+    "title_en": "Bright Apartment in Málaga Centro",
     "price": 285000,
     "bedrooms": 3,
     "bathrooms": 2,
@@ -47,6 +50,7 @@
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Precioso piso en el corazón de Málaga, a pocos pasos de la Calle Larios y el Museo Picasso. Amplio salón con luz natural, cocina moderna totalmente equipada y terraza con vistas a la ciudad histórica.",
+    "description_en": "Beautiful apartment in the heart of Málaga, just steps from Calle Larios and the Picasso Museum. Bright, open living room, fully equipped modern kitchen, and a terrace overlooking the historic city centre.",
     "features": ["terrace", "air_conditioning", "elevator"],
     "agent": "Ana Martínez",
     "listed_date": "2026-02-15",
@@ -55,6 +59,7 @@
   {
     "id": "prop-003",
     "title": "Mansión frente al mar en Marbella",
+    "title_en": "Beachfront Luxury Villa in Marbella",
     "price": 1150000,
     "bedrooms": 6,
     "bathrooms": 5,
@@ -73,6 +78,7 @@
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Exclusiva mansión en primera línea de playa con acceso directo al mar. Diseño moderno con grandes espacios abiertos, piscina infinita, cine en casa y tecnología domótica integrada en cada habitación.",
+    "description_en": "Exclusive beachfront mansion with direct sea access. Contemporary design featuring generous open-plan living spaces, an infinity pool, home cinema, and smart home technology integrated throughout every room.",
     "features": ["pool", "beachfront", "garage", "home_automation", "sea_views", "air_conditioning"],
     "agent": "Roberto Fernández",
     "listed_date": "2026-01-10",
@@ -81,6 +87,7 @@
   {
     "id": "prop-004",
     "title": "Apartamento con vistas al mar en Torremolinos",
+    "title_en": "Apartment with Sea Views in Torremolinos",
     "price": 168000,
     "bedrooms": 2,
     "bathrooms": 1,
@@ -98,6 +105,7 @@
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Acogedor apartamento a 200 metros de la playa de La Carihuela. Ideal como primera vivienda o inversión turística con alta rentabilidad. Comunidad con piscina y jardines cuidados.",
+    "description_en": "Charming apartment just 200 metres from La Carihuela beach. Perfect as a first home or a high-yield holiday investment. The development features a communal pool and well-kept gardens.",
     "features": ["pool", "terrace", "elevator", "sea_views"],
     "agent": "Laura Gómez",
     "listed_date": "2026-02-28",
@@ -106,6 +114,7 @@
   {
     "id": "prop-005",
     "title": "Adosado en urbanización privada en Estepona",
+    "title_en": "Townhouse in Gated Community in Estepona",
     "price": 395000,
     "bedrooms": 4,
     "bathrooms": 3,
@@ -124,6 +133,7 @@
       "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Elegante adosado en exclusiva urbanización privada con seguridad 24 horas. Amplio jardín privado, garaje doble y piscina comunitaria. A 5 minutos de las mejores playas de la Costa del Sol.",
+    "description_en": "Elegant townhouse in an exclusive gated development with 24-hour security. Large private garden, double garage, and communal pool. Just 5 minutes from some of the finest beaches on the Costa del Sol.",
     "features": ["garden", "garage", "pool", "air_conditioning"],
     "agent": "Miguel Ruiz",
     "listed_date": "2026-03-05",
@@ -132,6 +142,7 @@
   {
     "id": "prop-006",
     "title": "Apartamento con terraza en Nerja",
+    "title_en": "Apartment with Terrace in Nerja",
     "price": 245000,
     "bedrooms": 2,
     "bathrooms": 2,
@@ -149,6 +160,7 @@
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Encantador apartamento a pocos pasos del Balcón de Europa. Terraza con vistas al mar, cocina renovada y baños modernos. El lugar perfecto para disfrutar de la Costa del Sol oriental.",
+    "description_en": "Charming apartment just a short walk from the Balcón de Europa. Sea-view terrace, renovated kitchen, and modern bathrooms. The perfect base for enjoying Spain's eastern Costa del Sol.",
     "features": ["terrace", "air_conditioning", "elevator", "sea_views"],
     "agent": "Sofía Herrera",
     "listed_date": "2026-02-20",
@@ -157,6 +169,7 @@
   {
     "id": "prop-007",
     "title": "Villa con piscina y vistas en Mijas",
+    "title_en": "Villa with Pool and Views in Mijas",
     "price": 545000,
     "bedrooms": 4,
     "bathrooms": 3,
@@ -175,6 +188,7 @@
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800"
     ],
     "description": "Magnífica villa en las colinas de Mijas con impresionantes vistas al mar y a la Costa del Sol. Gran parcela con jardín maduro, piscina de sal y amplia terraza para entretenimiento al aire libre.",
+    "description_en": "Magnificent villa in the hills of Mijas with stunning views over the Mediterranean and the Costa del Sol. Generous plot with a mature garden, saltwater pool, and a large terrace perfect for outdoor entertaining.",
     "features": ["pool", "sea_views", "garden", "garage", "terrace"],
     "agent": "Carlos López",
     "listed_date": "2026-01-25",
@@ -183,6 +197,7 @@
   {
     "id": "prop-008",
     "title": "Apartamento frente al mar en Benalmádena",
+    "title_en": "Seafront Apartment in Benalmádena",
     "price": 198000,
     "bedrooms": 2,
     "bathrooms": 1,
@@ -198,6 +213,7 @@
       "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Luminoso apartamento en primera línea de playa con vistas directas al Mediterráneo. Acceso a piscina comunitaria y paseo marítimo. Excelente oportunidad de inversión con alta rentabilidad turística.",
+    "description_en": "Light-filled seafront apartment with direct views over the Mediterranean. Access to a communal pool and the beachside promenade. An outstanding investment opportunity with strong holiday rental yields.",
     "features": ["beachfront", "pool", "sea_views", "terrace"],
     "agent": "Ana Martínez",
     "listed_date": "2026-03-10",
@@ -206,6 +222,7 @@
   {
     "id": "prop-009",
     "title": "Casa adosada en urbanización en Fuengirola",
+    "title_en": "Townhouse in Residential Development in Fuengirola",
     "price": 320000,
     "bedrooms": 3,
     "bathrooms": 2,
@@ -223,6 +240,7 @@
       "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Fantástica casa adosada en tranquila urbanización con piscina comunitaria. Planta baja con jardín privado, tres dormitorios y dos baños completos. A 10 minutos a pie de la playa y el centro comercial.",
+    "description_en": "Fantastic townhouse in a quiet residential development with a communal pool. Ground-floor unit with a private garden, three bedrooms, and two full bathrooms. A 10-minute walk to the beach and shopping centre.",
     "features": ["garden", "pool", "garage", "air_conditioning"],
     "agent": "Miguel Ruiz",
     "listed_date": "2026-02-05",
@@ -231,6 +249,7 @@
   {
     "id": "prop-010",
     "title": "Cortijo restaurado con vistas en Ronda",
+    "title_en": "Restored Andalusian Farmhouse with Views in Ronda",
     "price": 475000,
     "bedrooms": 4,
     "bathrooms": 3,
@@ -246,6 +265,7 @@
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80&auto=format&fit=crop"
     ],
     "description": "Impresionante cortijo andaluz completamente restaurado con materiales de alta calidad, respetando el estilo tradicional. Vistas espectaculares a la sierra y al famoso Tajo de Ronda. Amplia finca con olivares y huerto.",
+    "description_en": "Stunning fully restored Andalusian farmhouse, finished with premium materials while faithfully preserving its traditional character. Breathtaking views of the sierra and the famous Tajo de Ronda gorge. Extensive grounds with olive groves and a vegetable garden.",
     "features": ["pool", "garden", "sea_views"],
     "agent": "Roberto Fernández",
     "listed_date": "2026-02-12",

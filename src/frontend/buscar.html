@@ -1321,6 +1321,8 @@
 
     const T = (k) => (window.PreosLang ? window.PreosLang.t(k) : (window.PreosLang && window.PreosLang.strings && window.PreosLang.strings.es && window.PreosLang.strings.es[k])) || k;
     list.innerHTML = sorted.map(p => {
+      const cardLang = localStorage.getItem('preos-lang') || 'es';
+      const cardTitle = cardLang === 'en' ? (p.title_en || p.title) : p.title;
       const bathLabel = p.bathrooms === 1 ? T('card_bathrooms_singular') : T('card_bathrooms_plural');
       const badges = [
         (p.status === 'new' || p.obra_nueva) ? `<span class="badge badge-nuevo">${T('card_new')}</span>` : '',
@@ -1330,14 +1332,14 @@
       <a class="h-card" href="propiedad.html?id=${p.id}"
          data-price="${p.price}" data-beds="${p.bedrooms}" data-tipo="${p.type.toLowerCase()}">
         <div class="h-card-img">
-          <img src="${p.images[0]}" alt="${p.title}" loading="lazy">
+          <img src="${p.images[0]}" alt="${cardTitle}" loading="lazy">
           <button class="card-heart" aria-label="Guardar" onclick="event.preventDefault()">${SVG_HEART}</button>
           <div class="h-card-badges">${badges}</div>
         </div>
         <div class="h-card-body">
           <div>
             <div class="h-card-price">${formatPrice(p.price)}</div>
-            <div class="h-card-address">${p.title}</div>
+            <div class="h-card-address">${cardTitle}</div>
             <div class="h-card-specs">
               <div class="h-card-spec">${p.bedrooms} ${T('card_bedrooms')}</div>
               <div class="h-card-sep"></div>
