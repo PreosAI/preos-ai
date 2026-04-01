@@ -301,6 +301,8 @@ window.PreosLang = (function () {
       statusConfirmed:          'Confirmada',
       statusCompleted:          'Completada',
       statusCancelled:          'Cancelada',
+      viewMyVisits:             'Ver mis visitas →',
+      exploreProperties:        'Explorar propiedades',
 
       // Backward-compat dotted keys used by data-i18n attributes on existing pages
       'nav.comprar':        'Comprar',
@@ -605,6 +607,8 @@ window.PreosLang = (function () {
       statusConfirmed:          'Confirmed',
       statusCompleted:          'Completed',
       statusCancelled:          'Cancelled',
+      viewMyVisits:             'View my visits →',
+      exploreProperties:        'Explore properties',
 
       // Backward-compat dotted keys
       'nav.comprar':        'Buy',

@@ -1629,6 +1629,7 @@
     <div style="font-size:48px;margin-bottom:16px;">🗓️</div>
     <div class="modal-title">¡Recorrido agendado!</div>
     <div class="modal-sub" id="tour-success-text" style="margin-top:12px;line-height:1.7;">Te contactaremos para confirmar tu visita.</div>
+    <a href="visitas.html" id="modal-visitas-link" style="display:inline-block;margin-top:16px;font-size:13px;font-weight:600;color:#cc1f1f;text-decoration:none;" data-i18n="viewMyVisits">Ver mis visitas →</a>
   </div>
 </div>
 
@@ -1820,6 +1821,10 @@
     // Store for interactive features
     window._currentProp = p;
     window._lbImages    = p.images;
+
+    // Fix "Ver más fechas" href now that we know the property ID
+    const moreDatesBtn = document.getElementById('btn-more-dates');
+    if (moreDatesBtn) moreDatesBtn.href = 'tour.html?id=' + p.id;
 
     // Track viewed properties
     const viewed = JSON.parse(localStorage.getItem('preos_viewed') || '[]');

@@ -83,6 +83,7 @@ firebase.auth().onAuthStateChanged(function (user) {
 
     const myAccountLabel  = window.PreosLang ? window.PreosLang.t('nav_myaccount')  : 'Mi cuenta';
     const myFavsLabel     = window.PreosLang ? window.PreosLang.t('nav_myfavs')     : 'Mis favoritos';
+    const myVisitsLabel   = window.PreosLang ? window.PreosLang.t('myVisits')        : 'Mis visitas';
     const signOutLabel    = window.PreosLang ? window.PreosLang.t('nav_signout')     : 'Cerrar sesión';
 
     miCuenta.innerHTML = `
@@ -94,6 +95,7 @@ firebase.auth().onAuthStateChanged(function (user) {
         <div class="auth-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);min-width:160px;z-index:999;">
           <a href="dashboard.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myAccountLabel}</a>
           <a href="favoritos.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myFavsLabel}</a>
+          <a href="visitas.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myVisitsLabel}</a>
           <hr style="margin:4px 0;border:none;border-top:1px solid #f0f0f0;">
           <button id="btn-cerrar-sesion" style="width:100%;background:none;border:none;cursor:pointer;padding:10px 16px;font-size:13px;color:#cc1f1f;text-align:left;white-space:nowrap;">${signOutLabel}</button>
         </div>

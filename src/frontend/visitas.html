@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mis favoritos — Preos</title>
+  <title>Mis visitas — Preos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -201,8 +201,8 @@
       display: flex;
       align-items: center;
       white-space: nowrap;
-      transition: color .15s, border-color .15s;
       text-decoration: none;
+      transition: color .15s, border-color .15s;
     }
     .tab:hover { color: var(--text); }
     .tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
@@ -210,10 +210,10 @@
     /* ─── PAGE BODY ────────────────────────────────────────── */
     .page-body {
       margin-top: calc(var(--nav-h) + var(--tabs-h));
-      max-width: 1200px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
-      padding: 32px 32px 60px;
+      padding: 36px 32px 80px;
       flex: 1;
     }
 
@@ -221,157 +221,129 @@
       font-size: 22px;
       font-weight: 700;
       color: var(--text);
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
-    /* ─── CARDS GRID ───────────────────────────────────────── */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-    }
-
-    /* ─── CARD WRAPPER ─────────────────────────────────────── */
-    .card-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ─── PROPERTY CARD ────────────────────────────────────── */
-    .card {
-      background: #fff;
-      border-radius: 14px 14px 0 0;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-bottom: none;
-      box-shadow: 0 2px 10px rgba(0,0,0,.06);
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      transition: box-shadow .25s, transform .25s;
-    }
-    .card:hover {
-      box-shadow: 0 8px 28px rgba(0,0,0,.12);
-      transform: translateY(-3px);
-    }
-
-    /* Image */
-    .card-img-wrap {
-      position: relative;
-      height: 200px;
-      overflow: hidden;
-      background: #e5e7eb;
-    }
-
-    .card-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform .4s;
-    }
-    .card:hover .card-img-wrap img { transform: scale(1.04); }
-
-    /* Heart */
-    .card-heart {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 32px;
-      height: 32px;
-      background: rgba(0,0,0,.35);
-      border: none;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 4;
-      transition: background .15s;
-    }
-    .card-heart:hover { background: rgba(0,0,0,.55); }
-    .card-heart svg { width: 16px; height: 16px; }
-
-    /* Badges */
-    .card-badges {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      display: flex;
-      gap: 5px;
-      z-index: 3;
-    }
-
-    .badge {
-      font-size: 10px;
+    /* ─── SECTION HEADING ──────────────────────────────────── */
+    .section-heading {
+      font-size: 11px;
       font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.3px;
+      color: var(--muted);
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 32px;
     }
-    .badge-nuevo { background: var(--red); color: #fff; }
-    .badge-3d { background: rgba(0,0,0,0.65); color: #fff; }
+    .section-heading:first-child { margin-top: 0; }
 
-    /* Card body */
-    .card-body { padding: 14px 16px 16px; }
+    /* ─── VISIT CARD ───────────────────────────────────────── */
+    .visit-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      transition: box-shadow .15s;
+    }
+    .visit-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.08); }
 
-    .card-price {
-      font-size: 18px;
-      font-weight: 800;
+    .visit-thumb {
+      width: 84px;
+      height: 64px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #f3f4f6;
+    }
+
+    .visit-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .visit-title {
+      font-size: 14px;
+      font-weight: 600;
       color: var(--text);
-      letter-spacing: -0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .visit-title:hover { color: var(--red); }
+
+    .visit-datetime {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
       margin-bottom: 6px;
     }
 
-    .card-specs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: #374151;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
+    .visit-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
     }
+    .badge-pending   { background: #FFF3CD; color: #856404; }
+    .badge-confirmed { background: #D1E7DD; color: #0A3622; }
+    .badge-completed { background: #E2E3E5; color: #41464B; }
+    .badge-cancelled { background: #F8D7DA; color: #842029; }
 
-    .card-spec {
+    .visit-actions {
       display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .card-spec svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
-
-    .card-sep { width: 1px; height: 11px; background: var(--border); }
-
-    .card-location {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .card-location svg { width: 12px; height: 12px; color: var(--red); flex-shrink: 0; }
-
-    /* ─── REMOVE BUTTON ────────────────────────────────────── */
-    .btn-eliminar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       gap: 6px;
-      width: 100%;
-      padding: 10px 16px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 14px 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-action {
       font-size: 12px;
       font-weight: 600;
       font-family: 'Inter', sans-serif;
-      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 16px;
       cursor: pointer;
-      transition: color .15s, background .15s;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s;
     }
-    .btn-eliminar svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .btn-eliminar:hover { color: var(--red); background: #fff8f8; }
+
+    .btn-change-date {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-change-date:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+    .btn-cancel {
+      background: none;
+      border: 1.5px solid #fca5a5;
+      color: #dc2626;
+    }
+    .btn-cancel:hover { background: #fee2e2; }
+
+    /* ─── LOADING SPINNER ──────────────────────────────────── */
+    .loading-wrap {
+      text-align: center;
+      padding: 64px 0;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; color: var(--muted); }
 
     /* ─── EMPTY STATE ──────────────────────────────────────── */
     .empty-state {
@@ -383,15 +355,11 @@
       padding: 72px 32px;
       text-align: center;
     }
-    .empty-state svg { color: #d1d5db; }
+    .empty-state-icon { font-size: 52px; }
     .empty-state-title {
       font-size: 18px;
       font-weight: 700;
       color: var(--text);
-    }
-    .empty-state-desc {
-      font-size: 14px;
-      color: var(--muted);
       max-width: 360px;
     }
     .btn-explorar {
@@ -409,6 +377,40 @@
       transition: background .2s;
     }
     .btn-explorar:hover { background: var(--red-hover); }
+
+    /* ─── CANCEL CONFIRM MODAL ─────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 32px;
+      width: 380px;
+      max-width: 90vw;
+    }
+    .modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+    .modal-box p { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-modal-cancel {
+      background: none; border: 1.5px solid var(--border); border-radius: 999px;
+      padding: 9px 22px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
+      color: var(--text); cursor: pointer; transition: background .15s;
+    }
+    .btn-modal-cancel:hover { background: #f3f4f6; }
+    .btn-modal-confirm {
+      background: var(--red); color: #fff; border: none; border-radius: 999px;
+      padding: 9px 22px; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-modal-confirm:hover { background: var(--red-hover); }
 
     /* ─── TOAST ────────────────────────────────────────────── */
     #toast {
@@ -492,13 +494,11 @@
       .nav-right { margin-left: 0; }
       .tabs-bar { padding: 0 16px; overflow-x: auto; }
       .page-body { padding: 20px 16px 40px; }
-      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .visit-card { flex-wrap: wrap; }
+      .visit-actions { flex-direction: row; width: 100%; }
       footer { padding: 32px 20px 24px; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
       .footer-bottom { flex-direction: column; gap: 12px; }
-    }
-    @media (max-width: 480px) {
-      .cards-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -548,24 +548,50 @@
 <!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
 <div class="tabs-bar">
   <a href="dashboard.html" class="tab">Panel de propietarios</a>
-  <a href="favoritos.html" class="tab active">Mis favoritos</a>
-  <a href="visitas.html" class="tab">Mis visitas</a>
+  <a href="favoritos.html" class="tab">Mis favoritos</a>
+  <a href="visitas.html" class="tab active">Mis visitas</a>
   <a href="perfil.html" class="tab">Configuración de mi perfil</a>
 </div>
 
 <!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
 <div class="page-body">
-  <div class="page-title">Mis favoritos <span id="fav-count" style="font-weight:400; color:var(--muted);"></span></div>
+  <div class="page-title" data-i18n="myVisits">Mis visitas</div>
 
-  <div class="cards-grid" id="fav-grid"></div>
+  <!-- Loading state -->
+  <div class="loading-wrap" id="loading-wrap">
+    <div class="spinner"></div>
+    <div class="loading-text">Cargando visitas...</div>
+  </div>
 
+  <!-- Empty state -->
   <div class="empty-state" id="empty-state">
-    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-    </svg>
-    <div class="empty-state-title">Aún no tienes propiedades guardadas</div>
-    <div class="empty-state-desc">¡Empieza a explorar y guarda las propiedades que más te gusten!</div>
-    <a href="buscar.html" class="btn-explorar">Explorar propiedades</a>
+    <div class="empty-state-icon">🏠</div>
+    <div class="empty-state-title" data-i18n="noVisits">Todavía no tienes visitas programadas.</div>
+    <a href="buscar.html" class="btn-explorar" data-i18n="exploreProperties">Explorar propiedades</a>
+  </div>
+
+  <!-- Upcoming section -->
+  <div id="upcoming-section" style="display:none;">
+    <div class="section-heading" data-i18n="upcomingVisits">Próximas visitas</div>
+    <div id="upcoming-list"></div>
+  </div>
+
+  <!-- Past section -->
+  <div id="past-section" style="display:none;">
+    <div class="section-heading" data-i18n="pastVisits">Visitas pasadas</div>
+    <div id="past-list"></div>
+  </div>
+</div>
+
+<!-- ═══ CANCEL CONFIRM MODAL ════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-cancel">
+  <div class="modal-box">
+    <h3 data-i18n="cancelVisit">Cancelar visita</h3>
+    <p data-i18n="cancelConfirm">¿Seguro que quieres cancelar esta visita?</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="btn-modal-no">Volver</button>
+      <button class="btn-modal-confirm" id="btn-modal-yes">Cancelar visita</button>
+    </div>
   </div>
 </div>
 
@@ -621,6 +647,7 @@
 <script src="js/logo-path.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="js/auth-nav.js"></script>
 <script src="js/properties.js"></script>
 <script src="js/lang.js"></script>
@@ -638,114 +665,213 @@
     setTimeout(function() { t.classList.remove('show'); }, 3000);
   }
 
-  // ── Build a single card wrapper ────────────────────────────────
-  function buildCard(p) {
-    var badges = '';
-    if (p.status === 'new') {
-      badges += '<span class="badge badge-nuevo">NUEVO</span>';
+  // ── Cancel modal state ─────────────────────────────────────────
+  var _pendingCancelId = null;
+
+  document.getElementById('btn-modal-no').addEventListener('click', function() {
+    document.getElementById('modal-cancel').classList.remove('open');
+    document.body.style.overflow = '';
+    _pendingCancelId = null;
+  });
+
+  document.getElementById('modal-cancel').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('open');
+      document.body.style.overflow = '';
+      _pendingCancelId = null;
     }
-    if (p.has_3d_tour) {
-      badges += '<span class="badge badge-3d">RECORRIDO 3D</span>';
-    }
+  });
 
-    var wrapper = document.createElement('div');
-    wrapper.className = 'card-wrapper';
-    wrapper.setAttribute('data-id', p.id);
-    wrapper.innerHTML =
-      '<a class="card" href="propiedad.html?id=' + p.id + '">' +
-        '<div class="card-img-wrap">' +
-          '<img src="' + p.images[0] + '" alt="' + p.title + '" loading="lazy">' +
-          '<button class="card-heart" onclick="event.preventDefault()">' +
-            '<svg viewBox="0 0 24 24" fill="#cc1f1f" stroke="#cc1f1f" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
-          '</button>' +
-          (badges ? '<div class="card-badges">' + badges + '</div>' : '') +
-        '</div>' +
-        '<div class="card-body">' +
-          '<div class="card-price">' + formatPrice(p.price) + '</div>' +
-          '<div class="card-specs">' +
-            '<div class="card-spec">' +
-              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' +
-              p.bedrooms + ' Camas' +
-            '</div>' +
-            '<div class="card-sep"></div>' +
-            '<div class="card-spec">' +
-              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 12a2 2 0 0 1-2-2V6h20v4a2 2 0 0 1-2 2M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><line x1="12" y1="6" x2="12" y2="4"/></svg>' +
-              p.bathrooms + ' Ba\xf1os' +
-            '</div>' +
-            '<div class="card-sep"></div>' +
-            '<div class="card-spec">' + p.size_m2 + ' m\xb2</div>' +
-          '</div>' +
-          '<div class="card-location">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
-            p.location +
-          '</div>' +
-        '</div>' +
-      '</a>' +
-      '<button class="btn-eliminar">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
-        'Eliminar de favoritos' +
-      '</button>';
+  document.getElementById('btn-modal-yes').addEventListener('click', function() {
+    if (!_pendingCancelId) return;
+    var btn  = this;
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    btn.disabled = true;
+    btn.textContent = lang === 'en' ? 'Cancelling...' : 'Cancelando...';
 
-    wrapper.querySelector('.btn-eliminar').addEventListener('click', function() {
-      removeFavorito(p.id, wrapper);
-    });
+    firebase.firestore().collection('bookings').doc(_pendingCancelId).update({ status: 'cancelled' })
+      .then(function() {
+        document.getElementById('modal-cancel').classList.remove('open');
+        document.body.style.overflow = '';
+        btn.disabled = false;
+        btn.textContent = lang === 'en' ? 'Cancel visit' : 'Cancelar visita';
+        _pendingCancelId = null;
+        showToast(lang === 'en' ? 'Visit cancelled.' : 'Visita cancelada.');
+        loadVisits();
+      })
+      .catch(function(err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = lang === 'en' ? 'Cancel visit' : 'Cancelar visita';
+        showToast(lang === 'en' ? 'Error. Please try again.' : 'Error. Inténtalo de nuevo.');
+      });
+  });
 
-    return wrapper;
-  }
-
-  // ── Remove from favorites ──────────────────────────────────────
-  function removeFavorito(id, wrapperEl) {
-    var favIds = JSON.parse(localStorage.getItem('favoritos') || '[]');
-    favIds = favIds.filter(function(x) { return x !== id; });
-    localStorage.setItem('favoritos', JSON.stringify(favIds));
-    wrapperEl.remove();
-    updateCount();
-    showToast('Propiedad eliminada de favoritos');
-  }
-
-  function updateCount() {
-    var remaining = document.querySelectorAll('.card-wrapper').length;
-    var countEl = document.getElementById('fav-count');
-    if (remaining === 0) {
-      countEl.textContent = '(0 propiedades)';
-      document.getElementById('empty-state').style.display = 'flex';
-    } else {
-      countEl.textContent = '(' + remaining + ' ' + (remaining === 1 ? 'propiedad' : 'propiedades') + ')';
-    }
-  }
-
-  // ── Load favorites ─────────────────────────────────────────────
-  async function loadFavoritos() {
-    var favIds = JSON.parse(localStorage.getItem('favoritos') || '[]');
-    var countEl = document.getElementById('fav-count');
-
-    if (favIds.length === 0) {
-      countEl.textContent = '(0 propiedades)';
-      document.getElementById('empty-state').style.display = 'flex';
+  // ── Auth check + load ─────────────────────────────────────────
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = 'ingresar.html?next=visitas.html';
       return;
     }
+    loadVisits();
+  });
 
-    try {
-      var all = await getAllProperties();
-      var favProps = all.filter(function(p) { return favIds.includes(p.id); });
+  // ── Load visits ────────────────────────────────────────────────
+  function loadVisits() {
+    var user = firebase.auth().currentUser;
+    if (!user) return;
 
-      countEl.textContent = '(' + favProps.length + ' ' + (favProps.length === 1 ? 'propiedad' : 'propiedades') + ')';
+    document.getElementById('loading-wrap').style.display = 'block';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('upcoming-section').style.display = 'none';
+    document.getElementById('past-section').style.display = 'none';
+    document.getElementById('upcoming-list').innerHTML = '';
+    document.getElementById('past-list').innerHTML = '';
 
-      var grid = document.getElementById('fav-grid');
-      if (favProps.length === 0) {
+    Promise.all([
+      getAllProperties(),
+      firebase.firestore().collection('bookings')
+        .where('userId', '==', user.uid)
+        .orderBy('createdAt', 'desc')
+        .get()
+    ]).then(function(results) {
+      var allProps = results[0];
+      var snapshot = results[1];
+
+      document.getElementById('loading-wrap').style.display = 'none';
+
+      var bookings = [];
+      snapshot.forEach(function(doc) {
+        bookings.push(Object.assign({ _id: doc.id }, doc.data()));
+      });
+
+      if (bookings.length === 0) {
         document.getElementById('empty-state').style.display = 'flex';
-      } else {
-        favProps.forEach(function(p) {
-          grid.appendChild(buildCard(p));
+        return;
+      }
+
+      var today    = new Date().toISOString().slice(0, 10);
+      var upcoming = bookings.filter(function(b) {
+        return b.date >= today && b.status !== 'cancelled' && b.status !== 'completed';
+      });
+      var past = bookings.filter(function(b) {
+        return b.date < today || b.status === 'cancelled' || b.status === 'completed';
+      });
+
+      if (upcoming.length > 0) {
+        document.getElementById('upcoming-section').style.display = 'block';
+        upcoming.forEach(function(b) {
+          document.getElementById('upcoming-list').appendChild(buildCard(b, allProps, true));
         });
       }
-    } catch(e) {
-      console.error('Error loading favorites:', e);
+
+      if (past.length > 0) {
+        document.getElementById('past-section').style.display = 'block';
+        past.forEach(function(b) {
+          document.getElementById('past-list').appendChild(buildCard(b, allProps, false));
+        });
+      }
+
+      if (upcoming.length === 0 && past.length === 0) {
+        document.getElementById('empty-state').style.display = 'flex';
+      }
+    }).catch(function(err) {
+      console.error('Visits error:', err);
+      document.getElementById('loading-wrap').style.display = 'none';
       document.getElementById('empty-state').style.display = 'flex';
-    }
+    });
   }
 
-  loadFavoritos();
+  // ── Build a booking card ───────────────────────────────────────
+  function buildCard(booking, allProps, isUpcoming) {
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    var prop = allProps ? allProps.find(function(p) { return p.id === booking.propertyId; }) : null;
+
+    var thumb = prop && prop.images && prop.images[0]
+      ? prop.images[0]
+      : 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200&q=60&auto=format';
+    var title = prop ? (prop.title || prop.location || booking.propertyId) : ('Propiedad #' + booking.propertyId);
+
+    var dateStr = formatDate(booking.date, lang);
+    var timeStr = booking.time ? ' · ' + booking.time : '';
+
+    var badgeClass = 'badge-' + (booking.status || 'pending');
+    var badgeText  = getBadgeText(booking.status, lang);
+
+    var canAct = booking.status === 'pending' || booking.status === 'confirmed';
+
+    var card = document.createElement('div');
+    card.className = 'visit-card';
+
+    var actionsHTML = '';
+    if (isUpcoming && canAct) {
+      actionsHTML =
+        '<div class="visit-actions">' +
+          '<button class="btn-action btn-change-date" data-id="' + booking._id + '" data-propid="' + booking.propertyId + '">' +
+            (lang === 'en' ? 'Change date' : 'Cambiar fecha') +
+          '</button>' +
+          '<button class="btn-action btn-cancel" data-id="' + booking._id + '">' +
+            (lang === 'en' ? 'Cancel' : 'Cancelar visita') +
+          '</button>' +
+        '</div>';
+    }
+
+    card.innerHTML =
+      '<img class="visit-thumb" src="' + thumb + '" alt="' + title + '" ' +
+        'onerror="this.src=\'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200&q=60&auto=format\'">' +
+      '<div class="visit-info">' +
+        '<a class="visit-title" href="propiedad.html?id=' + booking.propertyId + '">' + title + '</a>' +
+        '<div class="visit-datetime">' + dateStr + timeStr + '</div>' +
+        '<span class="visit-badge ' + badgeClass + '">' + badgeText + '</span>' +
+      '</div>' +
+      actionsHTML;
+
+    // Wire buttons
+    var changeBtn = card.querySelector('.btn-change-date');
+    if (changeBtn) {
+      changeBtn.addEventListener('click', function() {
+        window.location.href = 'tour.html?id=' + encodeURIComponent(booking.propertyId) +
+          '&reschedule=' + encodeURIComponent(booking._id);
+      });
+    }
+
+    var cancelBtn = card.querySelector('.btn-cancel');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function() {
+        _pendingCancelId = booking._id;
+        document.getElementById('modal-cancel').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+
+    return card;
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function formatDate(isoDate, lang) {
+    if (!isoDate) return '';
+    var parts = isoDate.split('-');
+    if (parts.length < 3) return isoDate;
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    if (isNaN(d.getTime())) return isoDate;
+    var dayNames = lang === 'en'
+      ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+      : ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    var monthNames = lang === 'en'
+      ? ['January','February','March','April','May','June','July','August','September','October','November','December']
+      : ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return dayNames[d.getDay()] + ', ' + d.getDate() + ' de ' + monthNames[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function getBadgeText(status, lang) {
+    var map = {
+      pending:   lang === 'en' ? 'Pending'   : 'Pendiente',
+      confirmed: lang === 'en' ? 'Confirmed' : 'Confirmada',
+      completed: lang === 'en' ? 'Completed' : 'Completada',
+      cancelled: lang === 'en' ? 'Cancelled' : 'Cancelada'
+    };
+    return map[status] || (status || '');
+  }
 </script>
 <script src="js/analytics.js"></script>
 </body>
