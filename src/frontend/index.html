@@ -545,15 +545,15 @@
   <div class="hero-overlay"></div>
 
   <div class="hero-content">
-    <h1 class="hero-headline">La forma más fácil de comprar<br>una propiedad, es con Preos</h1>
+    <h1 class="hero-headline" data-i18n="hero.title">La forma más fácil de comprar una propiedad, es con Preos</h1>
 
     <div class="hero-tabs">
-      <button class="hero-tab active" onclick="setTab(this)">Comprar</button>
-      <button class="hero-tab" onclick="setTab(this)">Vender</button>
+      <button class="hero-tab active" onclick="setTab(this)" data-i18n="hero.comprar">Comprar</button>
+      <button class="hero-tab" onclick="setTab(this)" data-i18n="hero.vender">Vender</button>
     </div>
 
     <form class="hero-search" action="buscar.html" method="get" onsubmit="var v=this.querySelector('input').value.trim();window.location=v?'buscar.html?q='+encodeURIComponent(v):'buscar.html';return false;">
-      <input type="text" name="q" placeholder="Busca por ciudad, dirección o código postal" />
+      <input type="text" name="q" placeholder="Busca por ciudad, dirección o código postal" data-i18n-placeholder="hero.search" />
       <button type="submit" class="hero-search-btn" aria-label="Buscar">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7"/>
@@ -593,7 +593,7 @@
 
 <!-- ═══ PROPERTIES ═════════════════════════════════════════════ -->
 <div class="section-wrap">
-  <h2 class="section-title" id="section-title-props">Propiedades que te recomendamos ver</h2>
+  <h2 class="section-title" id="section-title-props" data-i18n="recommended.title">Propiedades que te recomendamos ver</h2>
 
   <div class="cards-grid" id="featured-grid">
     <!-- Populated dynamically by js/properties.js -->
@@ -611,7 +611,7 @@
     </div>
 
     <div class="footer-col">
-      <h4>Explorar</h4>
+      <h4 data-i18n="footer.explorar">EXPLORAR</h4>
       <ul>
         <li><a href="buscar.html">Comprar</a></li>
         <li><a href="buscar.html?tipo=alquiler">Alquilar</a></li>
@@ -621,7 +621,7 @@
     </div>
 
     <div class="footer-col">
-      <h4>Empresa</h4>
+      <h4 data-i18n="footer.empresa">EMPRESA</h4>
       <ul>
         <li><a href="#">Quiénes somos</a></li>
         <li><a href="agentes.html">Agentes</a></li>
@@ -631,7 +631,7 @@
     </div>
 
     <div class="footer-col">
-      <h4>Legal</h4>
+      <h4 data-i18n="footer.legal">LEGAL</h4>
       <ul>
         <li><a href="#">Privacidad</a></li>
         <li><a href="#">Términos de uso</a></li>

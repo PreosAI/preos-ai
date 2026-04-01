@@ -835,13 +835,24 @@
     renderListings(props);
     renderMapMarkers(props);
 
-    // Pre-fill search from URL ?q= param
+    // Pre-fill search from URL ?q= param and filter results
     var _qParam = new URLSearchParams(window.location.search).get('q');
     if (_qParam) {
       var _navInput = document.querySelector('.nav-search input');
       if (_navInput) _navInput.value = _qParam;
+      var _qLower = _qParam.toLowerCase();
+      var _filtered = props.filter(function(p) {
+        return (p.title && p.title.toLowerCase().indexOf(_qLower) !== -1) ||
+               (p.location && p.location.toLowerCase().indexOf(_qLower) !== -1);
+      });
+      var _show = _filtered.length > 0 ? _filtered : props;
+      renderListings(_show);
+      renderMapMarkers(_show);
+      allProps = _show;
       var _countEl = document.querySelector('.listings-count');
-      if (_countEl) _countEl.innerHTML = props.length + ' resultados <span>para "' + _qParam + '"</span>';
+      if (_countEl && _filtered.length > 0) {
+        _countEl.innerHTML = _filtered.length + ' resultado' + (_filtered.length !== 1 ? 's' : '') + ' <span>para "' + _qParam + '"</span>';
+      }
     }
   });
 
