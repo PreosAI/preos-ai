@@ -1510,10 +1510,11 @@
 
 <!-- ═══ MODAL: RECORRIDO 3D ════════════════════════════════════ -->
 <div class="modal-overlay" id="modal-3d">
-  <div class="modal-card">
-    <button class="modal-close" onclick="closeModal('modal-3d')">✕</button>
-    <div class="modal-title">Recorrido 3D</div>
+  <div class="modal-card" style="max-width:640px;">
+    <button class="modal-close" id="modal-3d-close">✕</button>
+    <div class="modal-title" id="modal-3d-title">Recorrido 3D</div>
     <div id="modal-3d-content" style="margin-top:12px;"></div>
+    <button class="btn-red" id="modal-3d-contact-btn" style="display:none;width:auto;padding:11px 24px;margin-top:16px;">Contactar agente</button>
   </div>
 </div>
 
@@ -1654,6 +1655,17 @@
     });
   });
 
+  // ── Programar button state ────────────────────────────────────
+  function updateProgramarBtn() {
+    var btn = document.getElementById('btn-programar');
+    if (!btn) return;
+    var ready = !!(window._selectedTourDate && window._selectedTourTime);
+    btn.disabled = !ready;
+    btn.style.opacity = ready ? '1' : '0.45';
+    btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+  }
+  updateProgramarBtn();
+
   // ── Tour date pills (next 7 days) ─────────────────────────────
   (function() {
     var dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -1683,6 +1695,7 @@
           pill.style.borderColor = 'var(--text)';
           pill.querySelectorAll('div').forEach(function(div) { div.style.color = '#fff'; });
           window._selectedTourDate = date;
+          updateProgramarBtn();
         });
         container.appendChild(pill);
       })(d);
@@ -1707,6 +1720,7 @@
         pill.style.borderColor = 'var(--text)';
         pill.style.color = '#fff';
         window._selectedTourTime = t;
+        updateProgramarBtn();
       });
       container.appendChild(pill);
     });
@@ -1910,17 +1924,27 @@
     });
 
     // ── Gallery tool buttons ──────────────────────────────────────
+    document.getElementById('modal-3d-close').addEventListener('click', function() {
+      closeModal('modal-3d');
+    });
+    document.getElementById('modal-3d-contact-btn').addEventListener('click', function() {
+      closeModal('modal-3d');
+      openAgentModal();
+    });
     document.getElementById('btn-3d').addEventListener('click', function() {
       var p = window._currentProp;
       var content = document.getElementById('modal-3d-content');
+      var title = document.getElementById('modal-3d-title');
+      var contactBtn = document.getElementById('modal-3d-contact-btn');
       if (!content) return;
       if (p && p.has_3d_tour === true) {
-        document.querySelector('#modal-3d .modal-title').textContent = 'Recorrido 3D Virtual';
+        title.textContent = 'Recorrido 3D Virtual';
         content.innerHTML = '<iframe src="https://my.matterport.com/show/?m=SFR2t4U4kdA" width="100%" height="400" style="border:0;border-radius:8px;" allowfullscreen loading="lazy" allow="xr-spatial-tracking"></iframe>';
+        contactBtn.style.display = 'none';
       } else {
-        document.querySelector('#modal-3d .modal-title').textContent = 'Recorrido 3D';
-        content.innerHTML = '<p style="color:var(--muted);font-size:14px;line-height:1.75;padding:6px 0 20px;">Este inmueble no tiene recorrido 3D disponible. Contacta con el agente para más información.</p>' +
-          '<button class="btn-red" style="width:auto;padding:11px 24px;" onclick="closeModal(\'modal-3d\');openAgentModal();">Contactar agente</button>';
+        title.textContent = 'Recorrido 3D';
+        content.innerHTML = '<p style="color:var(--muted);font-size:14px;line-height:1.75;padding:6px 0 4px;">Este inmueble no tiene recorrido 3D disponible. Contacta con el agente para más información.</p>';
+        contactBtn.style.display = '';
       }
       openModal('modal-3d');
     });
@@ -2004,6 +2028,7 @@
     // ── Programar recorrido ───────────────────────────────────────
     document.getElementById('btn-programar').addEventListener('click', function(e) {
       e.preventDefault();
+      if (!window._selectedTourDate || !window._selectedTourTime) return;
       var user = (typeof firebase !== 'undefined') ? firebase.auth().currentUser : null;
       if (!user) { window.location.href = 'ingresar.html'; return; }
       var selDate = window._selectedTourDate;
