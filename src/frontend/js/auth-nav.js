@@ -147,3 +147,74 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function (reg) {
+        console.log('[Preos PWA] SW registered:', reg.scope);
+        reg.addEventListener('updatefound', function () {
+          var newWorker = reg.installing;
+          newWorker.addEventListener('statechange', function () {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              newWorker.postMessage('skipWaiting');
+            }
+          });
+        });
+      })
+      .catch(function (err) { console.warn('[Preos PWA] SW failed:', err); });
+  });
+}
+
+// PWA Install Prompt (Android/Chrome only — iOS uses Safari share sheet)
+var _deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+
+  var isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+  if (isMobile && !isStandalone && !sessionStorage.getItem('pwa-prompt-dismissed')) {
+    var banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    banner.innerHTML = [
+      '<div style="',
+        'position:fixed;bottom:16px;left:16px;right:16px;z-index:9999;',
+        'background:#1a1a1a;color:#fff;border-radius:12px;',
+        'padding:14px 16px;display:flex;align-items:center;gap:12px;',
+        'box-shadow:0 4px 20px rgba(0,0,0,0.3);font-family:inherit;',
+      '">',
+        '<img src="/icons/icon-192.png" style="width:40px;height:40px;border-radius:8px;flex-shrink:0;">',
+        '<div style="flex:1;min-width:0;">',
+          '<div style="font-size:14px;font-weight:600;margin-bottom:2px;">Instalar Preos</div>',
+          '<div style="font-size:12px;opacity:0.7;">Añade la app a tu pantalla de inicio</div>',
+        '</div>',
+        '<button id="pwa-install-btn" style="',
+          'background:#E51B27;color:#fff;border:none;border-radius:8px;',
+          'padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;',
+        '">Instalar</button>',
+        '<button id="pwa-dismiss-btn" style="',
+          'background:transparent;color:#fff;border:none;',
+          'font-size:20px;cursor:pointer;padding:0 4px;opacity:0.6;flex-shrink:0;',
+        '">×</button>',
+      '</div>'
+    ].join('');
+    document.body.appendChild(banner);
+
+    document.getElementById('pwa-install-btn').addEventListener('click', function () {
+      _deferredInstallPrompt.prompt();
+      _deferredInstallPrompt.userChoice.then(function () {
+        banner.remove();
+        _deferredInstallPrompt = null;
+      });
+    });
+
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', function () {
+      banner.remove();
+      sessionStorage.setItem('pwa-prompt-dismissed', '1');
+    });
+  }
+});
