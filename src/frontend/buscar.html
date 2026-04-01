@@ -879,6 +879,25 @@
   // ── Render listings ───────────────────────────────────────────
   var SVG_PIN_SMALL = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
+  var _lastResultsState = { count: 0, area: 'Málaga' };
+
+  function updateResultsCount() {
+    const countEl = document.querySelector('.listings-count');
+    if (!countEl) return;
+    const lang = localStorage.getItem('preos-lang') || 'es';
+    const count = _lastResultsState.count;
+    const areaName = _lastResultsState.area;
+    let countText;
+    if (lang === 'en') {
+      countText = count === 1 ? `1 property in ${areaName}` : `${count} properties in ${areaName}`;
+    } else {
+      countText = count === 1 ? `1 propiedad en ${areaName}` : `${count} propiedades en ${areaName}`;
+    }
+    countEl.textContent = countText;
+  }
+
+  document.addEventListener('preos:langchange', updateResultsCount);
+
   function renderListings(props, query, sortValOverride) {
     const sortVal = sortValOverride || document.getElementById('sort-select').value;
     const sorted = [...props].sort((a, b) => {
@@ -890,9 +909,12 @@
     const list    = document.querySelector('.listings-list');
     const countEl = document.querySelector('.listings-count');
 
+    const lang = localStorage.getItem('preos-lang') || 'es';
+
     if (sorted.length === 0) {
       list.innerHTML = renderEmptyState(query || '', _allPropsCache || []);
-      if (countEl) countEl.innerHTML = '0 resultados';
+      _lastResultsState = { count: 0, area: '' };
+      if (countEl) countEl.textContent = lang === 'en' ? '0 results' : '0 resultados';
       return;
     }
 
@@ -926,10 +948,10 @@
       </a>`;
     }).join('');
 
-    const area = query ? (sorted[0].city || query) : 'Málaga';
-    const t = window.PreosLang ? window.PreosLang.strings[localStorage.getItem('preos-lang') || 'es'] : {};
-    const inLabel = (t && t.search_results_in) || 'propiedades en';
-    if (countEl) countEl.innerHTML = `${sorted.length} <span>${inLabel} ${area}</span>`;
+    const rawArea = query ? (sorted[0].city || query) : 'Málaga';
+    const areaName = rawArea.charAt(0).toUpperCase() + rawArea.slice(1);
+    _lastResultsState = { count: sorted.length, area: areaName };
+    updateResultsCount();
   }
 
   // ── Render map markers ────────────────────────────────────────
@@ -1175,6 +1197,7 @@
         rows.forEach(function(r, i) { r.classList.toggle('active', i === _activeIdx); });
       } else if (e.key === 'Enter') {
         e.preventDefault();
+        e.stopPropagation();
         if (_activeIdx >= 0 && rows[_activeIdx]) {
           var val = rows[_activeIdx].getAttribute('data-value');
           _searchInput.value = val;
@@ -1243,6 +1266,8 @@
     if (_navSearchInput) {
       _navSearchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
           var val = this.value.trim();
           if (val) localStorage.setItem('preos_last_search', val);
         }
