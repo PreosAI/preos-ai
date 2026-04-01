@@ -277,6 +277,8 @@ window.PreosLang = (function () {
       filter_3d_tour:           'Con Recorrido 3D',
       filter_apply:             'Aplicar filtros',
       filter_clear:             'Limpiar',
+      mobile_map_toggle_map:    'Ver mapa',
+      mobile_map_toggle_list:   'Ver lista',
 
       // Backward-compat dotted keys used by data-i18n attributes on existing pages
       'nav.comprar':        'Comprar',
@@ -557,6 +559,8 @@ window.PreosLang = (function () {
       filter_3d_tour:           'With 3D Tour',
       filter_apply:             'Apply filters',
       filter_clear:             'Clear',
+      mobile_map_toggle_map:    'Map view',
+      mobile_map_toggle_list:   'List view',
 
       // Backward-compat dotted keys
       'nav.comprar':        'Buy',
