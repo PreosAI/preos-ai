@@ -1,0 +1,333 @@
+/**
+ * lang.js — Global bilingual translation system for Preos.
+ *
+ * Usage:
+ *   window.PreosLang.t('nav_buy')          → current-language string
+ *   window.setLang('en')                   → switch language
+ *   <span data-i18n="nav_buy">            → auto-translated text node
+ *   <input data-i18n-placeholder="nav_search_placeholder">
+ */
+
+window.PreosLang = (function () {
+
+  /* ─────────────────────────────────────────────────────────────────
+     String table
+  ──────────────────────────────────────────────────────────────────── */
+  var strings = {
+    es: {
+      // Nav
+      nav_buy:                'Comprar',
+      nav_sell:               'Vender',
+      nav_agents:             'Agentes de bienes raíces',
+      nav_why:                'Por qué Preos',
+      nav_signin:             'Ingresar',
+      nav_myaccount:          'Mi cuenta',
+      nav_myfavs:             'Mis favoritos',
+      nav_signout:            'Cerrar sesión',
+      nav_search_placeholder: 'Busca por ciudad, dirección o código postal',
+
+      // Hero
+      hero_title_1:   'La forma más fácil de comprar',
+      hero_title_2:   'una propiedad, es con Preos',
+      hero_subtitle:  'Precio real, agentes con salario fijo y datos en tiempo real. Sin sorpresas.',
+      hero_cta_search:'Buscar propiedades',
+      hero_cta_sell:  'Vender mi propiedad',
+
+      // Marketing banner
+      banner_savings_label:   'de ahorro medio por operación',
+      banner_savings_caption: 'Sin comisiones ocultas ni letra pequeña',
+
+      // Why Preos section
+      why_eyebrow:  'Por qué Preos',
+      why_title:    'Compramos diferente',
+      why_subtitle: 'Una plataforma construida desde cero para ponerse del lado del comprador.',
+
+      // Pillars
+      pillar1_title: 'Precios reales',
+      pillar1_desc:  'Accede al historial de precios y estimaciones de valor de cada propiedad. Sin sorpresas ni datos inventados.',
+      pillar2_title: 'Agentes con salario fijo',
+      pillar2_desc:  'Nuestros agentes cobran salario, no comisiones. Su único objetivo es que estés feliz con tu decisión.',
+      pillar3_title: 'Datos en tiempo real',
+      pillar3_desc:  'Conectados a las principales fuentes del mercado español para que siempre estés un paso adelante.',
+
+      // Comparison table
+      compare_title:       'Preos vs. agencia tradicional',
+      compare_aspect:      'Aspecto',
+      compare_traditional: 'Agencia tradicional',
+      compare_preos:       'Preos',
+
+      // Savings calculator
+      calc_title:        '¿Cuánto puedes ahorrar?',
+      calc_label:        'Precio de la propiedad',
+      calc_trad_label:   'Comisión tradicional (5%)',
+      calc_preos_label:  'Tarifa Preos (1,5%)',
+      calc_saving_label: 'Tu ahorro estimado',
+
+      // Agents
+      agents_title:        'Nuestros agentes',
+      agents_subtitle:     'Profesionales certificados con salario fijo. Trabajan para ti, no para la comisión.',
+      agents_salary_badge: 'Salario fijo',
+
+      // Sell page
+      sell_title:    'Vende con Preos',
+      sell_subtitle: 'Pon tu propiedad en el mercado con la plataforma más transparente de España.',
+
+      // Footer
+      footer_tagline: 'La plataforma inmobiliaria más fácil de España.',
+      footer_rights:  '© 2026 Preos. Todos los derechos reservados.',
+
+      // Buscar page
+      buscar_results: 'resultados',
+      buscar_in:      'en Málaga',
+
+      // Property page
+      prop_contact_agent: 'Contactar agente',
+      prop_book_visit:    'Programar recorrido',
+      prop_tour_3d:       'Recorrido 3D',
+
+      // Misc
+      recommended_title: 'Propiedades que te recomendamos ver',
+
+      // Footer headings
+      footer_explore: 'EXPLORAR',
+      footer_company: 'EMPRESA',
+      footer_legal:   'LEGAL',
+
+      // Backward-compat dotted keys used by data-i18n attributes on existing pages
+      'nav.comprar':        'Comprar',
+      'nav.vender':         'Vender',
+      'nav.agentes':        'Agentes de bienes raíces',
+      'nav.micuenta':       'Mi cuenta',
+      'nav.ingresar':       'Ingresar',
+      'hero.title':         'La forma más fácil de comprar una propiedad, es con Preos',
+      'hero.search':        'Busca por ciudad, dirección o código postal',
+      'hero.comprar':       'Comprar',
+      'hero.vender':        'Vender',
+      'recommended.title':  'Propiedades que te recomendamos ver',
+      'footer.explorar':    'EXPLORAR',
+      'footer.empresa':     'EMPRESA',
+      'footer.legal':       'LEGAL',
+    },
+
+    en: {
+      // Nav
+      nav_buy:                'Buy',
+      nav_sell:               'Sell',
+      nav_agents:             'Real Estate Agents',
+      nav_why:                'Why Preos',
+      nav_signin:             'Sign in',
+      nav_myaccount:          'My account',
+      nav_myfavs:             'Saved properties',
+      nav_signout:            'Sign out',
+      nav_search_placeholder: 'Search by city, address or postal code',
+
+      // Hero
+      hero_title_1:   'The easiest way to buy',
+      hero_title_2:   'a property — with Preos',
+      hero_subtitle:  'Honest pricing, salaried agents, real-time market data. No surprises, ever.',
+      hero_cta_search:'Browse properties',
+      hero_cta_sell:  'Sell my property',
+
+      // Marketing banner
+      banner_savings_label:   'average savings per transaction',
+      banner_savings_caption: 'No hidden fees, no small print',
+
+      // Why Preos section
+      why_eyebrow:  'Why Preos',
+      why_title:    'A smarter way to buy',
+      why_subtitle: 'A platform built from the ground up to put the buyer first — always.',
+
+      // Pillars
+      pillar1_title: 'Real prices',
+      pillar1_desc:  'Access full price history and independent valuation estimates for every listing. No guesswork.',
+      pillar2_title: 'Salaried agents',
+      pillar2_desc:  'Our agents earn a fixed salary, not commissions. Their only metric is your satisfaction.',
+      pillar3_title: 'Real-time data',
+      pillar3_desc:  "Connected to Spain's leading property data sources so you're always one step ahead of the market.",
+
+      // Comparison table
+      compare_title:       'Preos vs. traditional agency',
+      compare_aspect:      'Aspect',
+      compare_traditional: 'Traditional agency',
+      compare_preos:       'Preos',
+
+      // Savings calculator
+      calc_title:        'How much could you save?',
+      calc_label:        'Property price',
+      calc_trad_label:   'Traditional commission (5%)',
+      calc_preos_label:  'Preos fee (1.5%)',
+      calc_saving_label: 'Your estimated savings',
+
+      // Agents
+      agents_title:        'Our agents',
+      agents_subtitle:     'Certified professionals on a fixed salary. They work for you, not for a cut.',
+      agents_salary_badge: 'Fixed salary',
+
+      // Sell page
+      sell_title:    'Sell with Preos',
+      sell_subtitle: "List your property on Spain's most transparent real estate platform.",
+
+      // Footer
+      footer_tagline: "Spain's most straightforward property platform.",
+      footer_rights:  '© 2026 Preos. All rights reserved.',
+
+      // Buscar page
+      buscar_results: 'results',
+      buscar_in:      'in Málaga',
+
+      // Property page
+      prop_contact_agent: 'Contact agent',
+      prop_book_visit:    'Schedule a visit',
+      prop_tour_3d:       '3D Tour',
+
+      // Misc
+      recommended_title: 'Properties we recommend',
+
+      // Footer headings
+      footer_explore: 'EXPLORE',
+      footer_company: 'COMPANY',
+      footer_legal:   'LEGAL',
+
+      // Backward-compat dotted keys
+      'nav.comprar':        'Buy',
+      'nav.vender':         'Sell',
+      'nav.agentes':        'Real Estate Agents',
+      'nav.micuenta':       'My account',
+      'nav.ingresar':       'Sign in',
+      'hero.title':         'The easiest way to buy a property, is with Preos',
+      'hero.search':        'Search by city, address or postal code',
+      'hero.comprar':       'Buy',
+      'hero.vender':        'Sell',
+      'recommended.title':  'Properties we recommend',
+      'footer.explorar':    'EXPLORE',
+      'footer.empresa':     'COMPANY',
+      'footer.legal':       'LEGAL',
+    }
+  };
+
+  /* ─────────────────────────────────────────────────────────────────
+     State
+  ──────────────────────────────────────────────────────────────────── */
+  var _lang = 'es';
+
+  /* ─────────────────────────────────────────────────────────────────
+     Language detection
+  ──────────────────────────────────────────────────────────────────── */
+  function detectLang() {
+    // 1. localStorage
+    var stored = localStorage.getItem('preos-lang');
+    if (stored === 'en' || stored === 'es') return stored;
+
+    // Also check the old key used by translations.js for backwards compat
+    var storedOld = localStorage.getItem('preos_lang');
+    if (storedOld === 'en' || storedOld === 'es') return storedOld;
+
+    // 2. Browser language
+    var nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    if (nav.startsWith('en')) return 'en';
+
+    // 3. Default
+    return 'es';
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     Render — apply translations to the current DOM
+  ──────────────────────────────────────────────────────────────────── */
+  function render(lang) {
+    var t = strings[lang] || strings.es;
+
+    // <html lang>
+    document.documentElement.lang = lang;
+
+    // data-i18n text nodes
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+
+    // data-i18n-placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (t[key] !== undefined) el.placeholder = t[key];
+    });
+
+    // Nav links — matched by href so no data-i18n needed on every page
+    document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(function (a) {
+      var href = a.getAttribute('href') || '';
+      if (href.indexOf('buscar') !== -1) { a.textContent = t.nav_buy;    return; }
+      if (href.indexOf('vender') !== -1) { a.textContent = t.nav_sell;   return; }
+      if (href.indexOf('agentes') !== -1){ a.textContent = t.nav_agents; return; }
+    });
+
+    // #nav-ingresar-btn
+    var ingresarBtn = document.getElementById('nav-ingresar-btn');
+    if (ingresarBtn) ingresarBtn.textContent = t.nav_signin;
+
+    // #nav-mi-cuenta — only update if it's the logged-out plain link
+    var miCuenta = document.getElementById('nav-mi-cuenta');
+    if (miCuenta) {
+      var mcLink = miCuenta.tagName === 'A' ? miCuenta : miCuenta.querySelector('a:not([href="dashboard.html"])');
+      // only touch the simple "Mi cuenta" link, not the auth dropdown
+      if (mcLink && !miCuenta.querySelector('.auth-user-btn')) {
+        mcLink.textContent = t.nav_myaccount;
+      }
+    }
+
+    // Lang toggle appearance
+    document.querySelectorAll('.lang-toggle').forEach(function (el) {
+      el.innerHTML = lang === 'en'
+        ? '<strong>EN</strong>&nbsp;|&nbsp;<span style="opacity:.45;font-weight:500">ES</span>'
+        : '<strong>ES</strong>&nbsp;|&nbsp;<span style="opacity:.45;font-weight:500">EN</span>';
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     Public API
+  ──────────────────────────────────────────────────────────────────── */
+
+  /** Translate a single key in the current language. */
+  function t(key) {
+    var dict = strings[_lang] || strings.es;
+    return dict[key] !== undefined ? dict[key] : key;
+  }
+
+  /** Switch language, persist, and re-render the page. */
+  function setLang(lang) {
+    if (lang !== 'en' && lang !== 'es') return;
+    _lang = lang;
+    localStorage.setItem('preos-lang', lang);
+    localStorage.setItem('preos_lang', lang); // keep old key in sync
+    render(lang);
+  }
+
+  /** Detect language, render, and wire toggle click handlers.
+   *  Idempotent — safe to call multiple times. */
+  function init() {
+    _lang = detectLang();
+    render(_lang);
+
+    document.querySelectorAll('.lang-toggle').forEach(function (el) {
+      // Remove any existing listener by cloning (prevents double-binding)
+      var fresh = el.cloneNode(true);
+      el.parentNode.replaceChild(fresh, el);
+      fresh.addEventListener('click', function () {
+        setLang(_lang === 'es' ? 'en' : 'es');
+      });
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     Auto-init on DOMContentLoaded
+  ──────────────────────────────────────────────────────────────────── */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { init: init, setLang: setLang, t: t, strings: strings };
+
+})();
+
+/** Convenience global so inline onclick="setLang('en')" works. */
+window.setLang = function (lang) { window.PreosLang.setLang(lang); };
