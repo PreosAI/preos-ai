@@ -1,8 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="4" fill="#E51B27"/>
-  <g transform="translate(6, 4)" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-    <polyline points="0,11 10,2 20,11"/>
-    <polyline points="3,9 3,20 17,20 17,9"/>
-    <path d="M8,20 L8,15 Q10,13 12,15 L12,20"/>
+  <g transform="translate(4, 4) scale(1)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 10l10-8 10 8v10a1.5 1.5 0 0 1-1.5 1.5H3.5A1.5 1.5 0 0 1 2 20z"/>
+    <polyline points="8,21.5 8,14 12,14 12,21.5"/>
   </g>
 </svg>

@@ -174,8 +174,20 @@ window.PreosLang = (function () {
       sell_subtitle: 'Pon tu propiedad en el mercado con la plataforma más transparente de España.',
 
       // Footer
-      footer_tagline: 'La plataforma inmobiliaria más fácil de España.',
-      footer_rights:  '© 2026 Preos. Todos los derechos reservados.',
+      footer_tagline:       'La plataforma inmobiliaria más fácil de España.',
+      footer_rights:        '© 2026 Preos. Todos los derechos reservados.',
+      footer_rent:          'Alquilar',
+      footer_new_build:     'Obra nueva',
+      footer_commercial:    'Locales comerciales',
+      footer_about:         'Quiénes somos',
+      footer_agents_link:   'Agentes',
+      footer_blog:          'Blog',
+      footer_contact:       'Contacto',
+      footer_privacy:       'Privacidad',
+      footer_terms:         'Términos de uso',
+      footer_cookies:       'Cookies',
+      footer_legal_notice:  'Aviso legal',
+      home_recommended:     'Propiedades que te recomendamos ver',
 
       // Buscar page
       buscar_results: 'resultados',
@@ -442,8 +454,20 @@ window.PreosLang = (function () {
       sell_subtitle: "List your property on Spain's most transparent real estate platform.",
 
       // Footer
-      footer_tagline: "Spain's most straightforward property platform.",
-      footer_rights:  '© 2026 Preos. All rights reserved.',
+      footer_tagline:       "Spain's easiest property platform.",
+      footer_rights:        '© 2026 Preos. All rights reserved.',
+      footer_rent:          'Rent',
+      footer_new_build:     'New builds',
+      footer_commercial:    'Commercial',
+      footer_about:         'About us',
+      footer_agents_link:   'Agents',
+      footer_blog:          'Blog',
+      footer_contact:       'Contact',
+      footer_privacy:       'Privacy',
+      footer_terms:         'Terms of use',
+      footer_cookies:       'Cookies',
+      footer_legal_notice:  'Legal notice',
+      home_recommended:     'Properties we recommend',
 
       // Buscar page
       buscar_results: 'results',
