@@ -1806,12 +1806,42 @@
         setTimeout(function() { if (window._map) window._map.invalidateSize(true); }, 50);
         setTimeout(function() { if (window._map) window._map.invalidateSize(true); }, 200);
         setTimeout(function() { if (window._map) window._map.invalidateSize(true); }, 500);
+        setTimeout(function() {
+          if (window._map && window._currentResults && window._currentResults.length > 0) {
+            var props = window._currentResults.filter(function(p) { return p.lat && p.lng; });
+            if (props.length === 1) {
+              window._map.setView([props[0].lat, props[0].lng], 14);
+            } else if (props.length > 1) {
+              var lats = props.map(function(p) { return p.lat; });
+              var lngs = props.map(function(p) { return p.lng; });
+              window._map.fitBounds([
+                [Math.min.apply(null, lats) - 0.05, Math.min.apply(null, lngs) - 0.05],
+                [Math.max.apply(null, lats) + 0.05, Math.max.apply(null, lngs) + 0.05]
+              ], { padding: [40, 40], maxZoom: 13 });
+            }
+            window._map.invalidateSize(true);
+          }
+        }, 600);
         if (window._currentResults && window._currentResults.length > 0) {
           buildMapCardsStrip();
         } else {
           runSearch();
           setTimeout(function() {
             buildMapCardsStrip();
+            if (window._map && window._currentResults && window._currentResults.length > 0) {
+              var props = window._currentResults.filter(function(p) { return p.lat && p.lng; });
+              if (props.length === 1) {
+                window._map.setView([props[0].lat, props[0].lng], 14);
+              } else if (props.length > 1) {
+                var lats = props.map(function(p) { return p.lat; });
+                var lngs = props.map(function(p) { return p.lng; });
+                window._map.fitBounds([
+                  [Math.min.apply(null, lats) - 0.05, Math.min.apply(null, lngs) - 0.05],
+                  [Math.max.apply(null, lats) + 0.05, Math.max.apply(null, lngs) + 0.05]
+                ], { padding: [40, 40], maxZoom: 13 });
+              }
+              window._map.invalidateSize(true);
+            }
           }, 2000);
         }
       } else {

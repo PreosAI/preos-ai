@@ -164,6 +164,13 @@ if ('serviceWorker' in navigator) {
         });
       })
       .catch(function (err) { console.warn('[Preos PWA] SW failed:', err); });
+
+    // Force clear old caches on every load so PWA always gets fresh content
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        keys.filter(function(k) { return !k.includes('v3'); }).forEach(function(k) { caches.delete(k); });
+      });
+    }
   });
 }
 
