@@ -655,7 +655,6 @@
       flex: 1;
       position: relative;
       overflow: hidden;
-      background: #e8f0e8;
     }
 
     #map { width: 100%; height: 100%; }
@@ -788,13 +787,14 @@
         right: 0;
         bottom: 0;
         z-index: 100;
-        background: #f0f0f0;
+        background: transparent !important;
       }
       body.map-mode #map {
         width: 100%;
         height: 100%;
         height: 100dvh;
-        position: absolute;
+        position: relative;
+        z-index: 1;
         top: 0;
         left: 0;
         right: 0;
