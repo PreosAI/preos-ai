@@ -1768,7 +1768,7 @@
 
     function updateMapToggleVisibility() {
       var btn = document.getElementById('mobileMapToggle');
-      if (btn) btn.style.display = isMobile() ? 'flex' : 'none';
+      if (btn) btn.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
     }
     window.addEventListener('resize', updateMapToggleVisibility);
     updateMapToggleVisibility();
@@ -1781,13 +1781,17 @@
       if (isMapMode) {
         label.textContent = lang === 'en' ? 'List view' : 'Ver lista';
         btn.style.background = '#E51B27';
-        if (!window._currentResults || window._currentResults.length === 0) {
-          runSearch();
+        setTimeout(function() { if (window._map) window._map.invalidateSize(); }, 100);
+        setTimeout(function() { if (window._map) window._map.invalidateSize(); }, 400);
+        if (window._currentResults && window._currentResults.length > 0) {
+          buildMapCardsStrip();
+        } else {
+          runSearch().then(function() {
+            buildMapCardsStrip();
+          }).catch(function() {
+            buildMapCardsStrip();
+          });
         }
-        buildMapCardsStrip();
-        setTimeout(function() {
-          if (window._map) window._map.invalidateSize();
-        }, 100);
       } else {
         label.textContent = lang === 'en' ? 'Map view' : 'Ver mapa';
         btn.style.background = '#1a1a1a';
