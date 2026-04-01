@@ -187,17 +187,17 @@
     .step {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .step-circle {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       flex-shrink: 0;
       transition: background .2s, color .2s;
@@ -208,7 +208,7 @@
     .step.inactive .step-circle { background: #e5e7eb; color: var(--muted); }
 
     .step-label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       white-space: nowrap;
     }
@@ -220,7 +220,8 @@
       flex: 1;
       height: 2px;
       background: var(--border);
-      margin: 0 12px;
+      margin: 0 8px;
+      min-width: 16px;
     }
     .step-connector.done { background: var(--red); }
 
@@ -386,6 +387,59 @@
       background: rgba(204,31,31,.04);
     }
 
+    /* ─── STEP 3 ───────────────────────────────────────────── */
+    .form-field {
+      margin-bottom: 16px;
+    }
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+      background: #fafafa;
+    }
+    .form-field input:focus,
+    .form-field textarea:focus { border-color: #9ca3af; background: #fff; }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .form-field.error input,
+    .form-field.error textarea { border-color: var(--red); }
+    .field-error {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+    .form-field.error .field-error { display: block; }
+    .btn-confirm-tour {
+      width: 100%;
+      background: #E51B27;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background .2s, opacity .2s;
+      margin-top: 4px;
+    }
+    .btn-confirm-tour:hover:not(:disabled) { background: var(--red-hover); }
+    .btn-confirm-tour:disabled { opacity: .6; cursor: not-allowed; }
+
     /* ─── WIZARD FOOTER ────────────────────────────────────── */
     .wizard-footer {
       display: flex;
@@ -455,6 +509,11 @@
     #success-detail {
       font-weight: 600;
       color: var(--text);
+    }
+    .success-agent-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
     }
     .btn-volver {
       background: var(--red);
@@ -542,16 +601,21 @@
   <div class="split-right">
     <div class="wizard-box">
 
-      <!-- Step indicator -->
+      <!-- Step indicator (3 steps) -->
       <div class="steps">
         <div class="step active" id="step-ind-1">
           <div class="step-circle">1</div>
-          <div class="step-label">Selecciona una fecha</div>
+          <div class="step-label">Fecha</div>
         </div>
-        <div class="step-connector" id="step-connector"></div>
+        <div class="step-connector" id="step-connector-1"></div>
         <div class="step inactive" id="step-ind-2">
           <div class="step-circle">2</div>
-          <div class="step-label">Duración y hora</div>
+          <div class="step-label">Hora</div>
+        </div>
+        <div class="step-connector" id="step-connector-2"></div>
+        <div class="step inactive" id="step-ind-3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Tus datos</div>
         </div>
       </div>
 
@@ -610,7 +674,34 @@
 
         <div class="wizard-footer">
           <button class="btn-back" id="btn-step2-back">Atrás</button>
-          <button class="btn-continue" id="btn-step2-continue">Confirmar recorrido</button>
+          <button class="btn-continue" id="btn-step2-continue">Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Contact details -->
+      <div class="step-panel" id="panel-step3">
+        <div class="step-title" data-i18n="bookingName">Tus datos de contacto</div>
+
+        <div class="form-field" id="field-name">
+          <label for="booking-name" data-i18n="bookingName">Nombre completo</label>
+          <input type="text" id="booking-name" autocomplete="name" placeholder="Tu nombre completo">
+          <div class="field-error" id="err-name" data-i18n="bookingNameRequired">Por favor introduce tu nombre.</div>
+        </div>
+
+        <div class="form-field" id="field-phone">
+          <label for="booking-phone" data-i18n="bookingPhone">Teléfono</label>
+          <input type="tel" id="booking-phone" autocomplete="tel" placeholder="+34 600 000 000">
+          <div class="field-error" id="err-phone" data-i18n="bookingPhoneRequired">Por favor introduce tu teléfono.</div>
+        </div>
+
+        <div class="form-field" id="field-message">
+          <label for="booking-message" data-i18n="bookingMessage">Mensaje al agente (opcional)</label>
+          <textarea id="booking-message" rows="3" placeholder="Ej. Me interesa saber más sobre la terraza..."></textarea>
+        </div>
+
+        <div class="wizard-footer" style="flex-direction: column; gap: 10px;">
+          <button class="btn-confirm-tour" id="btn-step3-confirm" data-i18n="bookingConfirm">Confirmar recorrido</button>
+          <button class="btn-back" id="btn-step3-back" style="width:100%; text-align:center;">Atrás</button>
         </div>
       </div>
 
@@ -621,8 +712,10 @@
         </div>
         <div class="success-title">¡Recorrido confirmado!</div>
         <div class="success-desc">
-          Recibirás un correo de confirmación con los detalles.<br>
           <span id="success-detail"></span>
+        </div>
+        <div class="success-agent-note" data-i18n="bookingSuccess">
+          Un agente de Preos se pondrá en contacto contigo en menos de 2 horas.
         </div>
         <a id="btn-volver-prop" href="propiedad.html" class="btn-volver">Volver a la propiedad</a>
       </div>
@@ -635,7 +728,7 @@
   // ── Calendar state ──────────────────────────────────────────
   const today = new Date();
   let viewYear = today.getFullYear();
-  let viewMonth = today.getMonth(); // 0-indexed
+  let viewMonth = today.getMonth();
   let selectedDate = null;
 
   const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -647,13 +740,10 @@
     const datesEl = document.getElementById('cal-dates');
     datesEl.innerHTML = '';
 
-    // First day of month (0=Sun, adjust to Mon-start)
     const firstDay = new Date(viewYear, viewMonth, 1).getDay();
     const offset = (firstDay === 0) ? 6 : firstDay - 1;
-
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-    // Empty cells before first day
     for (let i = 0; i < offset; i++) {
       const empty = document.createElement('div');
       empty.className = 'cal-date empty';
@@ -712,20 +802,33 @@
   document.getElementById('btn-step1-continue').addEventListener('click', () => {
     document.getElementById('panel-step1').classList.remove('active');
     document.getElementById('panel-step2').classList.add('active');
-
-    // Update step indicators
     document.getElementById('step-ind-1').className = 'step done';
     document.getElementById('step-ind-2').className = 'step active';
-    document.getElementById('step-connector').classList.add('done');
+    document.getElementById('step-connector-1').classList.add('done');
   });
 
   document.getElementById('btn-step2-back').addEventListener('click', () => {
     document.getElementById('panel-step2').classList.remove('active');
     document.getElementById('panel-step1').classList.add('active');
-
     document.getElementById('step-ind-1').className = 'step active';
     document.getElementById('step-ind-2').className = 'step inactive';
-    document.getElementById('step-connector').classList.remove('done');
+    document.getElementById('step-connector-1').classList.remove('done');
+  });
+
+  document.getElementById('btn-step2-continue').addEventListener('click', () => {
+    document.getElementById('panel-step2').classList.remove('active');
+    document.getElementById('panel-step3').classList.add('active');
+    document.getElementById('step-ind-2').className = 'step done';
+    document.getElementById('step-ind-3').className = 'step active';
+    document.getElementById('step-connector-2').classList.add('done');
+  });
+
+  document.getElementById('btn-step3-back').addEventListener('click', () => {
+    document.getElementById('panel-step3').classList.remove('active');
+    document.getElementById('panel-step2').classList.add('active');
+    document.getElementById('step-ind-2').className = 'step active';
+    document.getElementById('step-ind-3').className = 'step inactive';
+    document.getElementById('step-connector-2').classList.remove('done');
   });
 
   // ── Time slot selection ──────────────────────────────────────
@@ -735,30 +838,17 @@
       slot.classList.add('selected');
     });
   });
-
-  // ── Step 2 confirm ───────────────────────────────────────────
-  document.getElementById('btn-step2-continue').addEventListener('click', () => {
-    var selDate = selectedDate
-      ? selectedDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
-      : 'la fecha seleccionada';
-    var selSlot = document.querySelector('.time-slot.selected');
-    var selTime = selSlot ? selSlot.textContent.trim() : '';
-    var detail = selDate + (selTime ? ' a las ' + selTime : '');
-    document.getElementById('success-detail').textContent = detail;
-
-    document.getElementById('panel-step2').classList.remove('active');
-    document.getElementById('panel-success').classList.add('active');
-    document.getElementById('step-ind-2').className = 'step done';
-    if (window.PreosAnalytics) PreosAnalytics.trackTourBooked(window._currentProp || null, selDate);
-  });
 </script>
 
 <script src="js/logo-path.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="js/auth-nav.js"></script>
 <script src="js/properties.js"></script>
 <script src="js/lang.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
 <script>
   // ── Load property from ?id= ──────────────────────────────────
   (async function() {
@@ -768,15 +858,138 @@
     try {
       var p = await getPropertyById(propId);
       if (!p) return;
-      document.getElementById('prop-img').src = p.images[0];
+      window._currentProp = p;
+      document.getElementById('prop-img').src = (p.images && p.images[0]) || 'Images/logo.png';
       document.getElementById('prop-img').alt = p.title;
       document.getElementById('prop-info-title').textContent = p.title;
       document.getElementById('prop-info-price').textContent = formatPrice(p.price);
       document.title = 'Agenda un recorrido — ' + p.title;
-      // Back link
       document.getElementById('btn-volver-prop').href = 'propiedad.html?id=' + p.id;
     } catch(e) {}
   })();
+
+  // ── Pre-fill name from Firebase auth ────────────────────────
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user && user.displayName) {
+      document.getElementById('booking-name').value = user.displayName;
+    }
+  });
+
+  // ── EmailJS — wire up when keys are available ─────────────────
+  function sendConfirmationEmail(bookingData) {
+    // TODO: Replace with real EmailJS keys from emailjs.com
+    var SERVICE_ID  = 'YOUR_SERVICE_ID';
+    var TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+    var PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+
+    if (SERVICE_ID === 'YOUR_SERVICE_ID') return; // skip until configured
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+      to_name:  bookingData.name,
+      to_email: bookingData.userEmail,
+      property: document.getElementById('prop-info-title') ? document.getElementById('prop-info-title').textContent : '',
+      date:     bookingData.date,
+      time:     bookingData.time,
+    }, PUBLIC_KEY);
+  }
+
+  /*
+    FIRESTORE RULES — paste these in Firebase Console > Firestore > Rules:
+
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /bookings/{bookingId} {
+          allow create: if true; // anyone can book (incl. unauthenticated)
+          allow read, update: if request.auth != null &&
+            (request.auth.uid == resource.data.userId ||
+             request.auth.token.email.matches('.*@preos\\.ai'));
+          allow delete: if false;
+        }
+      }
+    }
+  */
+
+  // ── Step 3 confirm → Firestore write ─────────────────────────
+  document.getElementById('btn-step3-confirm').addEventListener('click', function() {
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    var T = function(k) { return window.PreosLang ? window.PreosLang.t(k) : k; };
+
+    // Validate
+    var name  = document.getElementById('booking-name').value.trim();
+    var phone = document.getElementById('booking-phone').value.trim();
+    var valid = true;
+
+    document.getElementById('field-name').classList.remove('error');
+    document.getElementById('field-phone').classList.remove('error');
+
+    if (!name) {
+      document.getElementById('field-name').classList.add('error');
+      valid = false;
+    }
+    if (!phone) {
+      document.getElementById('field-phone').classList.add('error');
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Collect data
+    var selDate = selectedDate
+      ? selectedDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
+      : 'la fecha seleccionada';
+    var selDateISO = selectedDate
+      ? selectedDate.toISOString().split('T')[0]
+      : '';
+    var selSlot = document.querySelector('.time-slot.selected');
+    var selTime = selSlot ? selSlot.textContent.trim() : '';
+    var detail  = selDate + (selTime ? ' a las ' + selTime : '');
+
+    var params = new URLSearchParams(window.location.search);
+    var propertyId = params.get('id') || 'unknown';
+    var user = firebase.auth().currentUser;
+
+    var bookingData = {
+      propertyId:  propertyId,
+      userId:      user ? user.uid : 'anonymous',
+      userEmail:   user ? (user.email || '') : '',
+      name:        name,
+      phone:       phone,
+      message:     document.getElementById('booking-message').value.trim(),
+      date:        selDateISO,
+      time:        selTime,
+      status:      'pending',
+      createdAt:   firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Loading state
+    var confirmBtn = document.getElementById('btn-step3-confirm');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = lang === 'en' ? 'Saving...' : 'Guardando...';
+
+    firebase.firestore().collection('bookings').add(bookingData)
+      .then(function(docRef) {
+        // Show success
+        document.getElementById('success-detail').textContent = detail;
+        document.getElementById('panel-step3').classList.remove('active');
+        document.getElementById('panel-success').classList.add('active');
+        document.getElementById('step-ind-3').className = 'step done';
+
+        // Analytics
+        if (window.PreosAnalytics) PreosAnalytics.trackTourBooked(window._currentProp || null, selDateISO);
+
+        // Email confirmation
+        sendConfirmationEmail(bookingData);
+      })
+      .catch(function(err) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = T('bookingConfirm') || 'Confirmar recorrido';
+        var msg = lang === 'en'
+          ? 'Error saving booking. Please try again.'
+          : 'Error al guardar la reserva. Inténtalo de nuevo.';
+        alert(msg);
+        console.error('Firestore booking error:', err);
+      });
+  });
 </script>
 <script src="js/analytics.js"></script>
 </body>

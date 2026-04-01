@@ -280,6 +280,14 @@ window.PreosLang = (function () {
       mobile_map_toggle_map:    'Ver mapa',
       mobile_map_toggle_list:   'Ver lista',
 
+      bookingName:              'Nombre completo',
+      bookingPhone:             'Teléfono',
+      bookingMessage:           'Mensaje al agente (opcional)',
+      bookingConfirm:           'Confirmar recorrido',
+      bookingSuccess:           'Un agente de Preos se pondrá en contacto contigo en menos de 2 horas.',
+      bookingNameRequired:      'Por favor introduce tu nombre.',
+      bookingPhoneRequired:     'Por favor introduce tu teléfono.',
+
       // Backward-compat dotted keys used by data-i18n attributes on existing pages
       'nav.comprar':        'Comprar',
       'nav.vender':         'Vender',
@@ -561,6 +569,14 @@ window.PreosLang = (function () {
       filter_clear:             'Clear',
       mobile_map_toggle_map:    'Map view',
       mobile_map_toggle_list:   'List view',
+
+      bookingName:              'Full name',
+      bookingPhone:             'Phone',
+      bookingMessage:           'Message to agent (optional)',
+      bookingConfirm:           'Confirm tour',
+      bookingSuccess:           'A Preos agent will contact you within 2 hours.',
+      bookingNameRequired:      'Please enter your name.',
+      bookingPhoneRequired:     'Please enter your phone number.',
 
       // Backward-compat dotted keys
       'nav.comprar':        'Buy',
