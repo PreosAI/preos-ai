@@ -142,8 +142,8 @@
 
     /* ─── HERO ─────────────────────────────────────────────── */
     .hero {
-      position: relative;
-      min-height: 480px;
+      background: #E51B27;
+      min-height: 420px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -151,21 +151,7 @@
       padding: 120px 40px 80px;
     }
 
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, #111 0%, #333 100%);
-    }
-
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.3);
-    }
-
     .hero-content {
-      position: relative;
-      z-index: 2;
       max-width: 720px;
     }
 
@@ -173,15 +159,70 @@
       font-size: clamp(28px, 4vw, 50px);
       font-weight: 800;
       color: #fff;
-      line-height: 1.15;
+      line-height: 1.12;
       letter-spacing: -1px;
       margin-bottom: 20px;
     }
 
     .hero-subtitle {
-      font-size: 18px;
-      color: rgba(255,255,255,.8);
+      font-size: clamp(16px, 1.8vw, 19px);
+      color: rgba(255,255,255,.88);
       line-height: 1.65;
+    }
+
+    /* ─── STATS BAR ────────────────────────────────────────── */
+    .stats-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 64px;
+    }
+    .stats-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .stat-item {
+      padding: 32px 24px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-val {
+      font-size: 32px;
+      font-weight: 800;
+      color: #E51B27;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    /* ─── SALARY MODEL ─────────────────────────────────────── */
+    .model-section {
+      background: #f9f9f9;
+      border-bottom: 1px solid var(--border);
+      padding: 72px 64px;
+    }
+    .model-inner {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .model-title {
+      font-size: clamp(22px, 2.8vw, 32px);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+    .model-body {
+      font-size: 16px;
+      color: #374151;
+      line-height: 1.8;
     }
 
     /* ─── PILLARS ───────────────────────────────────────────── */
@@ -464,6 +505,12 @@
     @media (max-width: 768px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
+      .hero { padding: 100px 24px 64px; }
+      .stats-bar { padding: 0 24px; }
+      .stats-inner { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 24px; }
+      .stat-item:last-child { border-bottom: none; }
+      .model-section { padding: 56px 24px; }
       .pillars-grid { grid-template-columns: 1fr; }
       .pillars-section, .req-section { padding: 60px 24px; }
       .footer-grid { grid-template-columns: 1fr; }
@@ -507,37 +554,61 @@
 
 <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
   <div class="hero-content">
-    <h1 class="hero-title">Conviértete en agente Preos</h1>
-    <p class="hero-subtitle">Un nuevo modelo de agencia inmobiliaria centrado en el cliente — con salario fijo, sin presión de comisiones.</p>
+    <h1 class="hero-title" data-i18n="agents_hero_title">Agentes que trabajan para ti, no por su comisión.</h1>
+    <p class="hero-subtitle" data-i18n="agents_hero_sub">En Preos, nuestros agentes cobran salario fijo. Su único incentivo es que tú estés satisfecho.</p>
+  </div>
+</section>
+
+<!-- ═══ STATS BAR ════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-val" data-i18n="agents_stat1_val">24/7</div>
+      <div class="stat-label" data-i18n="agents_stat1_label">Disponibilidad</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" data-i18n="agents_stat2_val">NPS >80</div>
+      <div class="stat-label" data-i18n="agents_stat2_label">Satisfacción objetivo</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" data-i18n="agents_stat3_val">0€</div>
+      <div class="stat-label" data-i18n="agents_stat3_label">Comisión oculta</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SALARY MODEL ═════════════════════════════════════════════ -->
+<section class="model-section">
+  <div class="model-inner">
+    <h2 class="model-title" data-i18n="agents_model_title">¿Por qué importa el modelo de salario?</h2>
+    <p class="model-body" data-i18n="agents_model_body">Un agente tradicional cobra solo si vende, y cuanto más alto el precio, mejor para él. Eso crea un conflicto de interés directo con el comprador. En Preos, eliminamos ese conflicto: nuestros agentes cobran sueldo fijo y bonus por satisfacción del cliente (NPS). El resultado: más honestidad, menos presión, mejores decisiones.</p>
   </div>
 </section>
 
 <!-- ═══ 3 PILARES ══════════════════════════════════════════════ -->
 <section class="pillars-section">
   <div class="pillars-inner">
-    <div class="section-tag">Por qué Preos</div>
-    <h2 class="section-heading">Un modelo diferente</h2>
+    <div class="section-tag" data-i18n="agents_pillars_tag">Por qué Preos</div>
+    <h2 class="section-heading" data-i18n="agents_pillars_heading">Un modelo diferente</h2>
     <div class="pillars-grid">
 
       <div class="pillar-card">
         <div class="pillar-icon">💰</div>
-        <div class="pillar-title">Salario fijo, sin comisiones</div>
-        <div class="pillar-desc">Olvídate de la presión de vender para cobrar. En Preos cobrarás un salario competitivo para que te centres en lo que importa: el cliente.</div>
+        <div class="pillar-title" data-i18n="agents_p1_title">Salario fijo, sin comisiones</div>
+        <div class="pillar-desc" data-i18n="agents_p1_desc">Olvídate de la presión de vender para cobrar. En Preos cobrarás un salario competitivo para que te centres en lo que importa: el cliente.</div>
       </div>
 
       <div class="pillar-card">
         <div class="pillar-icon">⭐</div>
-        <div class="pillar-title">Éxito medido por satisfacción</div>
-        <div class="pillar-desc">Tu desempeño se mide por las valoraciones de tus clientes, no por el número de ventas. Calidad sobre cantidad.</div>
+        <div class="pillar-title" data-i18n="agents_p2_title">Éxito medido por satisfacción</div>
+        <div class="pillar-desc" data-i18n="agents_p2_desc">Tu desempeño se mide por las valoraciones de tus clientes, no por el número de ventas. Calidad sobre cantidad.</div>
       </div>
 
       <div class="pillar-card">
         <div class="pillar-icon">📈</div>
-        <div class="pillar-title">Crece con nosotros</div>
-        <div class="pillar-desc">Formación continua, herramientas digitales de última generación y un equipo que te apoya en cada paso.</div>
+        <div class="pillar-title" data-i18n="agents_p3_title">Crece con nosotros</div>
+        <div class="pillar-desc" data-i18n="agents_p3_desc">Formación continua, herramientas digitales de última generación y un equipo que te apoya en cada paso.</div>
       </div>
 
     </div>
@@ -547,23 +618,23 @@
 <!-- ═══ REQUISITOS ══════════════════════════════════════════════ -->
 <section class="req-section">
   <div class="req-inner">
-    <div class="section-tag">Requisitos</div>
-    <h2 class="section-heading" style="margin-bottom:32px;">¿Qué buscamos?</h2>
+    <div class="section-tag" data-i18n="agents_req_tag">Requisitos</div>
+    <h2 class="section-heading" style="margin-bottom:32px;" data-i18n="agents_req_heading">¿Qué buscamos?</h2>
     <ul class="req-list">
       <li>
         <div class="req-check">✓</div>
-        Experiencia en inmobiliaria o atención al cliente
+        <span data-i18n="agents_req1">Experiencia en inmobiliaria o atención al cliente</span>
       </li>
       <li>
         <div class="req-check">✓</div>
-        Pasión por ayudar a las personas
+        <span data-i18n="agents_req2">Pasión por ayudar a las personas</span>
       </li>
       <li>
         <div class="req-check">✓</div>
-        Basado/a en la zona de Málaga
+        <span data-i18n="agents_req3">Basado/a en la zona de Málaga</span>
       </li>
     </ul>
-    <button class="btn-red" onclick="openModal('modal-solicitud')">Solicitar información</button>
+    <button class="btn-red" onclick="openModal('modal-solicitud')" data-i18n="agents_req_cta">Solicitar información</button>
   </div>
 </section>
 
@@ -573,23 +644,23 @@
 <div class="modal-overlay" id="modal-solicitud">
   <div class="modal-card">
     <button class="modal-close" onclick="closeModal('modal-solicitud')">✕</button>
-    <div class="modal-title">Solicitar información</div>
+    <div class="modal-title" data-i18n="agents_modal_title">Solicitar información</div>
     <div class="field">
-      <label>Nombre</label>
-      <input type="text" id="form-nombre" placeholder="Tu nombre completo">
+      <label data-i18n="agents_form_name">Nombre</label>
+      <input type="text" id="form-nombre" placeholder="Tu nombre completo" data-i18n-placeholder="agents_form_name_ph">
     </div>
     <div class="field">
-      <label>Email</label>
+      <label data-i18n="agents_form_email">Email</label>
       <input type="email" id="form-email" placeholder="tu@email.com">
     </div>
     <div class="field">
-      <label>Teléfono</label>
+      <label data-i18n="agents_form_phone">Teléfono</label>
       <input type="tel" id="form-telefono" placeholder="+34 600 000 000">
     </div>
     <div class="field">
-      <label>Años de experiencia</label>
+      <label data-i18n="agents_form_exp">Años de experiencia</label>
       <select id="form-experiencia">
-        <option value="">Selecciona...</option>
+        <option value="" data-i18n="agents_form_exp_ph">Selecciona...</option>
         <option value="0">Sin experiencia previa</option>
         <option value="1">Menos de 1 año</option>
         <option value="1-3">1–3 años</option>
@@ -597,7 +668,7 @@
         <option value="5+">Más de 5 años</option>
       </select>
     </div>
-    <button class="modal-submit" onclick="submitSolicitud()">Enviar solicitud</button>
+    <button class="modal-submit" onclick="submitSolicitud()" data-i18n="agents_form_submit">Enviar solicitud</button>
   </div>
 </div>
 
