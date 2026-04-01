@@ -1713,7 +1713,6 @@
           });
         } else {
           hideSuggestions();
-          runSearch('');
         }
       }, 200);
     });
@@ -1736,6 +1735,7 @@
           var val = rows[_activeIdx].getAttribute('data-value');
           _searchInput.value = val;
         }
+        if (!_searchInput.value.trim()) { hideSuggestions(); return; }
         hideSuggestions();
         triggerSearch(_searchInput.value);
       } else if (e.key === 'Escape') {

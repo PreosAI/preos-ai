@@ -631,6 +631,14 @@
       .marketing-banner { padding: 52px 24px; }
       .marketing-actions { flex-direction: column; align-items: flex-start; gap: 16px; }
     }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-6px); }
+      40%       { transform: translateX(6px); }
+      60%       { transform: translateX(-4px); }
+      80%       { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.4s ease; }
   </style>
 </head>
 <body>
@@ -964,13 +972,27 @@
         } else if (e.key === 'Enter') {
           e.preventDefault();
           var val = _idx >= 0 && rows[_idx] ? rows[_idx].getAttribute('data-val') : inp.value.trim();
+          if (!val) {
+            inp.classList.add('shake');
+            setTimeout(function() { inp.classList.remove('shake'); }, 400);
+            return;
+          }
           navigate(val);
         } else if (e.key === 'Escape') {
           box.style.display = 'none';
         }
       });
 
-      btn.addEventListener('click', function() { navigate(inp.value.trim()); });
+      btn.addEventListener('click', function() {
+        var q = inp.value.trim();
+        if (!q) {
+          inp.classList.add('shake');
+          setTimeout(function() { inp.classList.remove('shake'); }, 400);
+          inp.focus();
+          return;
+        }
+        navigate(q);
+      });
 
       document.addEventListener('click', function(e) {
         var c = document.getElementById('heroSearchContainer');
