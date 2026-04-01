@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agentes Preos — Encuentra tu agente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #cc1f1f; --red-b: #E51B27; --red-hover: #b01a1a;
+      --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+      --bg: #f5f6f8; --nav-h: 64px;
+    }
+    body { font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ── NAV ── */
+    nav { position:fixed; top:0; left:0; right:0; z-index:200; background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.08); height:var(--nav-h); display:flex; align-items:center; padding:0 32px; gap:24px; }
+    .nav-links { display:flex; gap:24px; list-style:none; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .nav-links a:hover { color:var(--red); }
+    .nav-right { margin-left:auto; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+    .btn-ingresar { background:var(--red); color:#fff; border:none; padding:7px 20px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
+    .lang-toggle { font-size:12px; font-weight:500; color:var(--text); cursor:pointer; user-select:none; }
+    .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; margin-left:8px; }
+    .hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; display:block; transition:.2s; }
+    .mobile-menu { display:none; flex-direction:column; gap:0; background:#fff; padding:8px 0; border-top:1px solid var(--border); }
+    .mobile-menu a { padding:12px 24px; font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .mobile-menu.open { display:flex; }
+
+    /* ── PAGE BODY ── */
+    .page-wrap { margin-top:var(--nav-h); flex:1; }
+
+    /* ── HERO BAND ── */
+    .search-hero { background:#fff; border-bottom:1px solid var(--border); padding:32px 0 28px; }
+    .search-hero-inner { max-width:900px; margin:0 auto; padding:0 24px; }
+    .search-hero-title { font-size:clamp(22px,4vw,30px); font-weight:800; margin-bottom:6px; }
+    .search-hero-title span { color:var(--red); }
+    .search-hero-sub { font-size:14px; color:var(--muted); margin-bottom:20px; }
+    .search-bar-row { display:flex; gap:10px; align-items:center; }
+    .search-bar-inp { flex:1; height:44px; border:1.5px solid var(--border); border-radius:8px; padding:0 14px; font-size:14px; font-family:'Inter',sans-serif; color:var(--text); outline:none; background:#fff; }
+    .search-bar-inp:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(229,27,39,.08); }
+    .search-bar-btn { height:44px; padding:0 20px; background:var(--red-b); color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; white-space:nowrap; }
+    .search-bar-btn:hover { background:var(--red-hover); }
+    .result-count { margin-top:12px; font-size:13px; color:var(--muted); }
+
+    /* ── AGENT CARDS ── */
+    .agents-section { max-width:900px; margin:0 auto; padding:28px 24px 60px; }
+    .agents-list { display:flex; flex-direction:column; gap:16px; }
+
+    .agent-card {
+      background:#fff; border:1px solid var(--border); border-radius:12px;
+      padding:24px; display:flex; gap:20px; align-items:flex-start;
+      box-shadow:0 1px 3px rgba(0,0,0,.04); transition:box-shadow .15s;
+    }
+    .agent-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.09); }
+
+    .agent-avatar {
+      width:64px; height:64px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; font-weight:700; color:#fff;
+    }
+    .agent-avatar img { width:64px; height:64px; border-radius:50%; object-fit:cover; }
+
+    .agent-body { flex:1; min-width:0; }
+    .agent-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:4px; }
+    .agent-name { font-size:17px; font-weight:700; }
+    .agent-rating { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+    .agent-rating-score { font-size:14px; font-weight:700; color:var(--text); }
+    .agent-rating-reviews { font-size:12px; color:var(--muted); }
+    .stars { color:#f59e0b; font-size:13px; letter-spacing:-1px; }
+
+    .agent-meta { font-size:12px; color:var(--muted); margin-bottom:10px; }
+    .agent-meta strong { color:var(--text); font-weight:600; }
+
+    .agent-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+    .agent-tag { background:#f3f4f6; color:var(--text); border-radius:999px; padding:3px 10px; font-size:12px; font-weight:500; }
+    .agent-tag-lang { background:#eff6ff; color:#1d4ed8; }
+
+    .agent-bio { font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:12px;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+    .agent-stats { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:14px; }
+    .agent-stat { font-size:13px; color:var(--text); }
+    .agent-stat strong { font-weight:700; }
+    .agent-stat-sep { color:var(--border); }
+
+    .btn-agent-profile {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 18px; background:var(--red-b); color:#fff;
+      border:none; border-radius:8px; font-size:13px; font-weight:600;
+      font-family:'Inter',sans-serif; cursor:pointer; text-decoration:none;
+      transition:background .12s;
+    }
+    .btn-agent-profile:hover { background:var(--red-hover); }
+
+    /* ── EMPTY STATE ── */
+    .agents-empty { text-align:center; padding:60px 24px; }
+    .agents-empty-icon { font-size:48px; margin-bottom:16px; }
+    .agents-empty-title { font-size:18px; font-weight:700; margin-bottom:8px; }
+    .agents-empty-sub { font-size:14px; color:var(--muted); margin-bottom:24px; }
+    .notify-form { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+    .notify-inp { width:260px; height:40px; border:1.5px solid var(--border); border-radius:8px; padding:0 12px; font-size:14px; font-family:'Inter',sans-serif; outline:none; }
+    .notify-inp:focus { border-color:var(--red); }
+    .notify-btn { height:40px; padding:0 18px; background:var(--red-b); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; }
+    .notify-btn:hover { background:var(--red-hover); }
+
+    /* ── SPINNER ── */
+    .spinner-wrap { text-align:center; padding:60px 0; }
+    .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin .6s linear infinite; margin:0 auto 10px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer { background:#111827; color:#9ca3af; padding:32px 40px 24px; margin-top:auto; }
+    .footer-inner { max-width:1200px; margin:0 auto; }
+    .footer-bottom { display:flex; align-items:center; justify-content:space-between; font-size:12px; flex-wrap:wrap; gap:12px; }
+    .footer-bottom-links { display:flex; gap:16px; }
+    .footer-bottom-links a { color:#9ca3af; text-decoration:none; }
+    .footer-bottom-links a:hover { color:#fff; }
+
+    @media (max-width:640px) {
+      .hamburger { display:flex; }
+      .nav-links { display:none; }
+      .agent-card { flex-direction:column; }
+      .agent-top { flex-direction:column; align-items:flex-start; }
+      .search-bar-row { flex-direction:column; align-items:stretch; }
+      .search-bar-btn { width:100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" style="display:flex;align-items:center;">
+    <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0);">
+  </a>
+  <ul class="nav-links">
+    <li><a href="buscar.html" data-i18n="nav_buy">Comprar</a></li>
+    <li><a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a></li>
+    <li><a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a></li>
+    <li><a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px;font-weight:500;color:inherit;text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle"><strong>ES</strong>&nbsp;|&nbsp;<span style="opacity:.45">EN</span></div>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html" data-i18n="nav_buy">Comprar</a>
+  <a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a>
+  <a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a>
+  <a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin:8px 24px;">Ingresar</a>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ═══ SEARCH HERO ═══════════════════════════════════════════ -->
+  <div class="search-hero">
+    <div class="search-hero-inner">
+      <h1 class="search-hero-title" id="page-title">Agentes Preos en <span id="query-label">tu zona</span></h1>
+      <p class="search-hero-sub" id="page-sub">Agentes locales, sueldo fijo, sin comisiones ocultas.</p>
+      <div class="search-bar-row">
+        <input type="text" id="area-search" class="search-bar-inp" placeholder="Busca por zona, ciudad o municipio..." autocomplete="off"/>
+        <button class="search-bar-btn" id="area-search-btn">Buscar agentes</button>
+      </div>
+      <p class="result-count" id="result-count"></p>
+    </div>
+  </div>
+
+  <!-- ═══ AGENTS LIST ═══════════════════════════════════════════ -->
+  <div class="agents-section">
+    <div class="spinner-wrap" id="loading-wrap">
+      <div class="spinner"></div>
+      <div style="font-size:13px;color:var(--muted);">Cargando agentes...</div>
+    </div>
+    <div class="agents-list" id="agents-list" style="display:none;"></div>
+    <div class="agents-empty" id="agents-empty" style="display:none;">
+      <div class="agents-empty-icon">🗺️</div>
+      <div class="agents-empty-title" id="empty-title">No tenemos agentes en esa zona todavía.</div>
+      <div class="agents-empty-sub" id="empty-sub">Pero nos estamos expandiendo. Déjanos tu email y te avisamos cuando lleguemos.</div>
+      <div class="notify-form">
+        <input type="email" class="notify-inp" id="notify-email" placeholder="tu@email.com"/>
+        <button class="notify-btn" id="notify-btn">Avisar</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .page-wrap -->
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-bottom">
+      <span>© 2026 Preos. Todos los derechos reservados.</span>
+      <div class="footer-bottom-links">
+        <a href="index.html">Inicio</a>
+        <a href="buscar.html">Comprar</a>
+        <a href="por-que-preos.html">¿Por qué Preos?</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/lang.js"></script>
+<script>
+  /* ─── Hamburger ──────────────────────────────────────────── */
+  var _ham = document.getElementById('hamburger');
+  var _menu = document.getElementById('mobile-menu');
+  if (_ham && _menu) {
+    _ham.addEventListener('click', function() {
+      _ham.classList.toggle('open');
+      _menu.classList.toggle('open');
+    });
+  }
+
+  /* ─── Avatar colours (cycle 6) ──────────────────────────── */
+  var AVATAR_COLORS = ['#cc1f1f','#1d4ed8','#15803d','#92400e','#5b21b6','#0e7490'];
+
+  function initials(name) {
+    var parts = name.trim().split(' ');
+    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  }
+
+  function starsHTML(rating) {
+    var full = Math.floor(rating);
+    var half = rating - full >= 0.5;
+    var s = '';
+    for (var i = 0; i < full; i++) s += '★';
+    if (half) s += '½';
+    return '<span class="stars">' + s + '</span>';
+  }
+
+  /* ─── Normalise string for matching ────────────────────── */
+  function norm(s) { return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+  /* ─── Load agents.json ──────────────────────────────────── */
+  var _agents = [];
+  var _query  = '';
+
+  function loadAgents() {
+    var params = new URLSearchParams(window.location.search);
+    _query = (params.get('q') || '').trim();
+
+    // Pre-fill search bar
+    var inp = document.getElementById('area-search');
+    if (inp && _query) inp.value = _query;
+
+    // Update page title query label
+    var qlabel = document.getElementById('query-label');
+    var isEN = (localStorage.getItem('preos-lang') || 'es') === 'en';
+    if (qlabel) {
+      qlabel.textContent = _query || (isEN ? 'your area' : 'tu zona');
+    }
+    if (!_query) {
+      document.getElementById('page-title').innerHTML =
+        isEN ? 'Preos Agents' : 'Agentes Preos';
+    }
+
+    document.getElementById('loading-wrap').style.display = 'block';
+    document.getElementById('agents-list').style.display = 'none';
+    document.getElementById('agents-empty').style.display = 'none';
+
+    fetch('data/agents.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        _agents = data;
+        document.getElementById('loading-wrap').style.display = 'none';
+        renderAgents(_query);
+      })
+      .catch(function(err) {
+        console.error('Failed to load agents:', err);
+        document.getElementById('loading-wrap').style.display = 'none';
+        document.getElementById('agents-empty').style.display = 'block';
+      });
+  }
+
+  function renderAgents(query) {
+    var isEN = (localStorage.getItem('preos-lang') || 'es') === 'en';
+    var nq = norm(query);
+
+    var filtered = _agents;
+    if (nq) {
+      filtered = _agents.filter(function(a) {
+        return a.areas.some(function(area) {
+          return norm(area).indexOf(nq) !== -1;
+        }) || norm(a.name).indexOf(nq) !== -1;
+      });
+    }
+
+    // Result count
+    var countEl = document.getElementById('result-count');
+    if (countEl) {
+      if (filtered.length === 0) {
+        countEl.textContent = '';
+      } else if (isEN) {
+        countEl.textContent = filtered.length + ' agent' + (filtered.length !== 1 ? 's' : '') + ' available in your area';
+      } else {
+        countEl.textContent = filtered.length + ' agente' + (filtered.length !== 1 ? 's' : '') + ' disponible' + (filtered.length !== 1 ? 's' : '') + ' en tu zona';
+      }
+    }
+
+    var listEl = document.getElementById('agents-list');
+    var emptyEl = document.getElementById('agents-empty');
+
+    if (!filtered.length) {
+      listEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      document.getElementById('empty-title').textContent =
+        isEN ? "We don't have agents in that area yet." : 'No tenemos agentes en esa zona todavía.';
+      document.getElementById('empty-sub').textContent =
+        isEN ? "But we're expanding. Leave your email and we'll let you know when we arrive."
+             : 'Pero nos estamos expandiendo. Déjanos tu email y te avisamos cuando lleguemos.';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    listEl.style.display = 'flex';
+    emptyEl.style.display = 'none';
+
+    filtered.forEach(function(agent, idx) {
+      var color = AVATAR_COLORS[idx % AVATAR_COLORS.length];
+      var avatarHTML = agent.photo
+        ? '<img src="' + agent.photo + '" alt="' + agent.name + '">'
+        : '<div class="agent-avatar" style="background:' + color + ';">' + initials(agent.name) + '</div>';
+
+      var title = isEN ? agent.title_en : agent.title_es;
+      var bio   = isEN ? agent.bio_en   : agent.bio_es;
+      var sinceTxt = isEN ? 'Preos Agent since ' : 'Agente Preos · desde ';
+
+      var areaTags = agent.areas.map(function(a) {
+        return '<span class="agent-tag">📍 ' + a + '</span>';
+      }).join('');
+
+      var langTags = agent.languages.map(function(l) {
+        return '<span class="agent-tag agent-tag-lang">🌐 ' + l + '</span>';
+      }).join('');
+
+      var soldTxt   = isEN ? ' properties sold' : ' vendidas';
+      var daysTxt   = isEN ? ' avg. days' : ' días promedio';
+
+      var card = document.createElement('div');
+      card.className = 'agent-card';
+      card.innerHTML =
+        (agent.photo
+          ? '<img class="agent-avatar" src="' + agent.photo + '" alt="' + agent.name + '">'
+          : '<div class="agent-avatar" style="background:' + color + ';width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;">' + initials(agent.name) + '</div>'
+        ) +
+        '<div class="agent-body">' +
+          '<div class="agent-top">' +
+            '<div>' +
+              '<div class="agent-name">' + agent.name + '</div>' +
+              '<div class="agent-meta">' + sinceTxt + '<strong>' + agent.listed_since + '</strong></div>' +
+            '</div>' +
+            '<div class="agent-rating">' +
+              starsHTML(agent.rating) +
+              '<span class="agent-rating-score">' + agent.rating.toFixed(1) + '</span>' +
+              '<span class="agent-rating-reviews">(' + agent.reviews + ' reseñas)</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="agent-tags">' + areaTags + langTags + '</div>' +
+          '<p class="agent-bio">' + bio + '</p>' +
+          '<div class="agent-stats">' +
+            '<span class="agent-stat"><strong>' + agent.properties_sold + '</strong>' + soldTxt + '</span>' +
+            '<span class="agent-stat-sep">·</span>' +
+            '<span class="agent-stat"><strong>' + agent.avg_days_to_sell + '</strong>' + daysTxt + '</span>' +
+          '</div>' +
+          '<a class="btn-agent-profile" href="agente-perfil.html?id=' + agent.id + '">' +
+            (isEN ? 'View profile →' : 'Ver perfil →') +
+          '</a>' +
+        '</div>';
+
+      listEl.appendChild(card);
+    });
+  }
+
+  /* ─── Search bar ────────────────────────────────────────── */
+  document.getElementById('area-search-btn').addEventListener('click', function() {
+    var q = document.getElementById('area-search').value.trim();
+    var params = new URLSearchParams(window.location.search);
+    params.set('q', q);
+    if (q) {
+      window.history.replaceState({}, '', '?' + params.toString());
+      _query = q;
+      var qlabel = document.getElementById('query-label');
+      var isEN = (localStorage.getItem('preos-lang') || 'es') === 'en';
+      if (qlabel) qlabel.textContent = q;
+      document.getElementById('page-title').innerHTML =
+        (isEN ? 'Preos Agents in <span id="query-label">' : 'Agentes Preos en <span id="query-label">') + q + '</span>';
+      renderAgents(q);
+    }
+  });
+
+  document.getElementById('area-search').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('area-search-btn').click();
+  });
+
+  /* ─── Notify button (mailto fallback) ──────────────────── */
+  document.getElementById('notify-btn').addEventListener('click', function() {
+    var email = document.getElementById('notify-email').value.trim();
+    if (!email) return;
+    window.location.href = 'mailto:hola@preos.ai?subject=Avisar%20cuando%20lleguen%20agentes&body=' + encodeURIComponent(email);
+  });
+
+  /* ─── Init ──────────────────────────────────────────────── */
+  loadAgents();
+</script>
+</body>
+</html>

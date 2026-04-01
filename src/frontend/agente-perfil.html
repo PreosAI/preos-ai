@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perfil de agente — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --red:#cc1f1f; --red-b:#E51B27; --red-hover:#b01a1a;
+      --text:#1a1a1a; --muted:#6b7280; --border:#e5e7eb;
+      --bg:#f5f6f8; --nav-h:64px;
+    }
+    body { font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ── NAV ── */
+    nav { position:fixed; top:0; left:0; right:0; z-index:200; background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.08); height:var(--nav-h); display:flex; align-items:center; padding:0 32px; gap:24px; }
+    .nav-links { display:flex; gap:24px; list-style:none; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .nav-links a:hover { color:var(--red); }
+    .nav-right { margin-left:auto; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+    .btn-ingresar { background:var(--red); color:#fff; border:none; padding:7px 20px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
+    .lang-toggle { font-size:12px; font-weight:500; color:var(--text); cursor:pointer; user-select:none; }
+    .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; margin-left:8px; }
+    .hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; display:block; }
+    .mobile-menu { display:none; flex-direction:column; background:#fff; padding:8px 0; border-top:1px solid var(--border); }
+    .mobile-menu a { padding:12px 24px; font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .mobile-menu.open { display:flex; }
+
+    /* ── PAGE ── */
+    .page-wrap { margin-top:var(--nav-h); flex:1; }
+    .page-inner { max-width:1040px; margin:0 auto; padding:36px 24px 60px; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { font-size:13px; color:var(--muted); margin-bottom:24px; }
+    .breadcrumb a { color:var(--muted); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--red); }
+    .breadcrumb span { margin:0 6px; }
+
+    /* ── TWO-COLUMN ── */
+    .profile-grid { display:grid; grid-template-columns:1fr 380px; gap:28px; align-items:start; }
+
+    /* ── LEFT: PROFILE INFO ── */
+    .profile-card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:32px; }
+
+    .profile-header { display:flex; gap:20px; align-items:flex-start; margin-bottom:24px; }
+    .profile-avatar { width:80px; height:80px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; color:#fff; }
+    .profile-avatar img { width:80px; height:80px; border-radius:50%; object-fit:cover; }
+    .profile-header-info { flex:1; }
+    .profile-name { font-size:22px; font-weight:800; margin-bottom:4px; }
+    .profile-title { font-size:14px; color:var(--muted); margin-bottom:8px; }
+    .profile-rating { display:flex; align-items:center; gap:6px; font-size:13px; }
+    .stars { color:#f59e0b; font-size:15px; letter-spacing:-1px; }
+    .profile-rating-score { font-weight:700; }
+    .profile-rating-reviews { color:var(--muted); }
+
+    .profile-tags-section { margin-bottom:20px; }
+    .profile-tags-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+    .profile-tags { display:flex; flex-wrap:wrap; gap:6px; }
+    .profile-tag { background:#f3f4f6; color:var(--text); border-radius:999px; padding:4px 12px; font-size:13px; font-weight:500; }
+    .profile-tag-lang { background:#eff6ff; color:#1d4ed8; }
+    .profile-since { font-size:13px; color:var(--muted); margin-bottom:20px; }
+    .profile-since strong { color:var(--text); }
+
+    /* Stats row */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; }
+    .stat-box { background:#f5f6f8; border-radius:10px; padding:16px 12px; text-align:center; }
+    .stat-value { font-size:22px; font-weight:800; color:var(--text); margin-bottom:2px; }
+    .stat-label { font-size:11px; color:var(--muted); font-weight:500; }
+
+    /* About */
+    .section-heading { font-size:16px; font-weight:700; margin-bottom:12px; }
+    .profile-bio { font-size:14px; color:#374151; line-height:1.65; margin-bottom:28px; }
+
+    /* Why Preos */
+    .why-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .why-list li { display:flex; align-items:flex-start; gap:10px; font-size:14px; line-height:1.5; }
+    .why-icon { flex-shrink:0; font-size:15px; margin-top:1px; }
+
+    /* ── RIGHT: CONTACT CARD (sticky) ── */
+    .contact-card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:28px; position:sticky; top:calc(var(--nav-h) + 16px); }
+    .contact-heading { font-size:17px; font-weight:700; margin-bottom:4px; }
+    .contact-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px; }
+    .form-input, .form-textarea {
+      width:100%; border:1.5px solid var(--border); border-radius:8px;
+      padding:9px 12px; font-size:14px; font-family:'Inter',sans-serif;
+      color:var(--text); outline:none; background:#fff; transition:border-color .15s;
+    }
+    .form-input:focus, .form-textarea:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(229,27,39,.08); }
+    .form-textarea { min-height:90px; resize:vertical; }
+
+    @keyframes shake {
+      0%,100% { transform:translateX(0); }
+      20%      { transform:translateX(-5px); }
+      40%      { transform:translateX(5px); }
+      60%      { transform:translateX(-3px); }
+      80%      { transform:translateX(3px); }
+    }
+    .shake { animation:shake .35s ease; }
+
+    .btn-submit {
+      width:100%; padding:12px; background:var(--red-b); color:#fff;
+      border:none; border-radius:8px; font-size:14px; font-weight:700;
+      font-family:'Inter',sans-serif; cursor:pointer; margin-top:4px;
+      transition:background .12s;
+    }
+    .btn-submit:hover { background:var(--red-hover); }
+    .btn-submit:disabled { background:#f87171; cursor:not-allowed; }
+
+    .form-success { text-align:center; padding:24px 0; display:none; }
+    .form-success-icon { font-size:40px; margin-bottom:12px; }
+    .form-success-text { font-size:15px; font-weight:600; margin-bottom:4px; }
+    .form-success-sub { font-size:13px; color:var(--muted); }
+
+    .contact-links { margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px; }
+    .contact-link { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:var(--text); text-decoration:none; }
+    .contact-link:hover { color:var(--red); }
+
+    /* ── SPINNER ── */
+    .spinner-wrap { text-align:center; padding:80px 0; }
+    .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin .6s linear infinite; margin:0 auto 10px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer { background:#111827; color:#9ca3af; padding:32px 40px 24px; margin-top:auto; }
+    .footer-inner { max-width:1200px; margin:0 auto; }
+    .footer-bottom { display:flex; align-items:center; justify-content:space-between; font-size:12px; flex-wrap:wrap; gap:12px; }
+    .footer-bottom-links { display:flex; gap:16px; }
+    .footer-bottom-links a { color:#9ca3af; text-decoration:none; }
+    .footer-bottom-links a:hover { color:#fff; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:768px) {
+      .hamburger { display:flex; }
+      .nav-links { display:none; }
+      .profile-grid { grid-template-columns:1fr; }
+      .contact-card { position:static; }
+      .stats-row { grid-template-columns:repeat(3,1fr); }
+    }
+    @media (max-width:480px) {
+      .stats-row { grid-template-columns:1fr 1fr; }
+      .stats-row .stat-box:last-child { grid-column:span 2; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" style="display:flex;align-items:center;">
+    <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0);">
+  </a>
+  <ul class="nav-links">
+    <li><a href="buscar.html" data-i18n="nav_buy">Comprar</a></li>
+    <li><a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a></li>
+    <li><a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a></li>
+    <li><a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px;font-weight:500;color:inherit;text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle"><strong>ES</strong>&nbsp;|&nbsp;<span style="opacity:.45">EN</span></div>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html" data-i18n="nav_buy">Comprar</a>
+  <a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a>
+  <a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a>
+  <a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin:8px 24px;">Ingresar</a>
+</div>
+
+<div class="page-wrap">
+  <div class="page-inner">
+
+    <!-- spinner while loading -->
+    <div class="spinner-wrap" id="loading-wrap">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- content injected by JS -->
+    <div id="profile-content" style="display:none;"></div>
+
+  </div>
+</div>
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-bottom">
+      <span>© 2026 Preos. Todos los derechos reservados.</span>
+      <div class="footer-bottom-links">
+        <a href="index.html">Inicio</a>
+        <a href="buscar.html">Comprar</a>
+        <a href="por-que-preos.html">¿Por qué Preos?</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/lang.js"></script>
+<script>
+  /*
+    Firestore security rules — add to Firebase Console:
+
+    match /seller_leads/{leadId} {
+      allow create: if true;
+      allow read, update: if request.auth != null &&
+        request.auth.token.email.matches('.*@preos\\.ai');
+      allow delete: if false;
+    }
+  */
+
+  /* ─── Hamburger ──────────────────────────────────────────── */
+  var _ham = document.getElementById('hamburger');
+  var _menu = document.getElementById('mobile-menu');
+  if (_ham && _menu) {
+    _ham.addEventListener('click', function() {
+      _ham.classList.toggle('open');
+      _menu.classList.toggle('open');
+    });
+  }
+
+  /* ─── Helpers ────────────────────────────────────────────── */
+  var AVATAR_COLORS = ['#cc1f1f','#1d4ed8','#15803d','#92400e','#5b21b6','#0e7490'];
+
+  function initials(name) {
+    var parts = name.trim().split(' ');
+    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  }
+
+  function starsHTML(rating) {
+    var full = Math.floor(rating);
+    var half = rating - full >= 0.5;
+    var s = '';
+    for (var i = 0; i < 5; i++) {
+      if (i < full) s += '★';
+      else if (i === full && half) s += '½';
+      else s += '☆';
+    }
+    return '<span class="stars">' + s + '</span>';
+  }
+
+  function escHtml(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ─── Load & render agent ────────────────────────────────── */
+  var _agent = null;
+  var _agentColorIdx = 0;
+
+  function loadAgent() {
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('id');
+    if (!id) { showError(); return; }
+
+    fetch('data/agents.json')
+      .then(function(r) { return r.json(); })
+      .then(function(agents) {
+        var idx = agents.findIndex ? agents.findIndex(function(a) { return a.id === id; }) : -1;
+        if (idx === -1) { showError(); return; }
+        _agent = agents[idx];
+        _agentColorIdx = idx;
+        document.getElementById('loading-wrap').style.display = 'none';
+        renderProfile(_agent, idx);
+      })
+      .catch(function() { showError(); });
+  }
+
+  function showError() {
+    document.getElementById('loading-wrap').style.display = 'none';
+    document.getElementById('profile-content').style.display = 'block';
+    document.getElementById('profile-content').innerHTML =
+      '<div style="text-align:center;padding:80px 24px;">' +
+        '<div style="font-size:40px;margin-bottom:16px;">😕</div>' +
+        '<div style="font-size:18px;font-weight:700;margin-bottom:8px;">Agente no encontrado</div>' +
+        '<a href="agentes-buscar.html" style="color:var(--red);text-decoration:none;font-size:14px;">← Volver a todos los agentes</a>' +
+      '</div>';
+  }
+
+  function renderProfile(agent, colorIdx) {
+    var isEN = (localStorage.getItem('preos-lang') || 'es') === 'en';
+    var color = AVATAR_COLORS[colorIdx % AVATAR_COLORS.length];
+    var firstName = agent.name.split(' ')[0];
+
+    document.title = agent.name + ' — Preos';
+
+    var avatarHTML = agent.photo
+      ? '<img src="' + agent.photo + '" alt="' + escHtml(agent.name) + '">'
+      : initials(agent.name);
+
+    var title = isEN ? agent.title_en : agent.title_es;
+    var bio   = isEN ? agent.bio_en   : agent.bio_es;
+
+    var areaTags = agent.areas.map(function(a) {
+      return '<span class="profile-tag">📍 ' + escHtml(a) + '</span>';
+    }).join('');
+
+    var langTags = agent.languages.map(function(l) {
+      return '<span class="profile-tag profile-tag-lang">🌐 ' + escHtml(l) + '</span>';
+    }).join('');
+
+    var soldLabel  = isEN ? 'Properties sold'  : 'Propiedades vendidas';
+    var daysLabel  = isEN ? 'Avg. days to sell' : 'Días promedio';
+    var ratingLabel = isEN ? 'Rating'           : 'Valoración';
+
+    var agentSince = isEN ? 'Preos Agent since ' : 'Agente Preos desde ';
+    var aboutLabel = isEN ? 'About me'           : 'Sobre mí';
+    var whyLabel   = isEN ? 'Why choose Preos?'  : '¿Por qué elegir a Preos?';
+
+    var whyItems = isEN ? [
+      'Fixed-salary agents — no incentive to inflate the price',
+      '1.5–2% commission only on exclusive listings',
+      'Transparent pricing from day one',
+      'Service in ' + agent.languages.join(', ')
+    ] : [
+      'Agentes con sueldo fijo — sin incentivo de subir el precio',
+      'Comisión del 1.5–2% solo en propiedades exclusivas',
+      'Precios transparentes desde el primer día',
+      'Atención en ' + agent.languages.join(', ')
+    ];
+
+    var whyHTML = whyItems.map(function(item) {
+      return '<li><span class="why-icon">✅</span>' + escHtml(item) + '</li>';
+    }).join('');
+
+    var contactHeading = (isEN ? 'Contact ' : 'Contacta con ') + firstName;
+    var respondTxt = isEN ? 'Responds within 2 hours' : 'Responde en menos de 2 horas';
+    var namePh     = isEN ? 'Full name' : 'Nombre completo';
+    var phonePh    = isEN ? 'Phone' : 'Teléfono';
+    var addrLabel  = isEN ? 'Property address (optional)' : 'Dirección aproximada (opcional)';
+    var addrPh     = isEN ? 'E.g. Calle del Mar 12, Marbella' : 'Ej. Calle del Mar 12, Marbella';
+    var msgLabel   = isEN ? 'Tell us about your property' : 'Cuéntanos sobre tu propiedad';
+    var msgPh      = isEN ? 'E.g. I have a 3-bedroom flat in the city centre...' : 'Ej. Tengo un piso de 3 habitaciones en el centro...';
+    var submitTxt  = isEN ? 'Request free valuation' : 'Solicitar valoración gratuita';
+    var backTxt    = isEN ? '← All agents' : '← Todos los agentes';
+
+    var phoneDigits = (agent.phone || '').replace(/\D/g,'');
+    var waMsg = encodeURIComponent((isEN ? 'Hello ' : 'Hola ') + firstName + (isEN ? ', I found your profile on Preos and would like to find out more about selling my property.' : ', he encontrado tu perfil en Preos y me gustaría saber más sobre la venta de mi propiedad.'));
+
+    document.getElementById('profile-content').style.display = 'block';
+    document.getElementById('profile-content').innerHTML =
+      '<p class="breadcrumb">' +
+        '<a href="agentes-buscar.html">' + (isEN ? 'Find agents' : 'Encontrar agentes') + '</a>' +
+        '<span>›</span>' + escHtml(agent.name) +
+      '</p>' +
+
+      '<div class="profile-grid">' +
+
+        /* ── LEFT ── */
+        '<div>' +
+          '<div class="profile-card">' +
+
+            '<div class="profile-header">' +
+              '<div class="profile-avatar" style="background:' + color + ';">' + avatarHTML + '</div>' +
+              '<div class="profile-header-info">' +
+                '<div class="profile-name">' + escHtml(agent.name) + '</div>' +
+                '<div class="profile-title">' + escHtml(title) + '</div>' +
+                '<div class="profile-rating">' +
+                  starsHTML(agent.rating) +
+                  '<span class="profile-rating-score">' + agent.rating.toFixed(1) + '</span>' +
+                  '<span class="profile-rating-reviews">(' + agent.reviews + (isEN ? ' reviews' : ' reseñas') + ')</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="profile-since">📅 ' + agentSince + '<strong>' + agent.listed_since + '</strong></div>' +
+
+            '<div class="profile-tags-section">' +
+              '<div class="profile-tags-label">' + (isEN ? 'Areas' : 'Zonas') + '</div>' +
+              '<div class="profile-tags">' + areaTags + '</div>' +
+            '</div>' +
+            '<div class="profile-tags-section" style="margin-top:12px;">' +
+              '<div class="profile-tags-label">' + (isEN ? 'Languages' : 'Idiomas') + '</div>' +
+              '<div class="profile-tags">' + langTags + '</div>' +
+            '</div>' +
+
+            '<div class="stats-row" style="margin-top:24px;">' +
+              '<div class="stat-box">' +
+                '<div class="stat-value">' + agent.properties_sold + '</div>' +
+                '<div class="stat-label">' + escHtml(soldLabel) + '</div>' +
+              '</div>' +
+              '<div class="stat-box">' +
+                '<div class="stat-value">' + agent.avg_days_to_sell + '</div>' +
+                '<div class="stat-label">' + escHtml(daysLabel) + '</div>' +
+              '</div>' +
+              '<div class="stat-box">' +
+                '<div class="stat-value">★ ' + agent.rating.toFixed(1) + '</div>' +
+                '<div class="stat-label">' + escHtml(ratingLabel) + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="margin-top:28px;">' +
+              '<div class="section-heading">' + aboutLabel + '</div>' +
+              '<p class="profile-bio">' + escHtml(bio) + '</p>' +
+            '</div>' +
+
+            '<div>' +
+              '<div class="section-heading">' + whyLabel + '</div>' +
+              '<ul class="why-list">' + whyHTML + '</ul>' +
+            '</div>' +
+
+          '</div>' +
+        '</div>' +
+
+        /* ── RIGHT ── */
+        '<div>' +
+          '<div class="contact-card">' +
+            '<div class="contact-heading">' + escHtml(contactHeading) + '</div>' +
+            '<div class="contact-sub">' + respondTxt + '</div>' +
+
+            '<div id="contact-form-wrap">' +
+              '<div class="form-group">' +
+                '<label class="form-label" for="cf-name">' + namePh + ' *</label>' +
+                '<input type="text" id="cf-name" class="form-input" placeholder="' + escHtml(isEN ? 'María García' : 'María García') + '">' +
+              '</div>' +
+              '<div class="form-group">' +
+                '<label class="form-label" for="cf-phone">' + phonePh + ' *</label>' +
+                '<input type="tel" id="cf-phone" class="form-input" placeholder="+34 612 345 678">' +
+              '</div>' +
+              '<div class="form-group">' +
+                '<label class="form-label" for="cf-email">Email *</label>' +
+                '<input type="email" id="cf-email" class="form-input" placeholder="tu@email.com">' +
+              '</div>' +
+              '<div class="form-group">' +
+                '<label class="form-label" for="cf-address">' + escHtml(addrLabel) + '</label>' +
+                '<input type="text" id="cf-address" class="form-input" placeholder="' + escHtml(addrPh) + '">' +
+              '</div>' +
+              '<div class="form-group">' +
+                '<label class="form-label" for="cf-message">' + escHtml(msgLabel) + '</label>' +
+                '<textarea id="cf-message" class="form-textarea" placeholder="' + escHtml(msgPh) + '"></textarea>' +
+              '</div>' +
+              '<button class="btn-submit" id="cf-submit">' + escHtml(submitTxt) + '</button>' +
+            '</div>' +
+
+            '<div class="form-success" id="form-success">' +
+              '<div class="form-success-icon">✅</div>' +
+              '<div class="form-success-text" id="success-text"></div>' +
+              '<div class="form-success-sub" id="success-sub"></div>' +
+            '</div>' +
+
+            '<div class="contact-links">' +
+              '<a class="contact-link" href="tel:' + agent.phone.replace(/\s/g,'') + '">📞 ' + escHtml(agent.phone) + '</a>' +
+              '<a class="contact-link" href="https://wa.me/' + phoneDigits + '?text=' + waMsg + '" target="_blank" rel="noopener">💬 WhatsApp</a>' +
+            '</div>' +
+
+          '</div>' +
+        '</div>' +
+
+      '</div>';
+
+    /* ── Wire contact form ── */
+    document.getElementById('cf-submit').addEventListener('click', function() {
+      submitContactForm(agent, isEN);
+    });
+  }
+
+  function submitContactForm(agent, isEN) {
+    var nameEl    = document.getElementById('cf-name');
+    var phoneEl   = document.getElementById('cf-phone');
+    var emailEl   = document.getElementById('cf-email');
+    var addrEl    = document.getElementById('cf-address');
+    var msgEl     = document.getElementById('cf-message');
+    var submitBtn = document.getElementById('cf-submit');
+
+    var valid = true;
+    [nameEl, phoneEl, emailEl].forEach(function(el) {
+      if (!el.value.trim()) {
+        el.classList.add('shake');
+        el.style.borderColor = 'var(--red)';
+        setTimeout(function() {
+          el.classList.remove('shake');
+          el.style.borderColor = '';
+        }, 400);
+        valid = false;
+      }
+    });
+    if (!valid) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = isEN ? 'Sending...' : 'Enviando...';
+
+    var leadData = {
+      agentId:    agent.id,
+      agentEmail: agent.email,
+      name:       nameEl.value.trim(),
+      phone:      phoneEl.value.trim(),
+      email:      emailEl.value.trim(),
+      address:    addrEl.value.trim(),
+      message:    msgEl.value.trim(),
+      status:     'nuevo',
+      createdAt:  firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    firebase.firestore().collection('seller_leads').add(leadData)
+      .then(function() {
+        document.getElementById('contact-form-wrap').style.display = 'none';
+        var successEl = document.getElementById('form-success');
+        successEl.style.display = 'block';
+        var firstName = agent.name.split(' ')[0];
+        document.getElementById('success-text').textContent = isEN
+          ? 'Thank you! ' + firstName + ' will contact you within 2 hours.'
+          : '¡Gracias! ' + firstName + ' te contactará en menos de 2 horas.';
+        document.getElementById('success-sub').textContent = isEN
+          ? 'Check your email and WhatsApp.'
+          : 'Revisa tu email y WhatsApp.';
+
+        if (window.PreosAnalytics && typeof window.PreosAnalytics.contactAgent === 'function') {
+          window.PreosAnalytics.contactAgent(agent.id);
+        }
+      })
+      .catch(function(err) {
+        console.error('Firestore error:', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = isEN ? 'Request free valuation' : 'Solicitar valoración gratuita';
+        alert(isEN ? 'Error sending. Please try again.' : 'Error al enviar. Por favor, inténtalo de nuevo.');
+      });
+  }
+
+  /* ─── Hamburger ──────────────────────────────────────────── */
+  var _ham2 = document.getElementById('hamburger');
+  var _menu2 = document.getElementById('mobile-menu');
+  if (_ham2 && _menu2) {
+    _ham2.addEventListener('click', function() {
+      _ham2.classList.toggle('open');
+      _menu2.classList.toggle('open');
+    });
+  }
+
+  /* ─── Init ──────────────────────────────────────────────── */
+  loadAgent();
+</script>
+<script src="js/analytics.js"></script>
+</body>
+</html>

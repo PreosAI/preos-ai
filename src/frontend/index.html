@@ -779,9 +779,24 @@
 </footer>
 
 <script>
+  window._heroMode = 'comprar';
   function setTab(el) {
     document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
+    window._heroMode = el.getAttribute('data-i18n') === 'hero.vender' ? 'vender' : 'comprar';
+    var hl  = document.querySelector('.hero-headline');
+    var inp = document.getElementById('heroSearchInput');
+    var box = document.getElementById('heroSuggestions');
+    if (window._heroMode === 'vender') {
+      if (hl)  hl.setAttribute('data-i18n', 'sellHeroTitle');
+      if (inp) inp.setAttribute('data-i18n-placeholder', 'sellSearchPlaceholder');
+    } else {
+      if (hl)  hl.setAttribute('data-i18n', 'hero.title');
+      if (inp) inp.setAttribute('data-i18n-placeholder', 'hero.search');
+    }
+    if (window.PreosLang) window.PreosLang.init();
+    if (inp) inp.value = '';
+    if (box) box.style.display = 'none';
   }
 </script>
 
@@ -892,13 +907,50 @@
       }
 
       function navigate(q) {
-        if (q) window.location.href = 'buscar.html?q=' + encodeURIComponent(q);
-        else window.location.href = 'buscar.html';
+        if (window._heroMode === 'vender') {
+          window.location.href = q
+            ? 'agentes-buscar.html?q=' + encodeURIComponent(q) + '&mode=vender'
+            : 'agentes-buscar.html?mode=vender';
+        } else {
+          if (q) window.location.href = 'buscar.html?q=' + encodeURIComponent(q);
+          else window.location.href = 'buscar.html';
+        }
       }
 
       function renderHeroSuggestions(suggs, q) {
-        if (!suggs.length) { box.style.display = 'none'; return; }
+        var isVender = window._heroMode === 'vender';
         var isEN = (localStorage.getItem('preos-lang') || 'es') === 'en';
+
+        // Vender mode: only show location suggestions, no properties or 'all'
+        if (isVender) {
+          suggs = suggs.filter(function(s) { return s.type !== 'property' && s.type !== 'all'; });
+          if (!suggs.length) { box.style.display = 'none'; return; }
+          var agentsLabel = isEN ? 'Agents in' : 'Agentes en';
+          var html = '<div class="suggestions-label">' + agentsLabel + '</div>';
+          for (var i = 0; i < suggs.length; i++) {
+            var s = suggs[i];
+            var dv = esc(s.searchValue || s.text);
+            var icon = s.type === 'province' ? SVG_MAP : s.type === 'area' ? SVG_ZONE : SVG_PIN;
+            html += '<div class="suggestion-row" data-val="' + dv + '">'
+              + '<span class="suggestion-icon">' + icon + '</span>'
+              + '<span class="suggestion-main">' + boldM(s.text, q) + '</span>'
+              + (s.secondary ? '<span class="suggestion-secondary">' + esc(s.secondary) + '</span>' : '')
+              + '</div>';
+          }
+          box.innerHTML = html;
+          box.style.display = 'block';
+          _idx = -1;
+          box.querySelectorAll('.suggestion-row').forEach(function(row) {
+            row.addEventListener('mousedown', function(e) {
+              e.preventDefault();
+              navigate(row.getAttribute('data-val'));
+            });
+          });
+          return;
+        }
+
+        // Comprar mode: original behaviour
+        if (!suggs.length) { box.style.display = 'none'; return; }
         var LABELS = {
           province:     isEN ? 'Provinces'      : 'Provincias',
           city:         isEN ? 'Cities'         : 'Ciudades',

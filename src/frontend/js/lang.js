@@ -304,6 +304,19 @@ window.PreosLang = (function () {
       viewMyVisits:             'Ver mis visitas →',
       exploreProperties:        'Explorar propiedades',
 
+      // Vender / agent search flow
+      sellHeroTitle:            'Vende tu propiedad con el agente perfecto',
+      sellSearchPlaceholder:    '¿En qué zona quieres vender? (ej. Marbella)',
+      agentsIn:                 'Agentes en',
+      agentsSince:              'Agente Preos desde',
+      propertiesSold:           'propiedades vendidas',
+      avgDays:                  'días promedio',
+      requestValuation:         'Solicitar valoración gratuita',
+      propertyAddress:          'Dirección aproximada (opcional)',
+      aboutMe:                  'Sobre mí',
+      contactAgent:             'Contacta con',
+      respondTime:              'Responde en menos de 2 horas',
+
       // Backward-compat dotted keys used by data-i18n attributes on existing pages
       'nav.comprar':        'Comprar',
       'nav.vender':         'Vender',
@@ -609,6 +622,19 @@ window.PreosLang = (function () {
       statusCancelled:          'Cancelled',
       viewMyVisits:             'View my visits →',
       exploreProperties:        'Explore properties',
+
+      // Vender / agent search flow
+      sellHeroTitle:            'Sell your property with the perfect agent',
+      sellSearchPlaceholder:    'Which area do you want to sell in? (e.g. Marbella)',
+      agentsIn:                 'Agents in',
+      agentsSince:              'Preos Agent since',
+      propertiesSold:           'properties sold',
+      avgDays:                  'avg. days to sell',
+      requestValuation:         'Request free valuation',
+      propertyAddress:          'Property address (optional)',
+      aboutMe:                  'About me',
+      contactAgent:             'Contact',
+      respondTime:              'Responds within 2 hours',
 
       // Backward-compat dotted keys
       'nav.comprar':        'Buy',

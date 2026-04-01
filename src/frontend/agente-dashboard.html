@@ -443,6 +443,10 @@
       <button class="crm-nav-item" data-section="propiedades">
         🏠 Propiedades
       </button>
+      <button class="crm-nav-item" data-section="seller-leads">
+        📝 Leads de venta
+        <span class="nav-badge hidden" id="badge-seller">0</span>
+      </button>
     </nav>
   </aside>
 
@@ -495,6 +499,13 @@
         <div class="prop-grid" id="prop-grid"></div>
       </div>
 
+      <!-- ── Section: Leads de venta ────────────────────── -->
+      <div class="crm-section" id="section-seller-leads">
+        <div class="section-title">📝 Leads de venta</div>
+        <div class="section-subtitle" id="subtitle-seller">Solicitudes de valoración recibidas</div>
+        <div class="leads-list" id="list-seller"></div>
+      </div>
+
     </div><!-- .crm-content -->
   </div><!-- .crm-main -->
 </div><!-- .crm-wrap -->
@@ -542,9 +553,10 @@
 <script src="js/lang.js"></script>
 <script>
   /* ─── State ──────────────────────────────────────────────── */
-  var _allBookings = [];
-  var _allProps    = [];
-  var _currentFilter = 'all';
+  var _allBookings    = [];
+  var _allProps       = [];
+  var _allSellerLeads = [];
+  var _currentFilter  = 'all';
 
   /* ─── Access control ───────────────────��─────────────────── */
   firebase.auth().onAuthStateChanged(function(user) {
@@ -574,17 +586,22 @@
     document.getElementById('crm-loading').style.display = 'block';
     Promise.all([
       getAllProperties(),
-      firebase.firestore().collection('bookings').get()
+      firebase.firestore().collection('bookings').get(),
+      firebase.firestore().collection('seller_leads').get()
     ]).then(function(results) {
       _allProps    = results[0];
-      var snap     = results[1];
-      _allBookings = snap.docs.map(function(doc) {
+      _allBookings = results[1].docs.map(function(doc) {
+        return Object.assign({ id: doc.id }, doc.data());
+      });
+      _allSellerLeads = results[2].docs.map(function(doc) {
         return Object.assign({ id: doc.id }, doc.data());
       });
       // Sort newest first in JS
-      _allBookings.sort(function(a, b) {
+      var sortNewest = function(a, b) {
         return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
-      });
+      };
+      _allBookings.sort(sortNewest);
+      _allSellerLeads.sort(sortNewest);
       document.getElementById('crm-loading').style.display = 'none';
       updateBadges();
       renderActiveSection();
@@ -611,9 +628,10 @@
     document.querySelectorAll('.crm-section').forEach(function(s) { s.classList.remove('active'); });
     var el = document.getElementById('section-' + section);
     if (el) el.classList.add('active');
-    if (section === 'leads-nuevos')  renderLeadsNuevos();
-    else if (section === 'todos')    renderTodos();
-    else if (section === 'propiedades') renderPropiedades();
+    if (section === 'leads-nuevos')       renderLeadsNuevos();
+    else if (section === 'todos')         renderTodos();
+    else if (section === 'propiedades')   renderPropiedades();
+    else if (section === 'seller-leads')  renderSellerLeads();
   }
 
   /* ─── Badge counts ────────────────────────────���──────────── */
@@ -628,6 +646,13 @@
     var todosEl = document.getElementById('badge-todos');
     todosEl.textContent = _allBookings.length;
     if (_allBookings.length > 0) todosEl.classList.remove('hidden');
+
+    var sellerEl = document.getElementById('badge-seller');
+    var sellerNew = _allSellerLeads.filter(function(s) {
+      return !s.agentStatus || s.agentStatus === 'nuevo';
+    }).length;
+    if (sellerNew > 0) { sellerEl.textContent = sellerNew; sellerEl.classList.remove('hidden'); }
+    else sellerEl.classList.add('hidden');
 
     // Update global crm badge in navbar too
     var navBadge = document.getElementById('crm-unread-badge');
@@ -835,6 +860,103 @@
           }).catch(function(err) { console.error('Notes error:', err); });
       });
     }
+
+    return card;
+  }
+
+  /* ─── Seller leads ─────────────────────────────────────── */
+  function renderSellerLeads() {
+    var listEl = document.getElementById('list-seller');
+    var sub    = document.getElementById('subtitle-seller');
+    if (sub) sub.textContent = _allSellerLeads.length + ' solicitudes en total';
+    listEl.innerHTML = '';
+    if (!_allSellerLeads.length) {
+      listEl.innerHTML = '<div class="crm-empty"><div class="crm-empty-icon">📝</div><div class="crm-empty-text">Sin leads de venta todavía</div><div class="crm-empty-sub">Aparecerán aquí cuando alguien solicite una valoración desde agente-perfil.html</div></div>';
+      return;
+    }
+    _allSellerLeads.forEach(function(lead) {
+      listEl.appendChild(buildSellerLeadCard(lead));
+    });
+  }
+
+  function buildSellerLeadCard(lead) {
+    var card = document.createElement('div');
+    card.className = 'lead-card';
+
+    var status    = lead.agentStatus || 'nuevo';
+    var ts        = lead.createdAt ? new Date(lead.createdAt.seconds * 1000) : null;
+    var timeStr   = ts ? ts.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' }) + ' ' + ts.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' }) : '';
+    var phoneDigits = (lead.phone || '').replace(/\D/g,'');
+    var waMsg = encodeURIComponent('Hola ' + (lead.name || '') + ', soy agente de Preos. He recibido tu solicitud de valoración y me gustaría hablar contigo.');
+
+    var PIPELINE_LABELS = { nuevo:'Nuevo', contactado:'Contactado', visita:'Visita programada', oferta:'Oferta enviada', cerrado:'Cerrado ✓' };
+
+    card.innerHTML =
+      '<div class="lead-card-top">' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+          '<span style="font-size:15px;font-weight:700;">' + (lead.name || '—') + '</span>' +
+          '<span class="p-badge p-badge-' + status + '">' + (PIPELINE_LABELS[status] || status) + '</span>' +
+        '</div>' +
+        (timeStr ? '<span class="lead-time">' + timeStr + '</span>' : '') +
+      '</div>' +
+
+      '<div class="lead-fields">' +
+        '<div class="lead-field"><strong>Teléfono</strong>' + (lead.phone ? '<a href="tel:' + lead.phone + '">' + lead.phone + '</a>' : '—') + '</div>' +
+        '<div class="lead-field"><strong>Email</strong>' + (lead.email ? '<a href="mailto:' + lead.email + '">' + lead.email + '</a>' : '—') + '</div>' +
+        '<div class="lead-field lead-field-full"><strong>Dirección aprox.</strong>' + (lead.address || '—') + '</div>' +
+        (lead.message ? '<div class="lead-field lead-field-full"><strong>Mensaje</strong>' + lead.message + '</div>' : '') +
+      '</div>' +
+
+      '<div class="lead-card-actions">' +
+        (lead.phone ? '<a class="btn-lead btn-lead-call" href="tel:' + lead.phone + '">📞 Llamar</a>' : '') +
+        (phoneDigits ? '<a class="btn-lead btn-lead-wa" href="https://wa.me/' + phoneDigits + '?text=' + waMsg + '" target="_blank" rel="noopener">💬 WhatsApp</a>' : '') +
+        '<a class="btn-lead" href="agente-perfil.html?id=' + (lead.agentId || '') + '" target="_blank">🏠 Ver perfil agente</a>' +
+      '</div>' +
+
+      '<div class="lead-card-bottom">' +
+        '<div>' +
+          '<div class="lead-meta-label">Pipeline</div>' +
+          '<select class="pipeline-select" id="sel-sl-' + lead.id + '">' +
+            Object.keys(PIPELINE_LABELS).map(function(k) {
+              return '<option value="' + k + '"' + (status === k ? ' selected' : '') + '>' + PIPELINE_LABELS[k] + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div>' +
+          '<div class="lead-meta-label">Notas <span class="notes-saved" id="sl-saved-' + lead.id + '" style="display:none;">✓ Guardado</span></div>' +
+          '<div class="notes-wrap">' +
+            '<textarea class="notes-textarea" id="sl-notes-' + lead.id + '" placeholder="Añade notas sobre este lead...">' + (lead.agentNotes || '') + '</textarea>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    // Pipeline change
+    var select = card.querySelector('#sel-sl-' + lead.id);
+    select.addEventListener('change', function() {
+      var newVal = this.value;
+      firebase.firestore().collection('seller_leads').doc(lead.id).update({
+        agentStatus: newVal,
+        agentUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        var l = _allSellerLeads.find(function(x) { return x.id === lead.id; });
+        if (l) l.agentStatus = newVal;
+        updateBadges();
+      }).catch(function(err) { console.error('Pipeline update error:', err); });
+    });
+
+    // Notes save on blur
+    var textarea = card.querySelector('#sl-notes-' + lead.id);
+    var savedEl  = card.querySelector('#sl-saved-' + lead.id);
+    textarea.addEventListener('blur', function() {
+      var val = this.value;
+      firebase.firestore().collection('seller_leads').doc(lead.id).update({ agentNotes: val })
+        .then(function() {
+          var l = _allSellerLeads.find(function(x) { return x.id === lead.id; });
+          if (l) l.agentNotes = val;
+          savedEl.style.display = 'inline';
+          setTimeout(function() { savedEl.style.display = 'none'; }, 2000);
+        }).catch(function(err) { console.error('Notes error:', err); });
+    });
 
     return card;
   }
