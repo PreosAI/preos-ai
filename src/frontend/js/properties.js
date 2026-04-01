@@ -30,17 +30,29 @@ function norm(s) {
 function scoreProperty(p, query) {
   const q = norm(query);
   if (!q) return 0;
-  const city  = norm(p.city || '');
-  const nbhd  = norm(p.neighbourhood || '');
-  const title = norm(p.title || '');
-  const loc   = norm(p.location || '');
 
-  if (city === q)                    return 100;
-  if (nbhd === q)                    return 80;
-  if (city.startsWith(q))            return 60;
-  if (nbhd.startsWith(q))            return 55;
-  if (title.includes(q))             return 40;
-  if (loc.includes(q))               return 20;
+  // Strip " provincia" suffix if present
+  const cleanQ = q.replace(/\s*provincia\s*$/, '').trim();
+
+  const province = norm(p.province || '');
+  const city     = norm(p.city || '');
+  const area     = norm(p.area || '');
+  const nbhd     = norm(p.neighbourhood || '');
+  const title    = norm(p.title || '');
+  const loc      = norm(p.location || '');
+
+  // Province search — return ALL properties in the province
+  if (q.includes('provincia') && province === cleanQ) return 85;
+
+  if (city === cleanQ)               return 100;
+  if (area === cleanQ)               return 95;
+  if (nbhd === cleanQ && nbhd !== city) return 80;
+  if (city.startsWith(cleanQ))       return 60;
+  if (area.startsWith(cleanQ))       return 55;
+  if (nbhd.startsWith(cleanQ))       return 50;
+  if (area.includes(cleanQ))         return 40;
+  if (title.includes(cleanQ))        return 35;
+  if (loc.includes(cleanQ))          return 20;
   return 0;
 }
 
@@ -97,36 +109,107 @@ async function getSuggestions(query) {
   const props = await getAllProperties();
   const q = norm(query.trim());
 
-  const cities = new Set();
-  const nbhds  = new Map(); // neighbourhood → city
-  const titles = [];
+  const provinces      = new Map(); // province name → count
+  const cities         = new Map(); // city name → province
+  const areas          = new Map(); // area name → city
+  const neighbourhoods = new Map(); // neighbourhood → city (only if different from city)
+  const titles         = [];
 
   for (const p of props) {
-    const city = p.city || '';
-    const nbhd = p.neighbourhood || '';
-    const title = p.title || '';
+    const province = p.province || '';
+    const city     = p.city || '';
+    const area     = p.area || '';
+    const nbhd     = p.neighbourhood || '';
+    const title    = p.title || '';
 
-    if (city && norm(city).startsWith(q)) cities.add(city);
-    if (nbhd && nbhd !== city && norm(nbhd).startsWith(q)) nbhds.set(nbhd, city);
+    // Province match
+    if (province && norm(province).startsWith(q)) {
+      provinces.set(province, (provinces.get(province) || 0) + 1);
+    }
+
+    // City match
+    if (city && norm(city).startsWith(q)) {
+      cities.set(city, province);
+    }
+
+    // Area match — both startsWith and contains
+    if (area && norm(area).startsWith(q)) {
+      areas.set(area, city);
+    } else if (area && norm(area).includes(q)) {
+      areas.set(area, city);
+    }
+
+    // Neighbourhood match — only if different from city
+    if (nbhd && nbhd !== city && norm(nbhd).startsWith(q)) {
+      neighbourhoods.set(nbhd, city);
+    }
+
+    // Property title match
     if (title && norm(title).includes(q) && titles.length < 2) {
-      titles.push({ title, id: p.id });
+      titles.push({ text: title, id: p.id });
     }
   }
 
   const suggestions = [];
 
-  for (const city of cities) {
-    suggestions.push({ type: 'city', text: city, secondary: 'Ciudad' });
-  }
-  for (const [nbhd, city] of nbhds) {
-    suggestions.push({ type: 'neighbourhood', text: nbhd, secondary: city });
-  }
-  for (const { title, id } of titles) {
-    suggestions.push({ type: 'property', text: title, secondary: 'Propiedad', id });
+  // 1. Province suggestions
+  for (const [province, count] of provinces) {
+    suggestions.push({
+      type: 'province',
+      text: province,
+      secondary: `Provincia · ${count} ${count === 1 ? 'propiedad' : 'propiedades'}`,
+      searchValue: province + ' provincia'
+    });
   }
 
-  // Cap at 6 before adding the catch-all
-  const capped = suggestions.slice(0, 6);
-  capped.push({ type: 'all', text: query.trim(), secondary: '' });
+  // 2. City suggestions
+  for (const [city, province] of cities) {
+    suggestions.push({
+      type: 'city',
+      text: city,
+      secondary: province ? `Ciudad · ${province}` : 'Ciudad',
+      searchValue: city
+    });
+  }
+
+  // 3. Area/zone suggestions
+  for (const [area, city] of areas) {
+    suggestions.push({
+      type: 'area',
+      text: area,
+      secondary: city ? `Zona · ${city}` : 'Zona',
+      searchValue: area
+    });
+  }
+
+  // 4. Neighbourhood suggestions
+  for (const [nbhd, city] of neighbourhoods) {
+    suggestions.push({
+      type: 'neighbourhood',
+      text: nbhd,
+      secondary: city ? `Barrio · ${city}` : 'Barrio',
+      searchValue: nbhd
+    });
+  }
+
+  // 5. Property title suggestions
+  for (const { text, id } of titles) {
+    suggestions.push({
+      type: 'property',
+      text,
+      secondary: 'Propiedad',
+      id,
+      searchValue: text
+    });
+  }
+
+  // Cap at 7 before adding the catch-all
+  const capped = suggestions.slice(0, 7);
+  capped.push({
+    type: 'all',
+    text: query.trim(),
+    secondary: '',
+    searchValue: query.trim()
+  });
   return capped;
 }

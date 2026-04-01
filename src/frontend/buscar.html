@@ -1506,8 +1506,10 @@
   var _debounceTimer = null;
   var _activeIdx = -1;
 
-  const SVG_PIN_SUGG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  const SVG_PIN_SUGG   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
   const SVG_HOUSE_SUGG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+  const SVG_MAP_SUGG   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>`;
+  const SVG_ZONE_SUGG  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="1.5" fill="currentColor"/></svg>`;
 
   function normSearch(s) {
     return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -1532,32 +1534,39 @@
     const box = document.getElementById('searchSuggestions');
     if (!suggestions.length) { box.style.display = 'none'; return; }
 
-    const t = window.PreosLang ? window.PreosLang.strings[localStorage.getItem('preos-lang') || 'es'] : {};
-    const citiesLabel = (t && t.search_cities_label) || 'Ciudades';
-    const nbhdsLabel  = (t && t.search_neighbourhoods_label) || 'Barrios';
-    const propsLabel  = (t && t.search_properties_label) || 'Propiedades';
+    const lang = localStorage.getItem('preos-lang') || 'es';
+    const isEN = lang === 'en';
+    const LABELS = {
+      province:     isEN ? 'Provinces'     : 'Provincias',
+      city:         isEN ? 'Cities'        : 'Ciudades',
+      area:         isEN ? 'Areas / Zones' : 'Zonas',
+      neighbourhood:isEN ? 'Neighbourhoods': 'Barrios',
+      property:     isEN ? 'Properties'    : 'Propiedades',
+    };
 
     let html = '';
     let lastType = null;
 
     for (let i = 0; i < suggestions.length; i++) {
       const s = suggestions[i];
+      const displayValue = escHtml(s.searchValue || s.text);
       if (s.type === 'all') {
-        html += `<div class="suggestion-row all-search" data-idx="${i}" data-value="${escHtml(s.text)}">
+        html += `<div class="suggestion-row all-search" data-idx="${i}" data-value="${displayValue}">
           <span class="suggestion-icon">${SVG_PIN_SUGG}</span>
-          <span class="suggestion-main">Buscar "<strong>${escHtml(s.text)}</strong>" en toda España</span>
+          <span class="suggestion-main">${isEN ? 'Search' : 'Buscar'} "<strong>${escHtml(s.text)}</strong>" ${isEN ? 'across Spain' : 'en toda España'}</span>
         </div>`;
         continue;
       }
       if (s.type !== lastType) {
         lastType = s.type;
-        const label = s.type === 'city' ? citiesLabel : s.type === 'neighbourhood' ? nbhdsLabel : propsLabel;
-        html += `<div class="suggestions-label">${label}</div>`;
+        html += `<div class="suggestions-label">${LABELS[s.type] || s.type}</div>`;
       }
-      const icon = s.type === 'property'
-        ? `<span class="suggestion-icon house-icon">${SVG_HOUSE_SUGG}</span>`
-        : `<span class="suggestion-icon">${SVG_PIN_SUGG}</span>`;
-      html += `<div class="suggestion-row" data-idx="${i}" data-value="${escHtml(s.text)}">
+      let icon;
+      if (s.type === 'property')     icon = `<span class="suggestion-icon house-icon">${SVG_HOUSE_SUGG}</span>`;
+      else if (s.type === 'province') icon = `<span class="suggestion-icon">${SVG_MAP_SUGG}</span>`;
+      else if (s.type === 'area')     icon = `<span class="suggestion-icon">${SVG_ZONE_SUGG}</span>`;
+      else                            icon = `<span class="suggestion-icon">${SVG_PIN_SUGG}</span>`;
+      html += `<div class="suggestion-row" data-idx="${i}" data-value="${displayValue}">
         ${icon}
         <span class="suggestion-main">${boldMatch(s.text, query)}</span>
         ${s.secondary ? `<span class="suggestion-secondary">${escHtml(s.secondary)}</span>` : ''}
