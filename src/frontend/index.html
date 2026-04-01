@@ -494,18 +494,76 @@
     }
 
     /* ─── MARKETING BANNER ──────────────────────────────────── */
-    .marketing-banner { background: #fff; padding: 64px 64px; border-bottom: 1px solid var(--border); }
-    .marketing-inner { max-width: 1160px; margin: 0 auto; }
-    .marketing-title { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 14px; letter-spacing: -0.5px; }
-    .marketing-sub { font-size: 15px; color: var(--muted); line-height: 1.75; max-width: 680px; margin-bottom: 40px; }
-    .marketing-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .marketing-card { background: #f9f9f9; border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; }
-    .marketing-card-icon { font-size: 28px; margin-bottom: 12px; }
-    .marketing-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-    .marketing-card-desc { font-size: 13.5px; color: var(--muted); line-height: 1.65; }
+    .marketing-banner {
+      background: #E51B27;
+      padding: 72px 64px;
+    }
+    .marketing-inner { max-width: 860px; }
+    .marketing-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+      margin-bottom: 18px;
+    }
+    .marketing-title {
+      font-size: clamp(26px, 3.5vw, 46px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.12;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+    }
+    .marketing-sub {
+      font-size: clamp(15px, 1.6vw, 18px);
+      color: rgba(255,255,255,.85);
+      line-height: 1.65;
+      margin-bottom: 28px;
+      max-width: 600px;
+    }
+    .marketing-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.35);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 32px;
+    }
+    .marketing-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .marketing-btn {
+      background: #fff;
+      color: #E51B27;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity .2s;
+      display: inline-block;
+    }
+    .marketing-btn:hover { opacity: .9; }
+    .marketing-link {
+      color: rgba(255,255,255,.88);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .marketing-link:hover { color: #fff; }
     @media (max-width: 768px) {
-      .marketing-banner { padding: 40px 20px; }
-      .marketing-cards { grid-template-columns: 1fr; gap: 16px; }
+      .marketing-banner { padding: 52px 24px; }
+      .marketing-actions { flex-direction: column; align-items: flex-start; gap: 16px; }
     }
   </style>
 </head>
@@ -569,26 +627,13 @@
 <!-- ═══ MARKETING BANNER ════════════════════════════════════════ -->
 <section class="marketing-banner">
   <div class="marketing-inner">
-    <div class="marketing-text">
-      <h2 class="marketing-title">La plataforma inmobiliaria más transparente de España</h2>
-      <p class="marketing-sub">En Preos encontrarás el precio real de cada propiedad, sin sorpresas ni comisiones ocultas. Datos en tiempo real, visitas virtuales 3D, y agentes certificados con salario fijo — alineados 100% con tus intereses.</p>
-    </div>
-    <div class="marketing-cards">
-      <div class="marketing-card">
-        <div class="marketing-card-icon">🏠</div>
-        <div class="marketing-card-title">Precios reales</div>
-        <div class="marketing-card-desc">Accede al historial de precios y estimaciones de valor de cada propiedad</div>
-      </div>
-      <div class="marketing-card">
-        <div class="marketing-card-icon">🤝</div>
-        <div class="marketing-card-title">Agentes con salario fijo</div>
-        <div class="marketing-card-desc">Nuestros agentes cobran salario, no comisiones. Su único objetivo es que estés feliz</div>
-      </div>
-      <div class="marketing-card">
-        <div class="marketing-card-icon">📊</div>
-        <div class="marketing-card-title">Datos en tiempo real</div>
-        <div class="marketing-card-desc">Conectados a las principales fuentes de datos del mercado español</div>
-      </div>
+    <p class="marketing-eyebrow" data-i18n="home_eyebrow">Costa del Sol · Málaga</p>
+    <h2 class="marketing-title" data-i18n="home_hero_title">Tu próxima casa. Sin comisiones que te roben el sueño.</h2>
+    <p class="marketing-sub" data-i18n="home_hero_sub">Hasta un 70% menos en comisiones. Agentes asalariados. Transparencia total.</p>
+    <div class="marketing-badge" data-i18n="home_hero_badge">Ahorro medio: €17.500</div>
+    <div class="marketing-actions">
+      <a href="por-que-preos.html" class="marketing-btn" data-i18n="home_hero_cta">¿Por qué Preos?</a>
+      <a href="buscar.html" class="marketing-link" data-i18n="home_hero_cta2">Ver todas las propiedades →</a>
     </div>
   </div>
 </section>

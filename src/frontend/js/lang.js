@@ -37,6 +37,14 @@ window.PreosLang = (function () {
       banner_savings_label:   'de ahorro medio por operación',
       banner_savings_caption: 'Sin comisiones ocultas ni letra pequeña',
 
+      // Home marketing banner
+      home_eyebrow:   'Costa del Sol · Málaga',
+      home_hero_title:'Tu próxima casa. Sin comisiones que te roben el sueño.',
+      home_hero_sub:  'Hasta un 70% menos en comisiones. Agentes asalariados. Transparencia total.',
+      home_hero_badge:'Ahorro medio: €17.500',
+      home_hero_cta:  '¿Por qué Preos?',
+      home_hero_cta2: 'Ver todas las propiedades →',
+
       // Why Preos page — hero
       why_hero_title: 'El mercado inmobiliario lleva décadas sin cambiar. Nosotros lo cambiamos.',
       why_hero_sub:   'Agentes asalariados, tecnología transparente, y hasta un 70% menos en comisiones.',
@@ -190,6 +198,14 @@ window.PreosLang = (function () {
       // Marketing banner
       banner_savings_label:   'average savings per transaction',
       banner_savings_caption: 'No hidden fees, no small print',
+
+      // Home marketing banner
+      home_eyebrow:   'Costa del Sol · Málaga',
+      home_hero_title:'Your next home. Without fees that steal your dreams.',
+      home_hero_sub:  'Up to 70% less in fees. Salaried agents. Total transparency.',
+      home_hero_badge:'Average saving: €17,500',
+      home_hero_cta:  'Why Preos?',
+      home_hero_cta2: 'Browse all properties →',
 
       // Why Preos page — hero
       why_hero_title: "Real estate hasn't changed in decades. We're changing it.",
