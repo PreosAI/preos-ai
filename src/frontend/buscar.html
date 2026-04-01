@@ -1809,16 +1809,10 @@
         if (window._currentResults && window._currentResults.length > 0) {
           buildMapCardsStrip();
         } else {
-          var _stripAttempts = 0;
-          var _stripPoll = setInterval(function() {
-            _stripAttempts++;
-            if (window._currentResults && window._currentResults.length > 0) {
-              clearInterval(_stripPoll);
-              buildMapCardsStrip();
-            } else if (_stripAttempts > 15) {
-              clearInterval(_stripPoll);
-            }
-          }, 200);
+          runSearch();
+          setTimeout(function() {
+            buildMapCardsStrip();
+          }, 2000);
         }
       } else {
         label.textContent = lang === 'en' ? 'Map view' : 'Ver mapa';
