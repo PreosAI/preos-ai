@@ -601,6 +601,11 @@
   <div class="split-right">
     <div class="wizard-box">
 
+      <!-- Reschedule banner (shown only when ?reschedule= is present) -->
+      <div id="reschedule-banner" style="display:none;background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#713f12;" data-i18n="rescheduleBanner">
+        Estás cambiando la fecha de una visita existente. Selecciona la nueva fecha y hora.
+      </div>
+
       <!-- Step indicator (3 steps) -->
       <div class="steps">
         <div class="step active" id="step-ind-1">
@@ -718,6 +723,7 @@
           Un agente de Preos se pondrá en contacto contigo en menos de 2 horas.
         </div>
         <a id="btn-volver-prop" href="propiedad.html" class="btn-volver">Volver a la propiedad</a>
+        <a id="btn-volver-visitas" href="perfil.html?tab=visits" class="btn-volver" style="display:none;margin-top:8px;background:none;border:1.5px solid var(--border);color:var(--text);">Ver mis visitas</a>
       </div>
 
     </div>
@@ -850,6 +856,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <script>
+  // ── Reschedule mode ──────────────────────────────────────────
+  var _rescheduleBookingId = (function() {
+    var params = new URLSearchParams(window.location.search);
+    return params.get('reschedule') || null;
+  })();
+
+  if (_rescheduleBookingId) {
+    var banner = document.getElementById('reschedule-banner');
+    if (banner) banner.style.display = 'block';
+  }
+
   // ── Load property from ?id= ──────────────────────────────────
   (async function() {
     var params = new URLSearchParams(window.location.search);
@@ -966,29 +983,45 @@
     confirmBtn.disabled = true;
     confirmBtn.textContent = lang === 'en' ? 'Saving...' : 'Guardando...';
 
-    firebase.firestore().collection('bookings').add(bookingData)
-      .then(function(docRef) {
-        // Show success
-        document.getElementById('success-detail').textContent = detail;
-        document.getElementById('panel-step3').classList.remove('active');
-        document.getElementById('panel-success').classList.add('active');
-        document.getElementById('step-ind-3').className = 'step done';
+    function onBookingSuccess() {
+      document.getElementById('success-detail').textContent = detail;
+      document.getElementById('panel-step3').classList.remove('active');
+      document.getElementById('panel-success').classList.add('active');
+      document.getElementById('step-ind-3').className = 'step done';
 
-        // Analytics
-        if (window.PreosAnalytics) PreosAnalytics.trackTourBooked(window._currentProp || null, selDateISO);
+      // In reschedule mode show "Ver mis visitas" link instead
+      if (_rescheduleBookingId) {
+        document.getElementById('btn-volver-prop').style.display = 'none';
+        document.getElementById('btn-volver-visitas').style.display = 'inline-flex';
+      }
 
-        // Email confirmation
-        sendConfirmationEmail(bookingData);
-      })
-      .catch(function(err) {
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = T('bookingConfirm') || 'Confirmar recorrido';
-        var msg = lang === 'en'
-          ? 'Error saving booking. Please try again.'
-          : 'Error al guardar la reserva. Inténtalo de nuevo.';
-        alert(msg);
-        console.error('Firestore booking error:', err);
-      });
+      if (window.PreosAnalytics) PreosAnalytics.trackTourBooked(window._currentProp || null, selDateISO);
+      sendConfirmationEmail(bookingData);
+    }
+
+    function onBookingError(err) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = T('bookingConfirm') || 'Confirmar recorrido';
+      var msg = lang === 'en'
+        ? 'Error saving booking. Please try again.'
+        : 'Error al guardar la reserva. Inténtalo de nuevo.';
+      alert(msg);
+      console.error('Firestore booking error:', err);
+    }
+
+    if (_rescheduleBookingId) {
+      // Reschedule: update the existing booking
+      firebase.firestore().collection('bookings').doc(_rescheduleBookingId).update({
+        date: selDateISO,
+        time: selTime,
+        status: 'pending',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(onBookingSuccess).catch(onBookingError);
+    } else {
+      // New booking
+      firebase.firestore().collection('bookings').add(bookingData)
+        .then(onBookingSuccess).catch(onBookingError);
+    }
   });
 </script>
 <script src="js/analytics.js"></script>

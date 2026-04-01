@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuración de mi perfil — Preos</title>
+  <title>Mi perfil — Preos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -136,7 +136,7 @@
       user-select: none;
     }
 
-    /* ─── TABS BAR ─────────────────────────────────────────── */
+    /* ─── TABS BAR (outer — page nav) ─────────────────────── */
     .tabs-bar {
       position: fixed;
       top: var(--nav-h);
@@ -176,12 +176,34 @@
       flex: 1;
     }
 
-    .page-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 24px;
+    /* ─── INNER TABS (Mi perfil / Mis visitas) ─────────────── */
+    .inner-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
     }
+
+    .inner-tab {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color .15s, border-color .15s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .inner-tab:hover { color: var(--text); }
+    .inner-tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+
+    .inner-panel { display: none; }
+    .inner-panel.active { display: block; }
 
     /* ─── PROFILE CARD ─────────────────────────────────────── */
     .profile-card {
@@ -195,7 +217,6 @@
       align-items: flex-start;
     }
 
-    /* Left: avatar */
     .profile-avatar-col {
       flex-shrink: 0;
       display: flex;
@@ -232,7 +253,6 @@
     .edit-photo-link:hover { text-decoration: underline; }
     .edit-photo-link svg { width: 13px; height: 13px; }
 
-    /* Right: form */
     .profile-form-col {
       flex: 1;
       min-width: 0;
@@ -277,7 +297,6 @@
       box-shadow: 0 0 0 3px rgba(204,31,31,.08);
     }
 
-    /* Phone field: country code + number side by side */
     .phone-wrap {
       display: flex;
       gap: 8px;
@@ -293,7 +312,6 @@
       flex: 1;
     }
 
-    /* Form footer */
     .form-footer {
       display: flex;
       align-items: center;
@@ -327,6 +345,136 @@
       transition: background .2s;
     }
     .btn-save:hover { background: var(--red-hover); }
+
+    /* ─── VISITS TAB ───────────────────────────────────────── */
+    .visits-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 28px;
+    }
+    .visits-section-title:first-child { margin-top: 0; }
+
+    .visit-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      transition: box-shadow .15s;
+    }
+    .visit-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,.08); }
+
+    .visit-thumb {
+      width: 80px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #f3f4f6;
+    }
+
+    .visit-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .visit-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .visit-datetime {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .visit-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .badge-pending   { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #d1fae5; color: #065f46; }
+    .badge-completed { background: #e0e7ff; color: #3730a3; }
+    .badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+    .visit-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-visit-action {
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s;
+    }
+
+    .btn-reschedule {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-reschedule:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+    .btn-cancel-visit {
+      background: none;
+      border: 1.5px solid #fca5a5;
+      color: #dc2626;
+    }
+    .btn-cancel-visit:hover { background: #fee2e2; }
+
+    /* Spinner */
+    .visits-loading {
+      text-align: center;
+      padding: 48px 0;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .visits-empty {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+    }
+    .visits-empty svg {
+      width: 48px; height: 48px;
+      color: var(--border);
+      margin: 0 auto 16px;
+      display: block;
+    }
+    .visits-empty p { font-size: 15px; font-weight: 500; margin-bottom: 8px; color: var(--text); }
+    .visits-empty span { font-size: 13px; }
 
     /* ─── HAMBURGER ────────────────────────────────────────── */
     .hamburger {
@@ -383,7 +531,7 @@
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ─── MODAL ────────────────────────────────────────────── */
+    /* ─── MODALS ───────────────────────────────────────────── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -451,9 +599,14 @@
       .hamburger { display: flex; }
       .nav-right { margin-left: 0; }
       .profile-card { flex-direction: column; gap: 24px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .span-2 { grid-column: span 1; }
       footer { padding: 32px 20px 24px; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
       .footer-bottom { flex-direction: column; gap: 12px; }
+      .visit-card { flex-wrap: wrap; }
+      .visit-actions { flex-direction: row; width: 100%; }
+      .page-body { padding: 24px 16px 80px; }
     }
   </style>
 </head>
@@ -503,79 +656,111 @@
 <div class="tabs-bar">
   <a href="dashboard.html" class="tab">Panel de propietarios</a>
   <a href="favoritos.html" class="tab">Mis favoritos</a>
-  <a href="perfil.html" class="tab active">Configuración de mi perfil</a>
+  <a href="perfil.html" class="tab active">Mi perfil</a>
 </div>
 
 <!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
 <div class="page-body">
 
-  <div class="page-title">Configuración de mi perfil</div>
+  <!-- Inner sub-tabs -->
+  <div class="inner-tabs">
+    <button class="inner-tab active" data-panel="panel-profile" data-i18n="myProfile">Mi perfil</button>
+    <button class="inner-tab" data-panel="panel-visits" data-i18n="myVisits">Mis visitas</button>
+  </div>
 
-  <div class="profile-card">
+  <!-- ── Panel: Mi perfil ──────────────────────────────────── -->
+  <div class="inner-panel active" id="panel-profile">
+    <div class="profile-card">
 
-    <!-- Left: avatar -->
-    <div class="profile-avatar-col">
-      <div class="profile-avatar">
-        <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=220&q=80&auto=format&fit=crop&facepad=3&face=1" alt="Kimberly Sandoval">
+      <!-- Left: avatar -->
+      <div class="profile-avatar-col">
+        <div class="profile-avatar">
+          <img id="profile-avatar-img" src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=220&q=80&auto=format&fit=crop" alt="Avatar">
+        </div>
+        <a class="edit-photo-link" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editar foto
+        </a>
       </div>
-      <a class="edit-photo-link" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        Editar foto
-      </a>
+
+      <!-- Right: form -->
+      <div class="profile-form-col">
+        <form id="profile-form" onsubmit="return false;">
+          <div class="form-grid">
+
+            <div class="field span-1">
+              <label for="primer-nombre">Primer nombre*</label>
+              <input type="text" id="primer-nombre" autocomplete="given-name">
+            </div>
+            <div class="field span-1">
+              <label for="apellido">Apellido</label>
+              <input type="text" id="apellido" autocomplete="family-name">
+            </div>
+
+            <div class="field span-1">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" autocomplete="email">
+            </div>
+
+            <div class="field span-1">
+              <label for="ubicacion">Ubicación</label>
+              <input type="text" id="ubicacion" autocomplete="address-level2">
+            </div>
+
+            <div class="field span-2">
+              <label for="telefono">Teléfono</label>
+              <div class="phone-wrap">
+                <select aria-label="Prefijo país">
+                  <option value="+34" selected>(+34)</option>
+                  <option value="+1">(+1)</option>
+                  <option value="+44">(+44)</option>
+                  <option value="+33">(+33)</option>
+                  <option value="+49">(+49)</option>
+                  <option value="+39">(+39)</option>
+                  <option value="+52">(+52)</option>
+                  <option value="+54">(+54)</option>
+                </select>
+                <input type="tel" id="telefono" autocomplete="tel-national">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-footer">
+            <button type="button" class="delete-link" id="btn-delete-account">Eliminar cuenta</button>
+            <button type="submit" class="btn-save" id="btn-save">Actualizar datos</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Panel: Mis visitas ────────────────────────────────── -->
+  <div class="inner-panel" id="panel-visits">
+
+    <div id="visits-loading" class="visits-loading">
+      <div class="spinner"></div>
+      <span style="font-size:14px;color:var(--muted);">Cargando visitas...</span>
     </div>
 
-    <!-- Right: form -->
-    <div class="profile-form-col">
-      <form onsubmit="return false;">
-        <div class="form-grid">
+    <div id="visits-empty" class="visits-empty" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <p data-i18n="noVisits">No tienes visitas programadas</p>
+      <span>Reserva una visita desde cualquier propiedad y aparecerá aquí.</span>
+    </div>
 
-          <!-- Row 1: Nombre + Apellido -->
-          <div class="field span-1">
-            <label for="primer-nombre">Primer nombre*</label>
-            <input type="text" id="primer-nombre" value="Kimberly" autocomplete="given-name">
-          </div>
-          <div class="field span-1">
-            <label for="apellido">Apellido</label>
-            <input type="text" id="apellido" value="Sandoval" autocomplete="family-name">
-          </div>
-
-          <!-- Row 2: Email -->
-          <div class="field span-1">
-            <label for="email">E-mail</label>
-            <input type="email" id="email" value="kimberly@e-me.co" autocomplete="email">
-          </div>
-
-          <!-- Row 2: Ubicación -->
-          <div class="field span-1">
-            <label for="ubicacion">Ubicación</label>
-            <input type="text" id="ubicacion" value="Málaga, España" autocomplete="address-level2">
-          </div>
-
-          <!-- Row 3: Teléfono (full width) -->
-          <div class="field span-2">
-            <label for="telefono">Teléfono</label>
-            <div class="phone-wrap">
-              <select aria-label="Prefijo país">
-                <option value="+34" selected>(+34)</option>
-                <option value="+1">(+1)</option>
-                <option value="+44">(+44)</option>
-                <option value="+33">(+33)</option>
-                <option value="+49">(+49)</option>
-                <option value="+39">(+39)</option>
-                <option value="+52">(+52)</option>
-                <option value="+54">(+54)</option>
-              </select>
-              <input type="tel" id="telefono" value="612 345 678" autocomplete="tel-national">
-            </div>
-          </div>
-
-        </div>
-
-        <div class="form-footer">
-          <button type="button" class="delete-link" id="btn-delete-account">Eliminar cuenta</button>
-          <button type="submit" class="btn-save" id="btn-save">Actualizar datos</button>
-        </div>
-      </form>
+    <div id="visits-content" style="display:none;">
+      <div id="upcoming-section" style="display:none;">
+        <div class="visits-section-title" data-i18n="upcomingVisits">Próximas visitas</div>
+        <div id="upcoming-list"></div>
+      </div>
+      <div id="past-section" style="display:none;">
+        <div class="visits-section-title" data-i18n="pastVisits">Visitas pasadas</div>
+        <div id="past-list"></div>
+      </div>
     </div>
 
   </div>
@@ -590,6 +775,18 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" id="btn-cancel-delete">Cancelar</button>
       <button class="btn-modal-confirm" id="btn-confirm-delete">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CANCEL VISIT MODAL ══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-cancel-visit">
+  <div class="modal-box">
+    <h3 data-i18n="cancelVisit">Cancelar visita</h3>
+    <p data-i18n="cancelConfirm">¿Estás seguro de que quieres cancelar esta visita? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="btn-cancel-visit-no">Volver</button>
+      <button class="btn-modal-confirm" id="btn-cancel-visit-yes">Cancelar visita</button>
     </div>
   </div>
 </div>
@@ -646,8 +843,10 @@
 <script src="js/logo-path.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="js/auth-nav.js"></script>
 <script src="js/lang.js"></script>
+<script src="js/properties.js"></script>
 <script>
   // ── Hamburger ──────────────────────────────────────────────────
   document.getElementById('hamburger').addEventListener('click', function() {
@@ -662,26 +861,69 @@
     setTimeout(function() { t.classList.remove('show'); }, 3000);
   }
 
+  // ── Inner tabs ─────────────────────────────────────────────────
+  document.querySelectorAll('.inner-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.inner-panel').forEach(function(p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      var panelId = tab.getAttribute('data-panel');
+      var panel = document.getElementById(panelId);
+      if (panel) panel.classList.add('active');
+      if (panelId === 'panel-visits' && !window._visitsLoaded) {
+        loadVisits();
+      }
+    });
+  });
+
+  // Check URL for ?tab=visits
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('tab') === 'visits') {
+      document.querySelectorAll('.inner-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.inner-panel').forEach(function(p) { p.classList.remove('active'); });
+      var visitsTab = document.querySelector('[data-panel="panel-visits"]');
+      if (visitsTab) visitsTab.classList.add('active');
+      var visitsPanel = document.getElementById('panel-visits');
+      if (visitsPanel) visitsPanel.classList.add('active');
+    }
+  })();
+
   // ── Firebase pre-fill ──────────────────────────────────────────
   firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-      var displayName = user.displayName || '';
-      var parts = displayName.split(' ');
-      document.getElementById('primer-nombre').value = parts[0] || '';
-      document.getElementById('apellido').value = parts.slice(1).join(' ') || '';
-      document.getElementById('email').value = user.email || '';
+    if (!user) {
+      window.location.href = 'ingresar.html?next=/perfil.html';
+      return;
+    }
+    var displayName = user.displayName || '';
+    var parts = displayName.split(' ');
+    document.getElementById('primer-nombre').value = parts[0] || '';
+    document.getElementById('apellido').value = parts.slice(1).join(' ') || '';
+    document.getElementById('email').value = user.email || '';
 
-      var avatar = document.querySelector('.profile-avatar img');
-      if (user.photoURL && avatar) {
-        avatar.src = user.photoURL;
-      }
+    var avatar = document.getElementById('profile-avatar-img');
+    if (user.photoURL && avatar) { avatar.src = user.photoURL; }
+
+    // Auto-load visits if tab is already active
+    var visitsTab = document.querySelector('[data-panel="panel-visits"]');
+    if (visitsTab && visitsTab.classList.contains('active')) {
+      loadVisits();
     }
   });
 
-  // ── Save ───────────────────────────────────────────────────────
-  document.querySelector('form').addEventListener('submit', function(e) {
+  // ── Save profile ───────────────────────────────────────────────
+  document.getElementById('profile-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    showToast('Perfil actualizado correctamente');
+    var user = firebase.auth().currentUser;
+    if (!user) return;
+    var firstName = document.getElementById('primer-nombre').value.trim();
+    var lastName = document.getElementById('apellido').value.trim();
+    var newName = (firstName + ' ' + lastName).trim();
+    user.updateProfile({ displayName: newName }).then(function() {
+      showToast('Perfil actualizado correctamente');
+    }).catch(function() {
+      showToast('Error al actualizar el perfil.');
+    });
   });
 
   // ── Delete account modal ───────────────────────────────────────
@@ -711,11 +953,196 @@
   });
 
   document.getElementById('modal-delete').addEventListener('click', function(e) {
-    if (e.target === this) {
-      this.classList.remove('open');
-      document.body.style.overflow = '';
-    }
+    if (e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; }
   });
+
+  // ── Cancel visit modal ─────────────────────────────────────────
+  var _cancelBookingId = null;
+
+  document.getElementById('btn-cancel-visit-no').addEventListener('click', function() {
+    document.getElementById('modal-cancel-visit').classList.remove('open');
+    document.body.style.overflow = '';
+    _cancelBookingId = null;
+  });
+
+  document.getElementById('modal-cancel-visit').addEventListener('click', function(e) {
+    if (e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; _cancelBookingId = null; }
+  });
+
+  document.getElementById('btn-cancel-visit-yes').addEventListener('click', function() {
+    if (!_cancelBookingId) return;
+    var btn = this;
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    btn.disabled = true;
+    btn.textContent = lang === 'en' ? 'Cancelling...' : 'Cancelando...';
+    firebase.firestore().collection('bookings').doc(_cancelBookingId).update({ status: 'cancelled' })
+      .then(function() {
+        document.getElementById('modal-cancel-visit').classList.remove('open');
+        document.body.style.overflow = '';
+        _cancelBookingId = null;
+        btn.disabled = false;
+        btn.textContent = lang === 'en' ? 'Cancel visit' : 'Cancelar visita';
+        showToast(lang === 'en' ? 'Visit cancelled.' : 'Visita cancelada.');
+        window._visitsLoaded = false;
+        loadVisits();
+      })
+      .catch(function(err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = lang === 'en' ? 'Cancel visit' : 'Cancelar visita';
+        showToast(lang === 'en' ? 'Error. Please try again.' : 'Error. Inténtalo de nuevo.');
+      });
+  });
+
+  // ── Load visits from Firestore ─────────────────────────────────
+  window._visitsLoaded = false;
+
+  function loadVisits() {
+    var user = firebase.auth().currentUser;
+    if (!user) return;
+    window._visitsLoaded = true;
+
+    document.getElementById('visits-loading').style.display = 'block';
+    document.getElementById('visits-empty').style.display = 'none';
+    document.getElementById('visits-content').style.display = 'none';
+
+    // Load properties + bookings in parallel
+    Promise.all([
+      getAllProperties(),
+      firebase.firestore().collection('bookings')
+        .where('userId', '==', user.uid)
+        .orderBy('date', 'desc')
+        .get()
+    ]).then(function(results) {
+      var allProps  = results[0];
+      var snapshot  = results[1];
+      window._allProperties = allProps;
+
+      document.getElementById('visits-loading').style.display = 'none';
+
+      var bookings = [];
+      snapshot.forEach(function(doc) {
+        bookings.push(Object.assign({ id: doc.id }, doc.data()));
+      });
+
+      if (bookings.length === 0) {
+        document.getElementById('visits-empty').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('visits-content').style.display = 'block';
+
+      var today = new Date().toISOString().slice(0, 10);
+      var upcoming = bookings.filter(function(b) { return b.date >= today && b.status !== 'cancelled' && b.status !== 'completed'; });
+      var past     = bookings.filter(function(b) { return b.date < today || b.status === 'cancelled' || b.status === 'completed'; });
+
+      renderVisitSection('upcoming', upcoming);
+      renderVisitSection('past', past);
+    }).catch(function(err) {
+      console.error('Visits load error:', err);
+      document.getElementById('visits-loading').style.display = 'none';
+      document.getElementById('visits-empty').style.display = 'block';
+    });
+  }
+
+  function renderVisitSection(type, bookings) {
+    var section = document.getElementById(type + '-section');
+    var list    = document.getElementById(type + '-list');
+    var lang    = localStorage.getItem('preos-lang') || 'es';
+
+    if (!bookings || bookings.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    list.innerHTML = '';
+
+    bookings.forEach(function(booking) {
+      // Find matching property for thumbnail + title
+      var prop = null;
+      if (window._allProperties) {
+        prop = window._allProperties.find(function(p) { return p.id === booking.propertyId; });
+      }
+
+      var thumb = prop && prop.images && prop.images[0] ? prop.images[0] : 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=160&q=60&auto=format';
+      var title = prop ? (prop.title || prop.location || booking.propertyId) : booking.propertyId;
+
+      var dateStr = formatBookingDate(booking.date, lang);
+      var badgeClass = 'badge-' + (booking.status || 'pending');
+      var badgeText = getBadgeText(booking.status, lang);
+
+      var canCancel    = booking.status === 'pending' || booking.status === 'confirmed';
+      var canReschedule = booking.status === 'pending' || booking.status === 'confirmed';
+
+      var actionsHTML = '';
+      if (type === 'upcoming') {
+        if (canReschedule) {
+          actionsHTML += '<button class="btn-visit-action btn-reschedule" data-id="' + booking.id + '" data-propid="' + booking.propertyId + '">' +
+            (lang === 'en' ? 'Change date' : 'Cambiar fecha') + '</button>';
+        }
+        if (canCancel) {
+          actionsHTML += '<button class="btn-visit-action btn-cancel-visit" data-id="' + booking.id + '">' +
+            (lang === 'en' ? 'Cancel' : 'Cancelar') + '</button>';
+        }
+      }
+
+      var card = document.createElement('div');
+      card.className = 'visit-card';
+      card.innerHTML =
+        '<img class="visit-thumb" src="' + thumb + '" alt="' + title + '" onerror="this.src=\'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=160&q=60&auto=format\'">' +
+        '<div class="visit-info">' +
+          '<a class="visit-title" href="propiedad.html?id=' + booking.propertyId + '" style="text-decoration:none;color:var(--text);">' + title + '</a>' +
+          '<div class="visit-datetime">' + dateStr + (booking.time ? ' · ' + booking.time : '') + '</div>' +
+          '<span class="visit-badge ' + badgeClass + '">' + badgeText + '</span>' +
+        '</div>' +
+        (actionsHTML ? '<div class="visit-actions">' + actionsHTML + '</div>' : '');
+
+      list.appendChild(card);
+    });
+
+    // Wire action buttons
+    list.querySelectorAll('.btn-cancel-visit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        _cancelBookingId = this.getAttribute('data-id');
+        document.getElementById('modal-cancel-visit').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    list.querySelectorAll('.btn-reschedule').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var bookingId = this.getAttribute('data-id');
+        var propId    = this.getAttribute('data-propid');
+        window.location.href = 'tour.html?id=' + encodeURIComponent(propId) + '&reschedule=' + encodeURIComponent(bookingId);
+      });
+    });
+  }
+
+  function formatBookingDate(isoDate, lang) {
+    if (!isoDate) return '';
+    var parts = isoDate.split('-');
+    if (parts.length < 3) return isoDate;
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    if (isNaN(d.getTime())) return isoDate;
+    var dayNames = lang === 'en'
+      ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+      : ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var monthNames = lang === 'en'
+      ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+      : ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    return dayNames[d.getDay()] + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function getBadgeText(status, lang) {
+    var map = {
+      pending:   lang === 'en' ? 'Pending'   : 'Pendiente',
+      confirmed: lang === 'en' ? 'Confirmed' : 'Confirmada',
+      completed: lang === 'en' ? 'Completed' : 'Completada',
+      cancelled: lang === 'en' ? 'Cancelled' : 'Cancelada'
+    };
+    return map[status] || status;
+  }
 </script>
 <script src="js/analytics.js"></script>
 </body>

@@ -699,6 +699,13 @@
     .btn-outline:hover { background: #f3f4f6; }
 
     .tour-dates { display: flex; gap: 8px; margin-bottom: 16px; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-6px); }
+      40%     { transform: translateX(6px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(4px); }
+    }
 
     .tour-date {
       flex: 1;
@@ -1478,7 +1485,10 @@
         <div class="sidebar-card-title">Agenda un recorrido</div>
 
         <!-- Step 1: Date pills -->
-        <div class="tour-dates" id="tour-date-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+        <div class="tour-dates" id="tour-date-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
+        <div style="text-align:right;margin-bottom:12px;">
+          <a id="btn-more-dates" href="#" style="font-size:12px;color:var(--muted);text-decoration:none;" data-i18n="moreDates">Ver más fechas disponibles →</a>
+        </div>
 
         <!-- Step 2: Time slot pills -->
         <div id="tour-time-section" style="margin-bottom:16px;">
@@ -1685,33 +1695,46 @@
     var monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     var container = document.getElementById('tour-date-pills');
     var today = new Date();
-    var selectedDate = null;
 
     for (var i = 0; i < 7; i++) {
       var d = new Date(today);
       d.setDate(today.getDate() + i);
       (function(date) {
+        var isoDate = date.getFullYear() + '-' +
+          String(date.getMonth() + 1).padStart(2, '0') + '-' +
+          String(date.getDate()).padStart(2, '0');
         var pill = document.createElement('button');
         pill.style.cssText = 'border:1.5px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer;text-align:center;font-family:inherit;transition:all .2s;min-width:52px;';
+        pill.setAttribute('data-date', isoDate);
         pill.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--muted);">' + dayNames[date.getDay()] + '</div>' +
           '<div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.2;">' + date.getDate() + '</div>' +
           '<div style="font-size:10px;color:var(--muted);">' + monthNames[date.getMonth()] + '</div>';
         pill.addEventListener('click', function() {
-          selectedDate = date;
           container.querySelectorAll('button').forEach(function(b) {
             b.style.background = '#fff';
             b.style.borderColor = 'var(--border)';
-            b.style.color = 'var(--text)';
             b.querySelectorAll('div').forEach(function(div) { div.style.color = ''; });
           });
           pill.style.background = 'var(--text)';
           pill.style.borderColor = 'var(--text)';
           pill.querySelectorAll('div').forEach(function(div) { div.style.color = '#fff'; });
           window._selectedTourDate = date;
+          window._selectedTourDateISO = isoDate;
           updateProgramarBtn();
         });
         container.appendChild(pill);
       })(d);
+    }
+
+    // Wire "more dates" link
+    var moreDatesBtn = document.getElementById('btn-more-dates');
+    if (moreDatesBtn) {
+      moreDatesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var params = new URLSearchParams(window.location.search);
+        var propId = params.get('id') || '';
+        window.location.href = 'tour.html' + (propId ? '?id=' + encodeURIComponent(propId) : '');
+      });
     }
   })();
 
@@ -1867,6 +1890,7 @@
   <script src="js/logo-path.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="js/auth-nav.js"></script>
   <script src="js/lang.js"></script>
 
@@ -2047,20 +2071,90 @@
     // ── Programar recorrido ───────────────────────────────────────
     document.getElementById('btn-programar').addEventListener('click', function(e) {
       e.preventDefault();
-      if (!window._selectedTourDate || !window._selectedTourTime) return;
+      var btn = this;
+      var lang = localStorage.getItem('preos-lang') || 'es';
+
+      // Validate date selected
+      if (!window._selectedTourDate || !window._selectedTourDateISO) {
+        var datePills = document.getElementById('tour-date-pills');
+        if (datePills) {
+          datePills.style.animation = 'none';
+          datePills.offsetHeight; // reflow
+          datePills.style.animation = 'shake 0.4s ease';
+        }
+        return;
+      }
+      // Validate time selected
+      if (!window._selectedTourTime) {
+        var timePills = document.getElementById('tour-time-pills');
+        if (timePills) {
+          timePills.style.animation = 'none';
+          timePills.offsetHeight; // reflow
+          timePills.style.animation = 'shake 0.4s ease';
+        }
+        return;
+      }
+
       var user = (typeof firebase !== 'undefined') ? firebase.auth().currentUser : null;
-      if (!user) { window.location.href = 'ingresar.html'; return; }
-      var selDate = window._selectedTourDate;
-      var selTime = window._selectedTourTime;
-      var dayNames = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-      var monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-      var dateStr = selDate
-        ? dayNames[selDate.getDay()] + ', ' + selDate.getDate() + ' de ' + monthNames[selDate.getMonth()]
-        : 'la fecha seleccionada';
-      var timeStr = selTime || '';
-      var msg = 'Te contactaremos para confirmar tu visita el ' + dateStr + (timeStr ? ' a las ' + timeStr : '') + '.';
-      document.getElementById('tour-success-text').textContent = msg;
-      openModal('modal-tour-success');
+      if (!user) {
+        var params = new URLSearchParams(window.location.search);
+        var propId = params.get('id') || '';
+        window.location.href = 'ingresar.html?next=' + encodeURIComponent('/propiedad.html' + (propId ? '?id=' + propId : ''));
+        return;
+      }
+
+      // Loading state
+      btn.disabled = true;
+      btn.textContent = lang === 'en' ? 'Saving...' : 'Guardando...';
+
+      var params = new URLSearchParams(window.location.search);
+      var propId = params.get('id') || '';
+
+      var bookingData = {
+        propertyId: propId,
+        userId: user.uid,
+        userEmail: user.email || '',
+        name: user.displayName || user.email || '',
+        phone: '',
+        message: '',
+        date: window._selectedTourDateISO,
+        time: window._selectedTourTime,
+        status: 'pending',
+        source: 'widget',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      firebase.firestore().collection('bookings').add(bookingData)
+        .then(function() {
+          // Update success modal text
+          var selDate = window._selectedTourDate;
+          var dayNames = lang === 'en'
+            ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+            : ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+          var monthNames = lang === 'en'
+            ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+            : ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+          var dateStr = selDate
+            ? dayNames[selDate.getDay()] + ', ' + selDate.getDate() + ' de ' + monthNames[selDate.getMonth()]
+            : window._selectedTourDateISO;
+          var timeStr = window._selectedTourTime || '';
+          var successEl = document.getElementById('tour-success-text');
+          if (successEl) {
+            successEl.textContent = lang === 'en'
+              ? 'We will contact you to confirm your visit on ' + dateStr + (timeStr ? ' at ' + timeStr : '') + '.'
+              : 'Te contactaremos para confirmar tu visita el ' + dateStr + (timeStr ? ' a las ' + timeStr : '') + '.';
+          }
+          if (window.PreosAnalytics) PreosAnalytics.trackTourBooked(window._currentProp, window._selectedTourDateISO);
+          openModal('modal-tour-success');
+          btn.disabled = false;
+          btn.textContent = lang === 'en' ? 'Schedule tour' : 'Programar recorrido';
+        })
+        .catch(function(err) {
+          console.error('Booking error:', err);
+          btn.disabled = false;
+          btn.textContent = lang === 'en' ? 'Schedule tour' : 'Programar recorrido';
+          alert(lang === 'en' ? 'Could not save booking. Please try again.' : 'No se pudo guardar la reserva. Inténtalo de nuevo.');
+        });
     });
   </script>
 
