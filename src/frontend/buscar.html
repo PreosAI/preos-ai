@@ -780,8 +780,26 @@
       }
       .map-panel.map-visible { display: block; }
       body.map-mode .listings-panel { display: none; }
-      body.map-mode .map-panel { display: block; }
-      body.map-mode #map { height: 100vh; height: 100dvh; }
+      body.map-mode .map-panel {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        background: #f0f0f0;
+      }
+      body.map-mode #map {
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
       /* Floating toggle button — always visible on mobile */
       .mobile-map-toggle {
         display: flex;
@@ -1397,14 +1415,18 @@
       return;
     }
 
-    const T = (k) => (window.PreosLang ? window.PreosLang.t(k) : (window.PreosLang && window.PreosLang.strings && window.PreosLang.strings.es && window.PreosLang.strings.es[k])) || k;
     list.innerHTML = sorted.map(p => {
       const cardLang = localStorage.getItem('preos-lang') || 'es';
       const cardTitle = cardLang === 'en' ? (p.title_en || p.title) : p.title;
-      const bathLabel = p.bathrooms === 1 ? T('card_bathrooms_singular') : T('card_bathrooms_plural');
+      const bedLabel = cardLang === 'en' ? 'bed' : 'hab.';
+      const bathLabel = p.bathrooms === 1
+        ? (cardLang === 'en' ? 'bath' : 'baño')
+        : (cardLang === 'en' ? 'baths' : 'baños');
+      const newLabel = cardLang === 'en' ? 'New' : 'Nuevo';
+      const tourLabel = cardLang === 'en' ? '3D Tour' : 'Recorrido 3D';
       const badges = [
-        (p.status === 'new' || p.obra_nueva) ? `<span class="badge badge-nuevo">${T('card_new')}</span>` : '',
-        p.has_3d_tour      ? `<span class="badge badge-3d">${T('card_3d_tour')}</span>` : '',
+        (p.status === 'new' || p.obra_nueva) ? `<span class="badge badge-nuevo">${newLabel}</span>` : '',
+        p.has_3d_tour      ? `<span class="badge badge-3d">${tourLabel}</span>` : '',
       ].join('');
       return `
       <a class="h-card" href="propiedad.html?id=${p.id}"
@@ -1419,7 +1441,7 @@
             <div class="h-card-price">${formatPrice(p.price)}</div>
             <div class="h-card-address">${cardTitle}</div>
             <div class="h-card-specs">
-              <div class="h-card-spec">${p.bedrooms} ${T('card_bedrooms')}</div>
+              <div class="h-card-spec">${p.bedrooms} ${bedLabel}</div>
               <div class="h-card-sep"></div>
               <div class="h-card-spec">${p.bathrooms} ${bathLabel}</div>
               <div class="h-card-sep"></div>
@@ -1781,16 +1803,22 @@
       if (isMapMode) {
         label.textContent = lang === 'en' ? 'List view' : 'Ver lista';
         btn.style.background = '#E51B27';
-        setTimeout(function() { if (window._map) window._map.invalidateSize(); }, 100);
-        setTimeout(function() { if (window._map) window._map.invalidateSize(); }, 400);
+        setTimeout(function() { if (window._map) window._map.invalidateSize(true); }, 50);
+        setTimeout(function() { if (window._map) window._map.invalidateSize(true); }, 200);
+        setTimeout(function() { if (window._map) window._map.invalidateSize(true); }, 500);
         if (window._currentResults && window._currentResults.length > 0) {
           buildMapCardsStrip();
         } else {
-          runSearch().then(function() {
-            buildMapCardsStrip();
-          }).catch(function() {
-            buildMapCardsStrip();
-          });
+          var _stripAttempts = 0;
+          var _stripPoll = setInterval(function() {
+            _stripAttempts++;
+            if (window._currentResults && window._currentResults.length > 0) {
+              clearInterval(_stripPoll);
+              buildMapCardsStrip();
+            } else if (_stripAttempts > 15) {
+              clearInterval(_stripPoll);
+            }
+          }, 200);
         }
       } else {
         label.textContent = lang === 'en' ? 'Map view' : 'Ver mapa';
