@@ -13,7 +13,19 @@
       "Bash(python3 -c \":*)",
       "Bash(python -c \":*)",
       "Bash(node -e \"require\\(''''sharp''''\\)\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(grep -rn \"translations.js\" src/frontend/*.html)",
+      "Bash(node -e \"console.log\\('node works'\\)\")",
+      "Bash(node -e \"require\\('sharp'\\)\")",
+      "Bash(node -e \"require\\('jimp'\\)\")",
+      "Bash(npm list:*)",
+      "Bash(node -e \"require\\('jimp'\\); console.log\\('jimp ok'\\)\")",
+      "Bash(node -e ':*)",
+      "Bash(node -e \"const J = require\\('jimp'\\); console.log\\(Object.keys\\(J\\).slice\\(0,20\\)\\)\")",
+      "Bash(node -e \"const { Jimp } = require\\('jimp'\\); console.log\\(typeof Jimp, Object.getOwnPropertyNames\\(Jimp\\).filter\\(k => typeof Jimp[k]==='function'\\).join\\(', '\\)\\)\")"
     ]
   }
 }

@@ -1630,6 +1630,7 @@
       window._currentResults = results;
       renderListings(results, query, sortVal);
       renderMapMarkers(results);
+      if (window.PreosAnalytics) PreosAnalytics.trackSearch(query || '', results.length, filters);
       allProps = results.length ? results : _allPropsCache;
       if (results.length > 1) {
         const lats = results.map(p => p.lat).filter(Boolean);
@@ -1823,6 +1824,7 @@
       var btn = document.getElementById('mobileMapToggle');
       var label = document.getElementById('mapToggleLabel');
       var isMapMode = document.body.classList.toggle('map-mode');
+      if (window.PreosAnalytics) PreosAnalytics.trackMapToggle(isMapMode ? 'map' : 'list');
       var lang = localStorage.getItem('preos-lang') || 'es';
       if (isMapMode) {
         label.textContent = lang === 'en' ? 'List view' : 'Ver lista';
@@ -1935,5 +1937,6 @@
 
   <!-- Horizontal mini card strip (shown in map mode on mobile) -->
   <div class="map-cards-strip" id="mapCardsStrip"></div>
+<script src="js/analytics.js"></script>
 </body>
 </html>

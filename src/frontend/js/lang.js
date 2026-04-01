@@ -673,6 +673,7 @@ window.PreosLang = (function () {
     localStorage.setItem('preos_lang', lang); // keep old key in sync
     render(lang);
     document.dispatchEvent(new CustomEvent('preos:langchange', { detail: { lang: lang } }));
+    if (window.PreosAnalytics) PreosAnalytics.trackLanguageSwitch(lang);
   }
 
   /** Detect language, render, and wire toggle click handlers.

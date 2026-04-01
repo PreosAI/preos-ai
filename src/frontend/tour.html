@@ -749,6 +749,7 @@
     document.getElementById('panel-step2').classList.remove('active');
     document.getElementById('panel-success').classList.add('active');
     document.getElementById('step-ind-2').className = 'step done';
+    if (window.PreosAnalytics) PreosAnalytics.trackTourBooked(window._currentProp || null, selDate);
   });
 </script>
 
@@ -777,5 +778,6 @@
     } catch(e) {}
   })();
 </script>
+<script src="js/analytics.js"></script>
 </body>
 </html>

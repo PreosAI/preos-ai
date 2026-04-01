@@ -1834,6 +1834,7 @@
     }
     renderPropDetails();
     document.addEventListener('preos:langchange', renderPropDetails);
+    if (window.PreosAnalytics) PreosAnalytics.trackPropertyView(p);
 
     // Specs
     const vals = document.querySelectorAll('.spec-value');
@@ -1962,6 +1963,7 @@
         content.innerHTML = '<p style="color:var(--muted);font-size:14px;line-height:1.75;padding:6px 0 4px;">Este inmueble no tiene recorrido 3D disponible. Contacta con el agente para más información.</p>';
         contactBtn.style.display = '';
       }
+      if (window.PreosAnalytics && p) PreosAnalytics.track3DTour(p.id);
       openModal('modal-3d');
     });
 
@@ -2011,6 +2013,7 @@
         favs.push(id);
         if (svg) { svg.setAttribute('fill', 'var(--red)'); svg.setAttribute('stroke', 'var(--red)'); }
         showToast('Guardado en favoritos ❤');
+        if (window.PreosAnalytics && window._currentProp) PreosAnalytics.trackFavouriteAdded(window._currentProp);
       }
       localStorage.setItem('favoritos', JSON.stringify(favs));
     });
@@ -2071,5 +2074,6 @@
       });
     }
   </script>
+<script src="js/analytics.js"></script>
 </body>
 </html>
