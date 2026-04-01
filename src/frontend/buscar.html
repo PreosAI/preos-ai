@@ -547,8 +547,8 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="ingresar.html">Vender</a></li>
-    <li><a href="#">Agentes de bienes raíces</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
   </ul>
 
   <div class="nav-right">
@@ -562,8 +562,8 @@
 </nav>
 <div class="mobile-menu" id="mobile-menu">
   <a href="buscar.html">Comprar</a>
-  <a href="ingresar.html">Vender</a>
-  <a href="#">Agentes de bienes raíces</a>
+  <a href="vender.html">Vender</a>
+  <a href="agentes.html">Agentes de bienes raíces</a>
   <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
 </div>
 
@@ -831,8 +831,31 @@
 
   // ── Initial load ──────────────────────────────────────────────
   getAllProperties().then(props => {
+    allProps = props;
     renderListings(props);
     renderMapMarkers(props);
+
+    // Pre-fill search from URL ?q= param
+    var _qParam = new URLSearchParams(window.location.search).get('q');
+    if (_qParam) {
+      var _navInput = document.querySelector('.nav-search input');
+      if (_navInput) _navInput.value = _qParam;
+      var _countEl = document.querySelector('.listings-count');
+      if (_countEl) _countEl.innerHTML = props.length + ' resultados <span>para "' + _qParam + '"</span>';
+    }
+  });
+
+  // Store all props for bounds filtering
+  var allProps = [];
+
+  // ── Map bounds filter ─────────────────────────────────────────
+  map.on('moveend', function() {
+    if (!allProps.length) return;
+    var bounds = map.getBounds();
+    var inView = allProps.filter(function(p) {
+      return p.lat && p.lng && bounds.contains([p.lat, p.lng]);
+    });
+    renderListings(inView.length > 0 ? inView : allProps);
   });
 </script>
 
@@ -849,6 +872,18 @@
         _menu.classList.toggle('open');
       });
     }
+
+    // Save search to localStorage on Enter
+    var _navSearchInput = document.querySelector('.nav-search input');
+    if (_navSearchInput) {
+      _navSearchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          var val = this.value.trim();
+          if (val) localStorage.setItem('preos_last_search', val);
+        }
+      });
+    }
   </script>
+  <script src="js/translations.js"></script>
 </body>
 </html>

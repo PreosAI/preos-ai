@@ -24,6 +24,9 @@
       font-family: 'Inter', sans-serif;
       color: var(--text);
       background: #f5f6f8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     /* ─── NAV ──────────────────────────────────────────────── */
@@ -159,6 +162,7 @@
       margin-left: auto;
       margin-right: auto;
       padding: 36px 32px 80px;
+      flex: 1;
     }
 
     /* ─── STEP INDICATOR ───────────────────────────────────── */
@@ -554,8 +558,8 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="ingresar.html">Vender</a></li>
-    <li><a href="#">Agentes de bienes raíces</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
   </ul>
 
   <div class="nav-right">
@@ -778,7 +782,7 @@
       <h4>Empresa</h4>
       <ul>
         <li><a href="#">Quiénes somos</a></li>
-        <li><a href="#">Agentes</a></li>
+        <li><a href="agentes.html">Agentes</a></li>
         <li><a href="#">Blog</a></li>
         <li><a href="#">Contacto</a></li>
       </ul>
@@ -875,6 +879,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="js/auth-nav.js"></script>
 <script src="js/properties.js"></script>
+<script src="js/translations.js"></script>
 <script>
   // ── Pre-fill from ?id= ────────────────────────────────────────
   (async function() {

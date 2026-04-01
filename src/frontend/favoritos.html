@@ -24,6 +24,9 @@
       font-family: 'Inter', sans-serif;
       color: var(--text);
       background: #f5f6f8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     /* ─── NAV ──────────────────────────────────────────────── */
@@ -200,6 +203,7 @@
       margin-left: auto;
       margin-right: auto;
       padding: 32px 32px 60px;
+      flex: 1;
     }
 
     .page-title {
@@ -506,8 +510,8 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="ingresar.html">Vender</a></li>
-    <li><a href="#">Agentes de bienes raíces</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
   </ul>
 
   <div class="nav-right">
@@ -523,8 +527,8 @@
 
 <div class="mobile-menu" id="mobile-menu">
   <a href="buscar.html">Comprar</a>
-  <a href="ingresar.html">Vender</a>
-  <a href="#">Agentes de bienes raíces</a>
+  <a href="vender.html">Vender</a>
+  <a href="agentes.html">Agentes de bienes raíces</a>
   <a href="ingresar.html">Ingresar</a>
 </div>
 
@@ -573,7 +577,7 @@
       <h4>Empresa</h4>
       <ul>
         <li><a href="#">Quiénes somos</a></li>
-        <li><a href="#">Agentes</a></li>
+        <li><a href="agentes.html">Agentes</a></li>
         <li><a href="#">Blog</a></li>
         <li><a href="#">Contacto</a></li>
       </ul>
@@ -605,6 +609,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="js/auth-nav.js"></script>
 <script src="js/properties.js"></script>
+<script src="js/translations.js"></script>
 <script>
   // ── Hamburger ─────────────────────────────────────────────────
   document.getElementById('hamburger').addEventListener('click', function() {

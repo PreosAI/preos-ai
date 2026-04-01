@@ -22,8 +22,7 @@
     body {
       font-family: 'Inter', sans-serif;
       color: var(--text);
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
@@ -503,8 +502,8 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="ingresar.html">Vender</a></li>
-    <li><a href="#">Agentes de bienes raíces</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
   </ul>
 
   <div class="nav-right">
@@ -746,6 +745,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="js/auth-nav.js"></script>
 <script src="js/properties.js"></script>
+<script src="js/translations.js"></script>
 <script>
   // ── Load property from ?id= ──────────────────────────────────
   (async function() {

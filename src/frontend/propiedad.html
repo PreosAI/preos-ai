@@ -982,8 +982,8 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="ingresar.html">Vender</a></li>
-    <li><a href="#">Agentes de bienes raíces</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
   </ul>
 
   <div class="nav-right">
@@ -997,8 +997,8 @@
 </nav>
 <div class="mobile-menu" id="mobile-menu">
   <a href="buscar.html">Comprar</a>
-  <a href="ingresar.html">Vender</a>
-  <a href="#">Agentes de bienes raíces</a>
+  <a href="vender.html">Vender</a>
+  <a href="agentes.html">Agentes de bienes raíces</a>
   <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
 </div>
 
@@ -1464,30 +1464,22 @@
       <div class="sidebar-card">
         <div class="sidebar-card-title">Agenda un recorrido</div>
 
-        <div class="tour-dates">
-          <div class="tour-date selected">
-            <div class="tour-date-day">Lun</div>
-            <div class="tour-date-num">31</div>
-            <div class="tour-date-month">Mar</div>
-          </div>
-          <div class="tour-date">
-            <div class="tour-date-day">Mar</div>
-            <div class="tour-date-num">1</div>
-            <div class="tour-date-month">Abr</div>
-          </div>
-          <div class="tour-date">
-            <div class="tour-date-day">Mié</div>
-            <div class="tour-date-num">2</div>
-            <div class="tour-date-month">Abr</div>
-          </div>
+        <!-- Step 1: Date pills -->
+        <div class="tour-dates" id="tour-date-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+
+        <!-- Step 2: Time slot pills -->
+        <div id="tour-time-section" style="margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Hora</div>
+          <div id="tour-time-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
 
-        <div class="tour-type">
-          <label class="tour-type-option selected">
+        <!-- Step 3: Tour type -->
+        <div class="tour-type" style="margin-bottom:16px;">
+          <label class="tour-type-option selected" id="type-persona">
             <input type="radio" name="tour-type" value="presencial" checked>
             <span class="tour-type-label">Tour en persona</span>
           </label>
-          <label class="tour-type-option">
+          <label class="tour-type-option" id="type-video">
             <input type="radio" name="tour-type" value="video">
             <span class="tour-type-label">Tour por video chat</span>
           </label>
@@ -1606,6 +1598,16 @@
   </div>
 </div>
 
+<!-- ═══ MODAL: TOUR SUCCESS (nuevo) ════════════════════════════ -->
+<div class="modal-overlay" id="modal-tour-success">
+  <div class="modal-card" style="text-align:center;padding:40px 32px;">
+    <button class="modal-close" onclick="closeModal('modal-tour-success')">✕</button>
+    <div style="font-size:48px;margin-bottom:16px;">🗓️</div>
+    <div class="modal-title">¡Recorrido agendado!</div>
+    <div class="modal-sub" id="tour-success-text" style="margin-top:12px;line-height:1.7;">Te contactaremos para confirmar tu visita.</div>
+  </div>
+</div>
+
 <!-- ═══ TOAST ════════════════════════════════════════════════════ -->
 <div class="toast" id="toast"></div>
 
@@ -1652,14 +1654,65 @@
     });
   });
 
-  // ── Tour date / type selection ─────────────────────────────────
-  document.querySelectorAll('.tour-date').forEach(date => {
-    date.addEventListener('click', () => {
-      document.querySelectorAll('.tour-date').forEach(d => d.classList.remove('selected'));
-      date.classList.add('selected');
-    });
-  });
+  // ── Tour date pills (next 7 days) ─────────────────────────────
+  (function() {
+    var dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    var monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var container = document.getElementById('tour-date-pills');
+    var today = new Date();
+    var selectedDate = null;
 
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(today);
+      d.setDate(today.getDate() + i);
+      (function(date) {
+        var pill = document.createElement('button');
+        pill.style.cssText = 'border:1.5px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer;text-align:center;font-family:inherit;transition:all .2s;min-width:52px;';
+        pill.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--muted);">' + dayNames[date.getDay()] + '</div>' +
+          '<div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.2;">' + date.getDate() + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);">' + monthNames[date.getMonth()] + '</div>';
+        pill.addEventListener('click', function() {
+          selectedDate = date;
+          container.querySelectorAll('button').forEach(function(b) {
+            b.style.background = '#fff';
+            b.style.borderColor = 'var(--border)';
+            b.style.color = 'var(--text)';
+            b.querySelectorAll('div').forEach(function(div) { div.style.color = ''; });
+          });
+          pill.style.background = 'var(--text)';
+          pill.style.borderColor = 'var(--text)';
+          pill.querySelectorAll('div').forEach(function(div) { div.style.color = '#fff'; });
+          window._selectedTourDate = date;
+        });
+        container.appendChild(pill);
+      })(d);
+    }
+  })();
+
+  // ── Tour time pills ────────────────────────────────────────────
+  (function() {
+    var times = ['10:00','11:00','12:00','16:00','17:00','18:00'];
+    var container = document.getElementById('tour-time-pills');
+    times.forEach(function(t) {
+      var pill = document.createElement('button');
+      pill.textContent = t;
+      pill.style.cssText = 'border:1.5px solid var(--border);background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;color:var(--text);transition:all .2s;';
+      pill.addEventListener('click', function() {
+        container.querySelectorAll('button').forEach(function(b) {
+          b.style.background = '#fff';
+          b.style.borderColor = 'var(--border)';
+          b.style.color = 'var(--text)';
+        });
+        pill.style.background = 'var(--text)';
+        pill.style.borderColor = 'var(--text)';
+        pill.style.color = '#fff';
+        window._selectedTourTime = t;
+      });
+      container.appendChild(pill);
+    });
+  })();
+
+  // ── Tour type selection ────────────────────────────────────────
   document.querySelectorAll('.tour-type-option').forEach(opt => {
     opt.addEventListener('click', () => {
       document.querySelectorAll('.tour-type-option').forEach(o => o.classList.remove('selected'));
@@ -1717,6 +1770,10 @@
     // Store for interactive features
     window._currentProp = p;
     window._lbImages    = p.images;
+
+    // Track viewed properties
+    const viewed = JSON.parse(localStorage.getItem('preos_viewed') || '[]');
+    if (!viewed.includes(p.id)) { viewed.push(p.id); localStorage.setItem('preos_viewed', JSON.stringify(viewed)); }
 
     // Gallery images + lightbox wiring
     const mainPH = document.querySelector('.gallery-main .img-placeholder');
@@ -1780,6 +1837,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="js/auth-nav.js"></script>
+  <script src="js/translations.js"></script>
 
   <!-- ── Interactive features ──────────────────────────────────── -->
   <script>
@@ -1855,10 +1913,14 @@
     document.getElementById('btn-3d').addEventListener('click', function() {
       var p = window._currentProp;
       var content = document.getElementById('modal-3d-content');
-      if (p && p.has_3d_tour) {
-        content.innerHTML = '<iframe src="https://www.google.com/maps/embed?pb=!4v1234!6m8!1m7" width="100%" height="320" style="border:0;border-radius:8px;" allowfullscreen loading="lazy"></iframe>';
+      if (!content) return;
+      if (p && p.has_3d_tour === true) {
+        document.querySelector('#modal-3d .modal-title').textContent = 'Recorrido 3D Virtual';
+        content.innerHTML = '<iframe src="https://my.matterport.com/show/?m=SFR2t4U4kdA" width="100%" height="400" style="border:0;border-radius:8px;" allowfullscreen loading="lazy" allow="xr-spatial-tracking"></iframe>';
       } else {
-        content.innerHTML = '<p style="color:var(--muted);font-size:14px;line-height:1.7;padding:6px 0;">Recorrido 3D no disponible para esta propiedad.</p>';
+        document.querySelector('#modal-3d .modal-title').textContent = 'Recorrido 3D';
+        content.innerHTML = '<p style="color:var(--muted);font-size:14px;line-height:1.75;padding:6px 0 20px;">Este inmueble no tiene recorrido 3D disponible. Contacta con el agente para más información.</p>' +
+          '<button class="btn-red" style="width:auto;padding:11px 24px;" onclick="closeModal(\'modal-3d\');openAgentModal();">Contactar agente</button>';
       }
       openModal('modal-3d');
     });
@@ -1944,15 +2006,17 @@
       e.preventDefault();
       var user = (typeof firebase !== 'undefined') ? firebase.auth().currentUser : null;
       if (!user) { window.location.href = 'ingresar.html'; return; }
-      var sel = document.querySelector('.tour-date.selected');
-      var dateText = '';
-      if (sel) {
-        dateText = sel.querySelector('.tour-date-num').textContent +
-                   ' de ' + sel.querySelector('.tour-date-month').textContent;
-      }
-      document.getElementById('tour-confirm-text').textContent =
-        'Recorrido agendado para el ' + dateText + '. Te contactaremos para confirmar.';
-      openModal('modal-tour-confirm');
+      var selDate = window._selectedTourDate;
+      var selTime = window._selectedTourTime;
+      var dayNames = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+      var monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      var dateStr = selDate
+        ? dayNames[selDate.getDay()] + ', ' + selDate.getDate() + ' de ' + monthNames[selDate.getMonth()]
+        : 'la fecha seleccionada';
+      var timeStr = selTime || '';
+      var msg = 'Te contactaremos para confirmar tu visita el ' + dateStr + (timeStr ? ' a las ' + timeStr : '') + '.';
+      document.getElementById('tour-success-text').textContent = msg;
+      openModal('modal-tour-success');
     });
   </script>
 

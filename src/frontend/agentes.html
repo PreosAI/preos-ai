@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conviértete en agente Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #cc1f1f;
+      --red-hover: #b01a1a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main { flex: 1; }
+
+    /* ─── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: transparent;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .nav-scrolled {
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+    }
+
+    .nav-brand { flex-shrink: 0; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      transition: color .2s;
+    }
+    .nav-scrolled .nav-links a { color: var(--text); }
+    .nav-links a:hover { opacity: 0.75; }
+
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-ingresar {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+    }
+    .btn-ingresar:hover { background: var(--red-hover); }
+
+    .lang-toggle {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+    .nav-scrolled .lang-toggle { color: var(--text); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      margin-left: auto;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+    }
+    .nav-scrolled .hamburger span { background: var(--text); }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      position: fixed;
+      top: 64px;
+      left: 0; right: 0;
+      background: #fff;
+      padding: 24px 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.1);
+      z-index: 99;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* ─── HERO ─────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 40px 80px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #111 0%, #333 100%);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.3);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+    }
+
+    .hero-title {
+      font-size: clamp(28px, 4vw, 50px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: rgba(255,255,255,.8);
+      line-height: 1.65;
+    }
+
+    /* ─── PILLARS ───────────────────────────────────────────── */
+    .pillars-section {
+      background: #fff;
+      padding: 80px 64px;
+    }
+
+    .pillars-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .section-heading {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 48px;
+    }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .pillar-card {
+      background: #f9f9f9;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+    }
+
+    .pillar-icon { font-size: 36px; margin-bottom: 16px; }
+
+    .pillar-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .pillar-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* ─── REQUISITOS ────────────────────────────────────────── */
+    .req-section {
+      background: #f9f9f9;
+      padding: 80px 64px;
+      border-top: 1px solid var(--border);
+    }
+
+    .req-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .req-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .req-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .req-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-red:hover { background: var(--red-hover); }
+
+    /* ─── MODAL ─────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      color: var(--text);
+      transition: border-color .2s;
+    }
+    .field input:focus, .field select:focus { border-color: var(--red); }
+
+    .modal-submit {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background .2s;
+    }
+    .modal-submit:hover { background: var(--red-hover); }
+
+    /* ─── TOAST ─────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #111;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      transition: transform .35s, opacity .35s;
+      z-index: 300;
+      white-space: nowrap;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    footer {
+      background: #111;
+      color: #fff;
+      padding: 48px 64px 24px;
+    }
+
+    .footer-grid {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    .footer-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,.55);
+      line-height: 1.75;
+      margin-top: 16px;
+    }
+
+    .footer-col h4 {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul { list-style: none; }
+    .footer-col ul li + li { margin-top: 10px; }
+    .footer-col ul a {
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-col ul a:hover { color: #fff; }
+
+    .footer-bottom {
+      max-width: 1160px;
+      margin: 24px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: rgba(255,255,255,.35);
+    }
+
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a {
+      color: rgba(255,255,255,.35);
+      text-decoration: none;
+    }
+    .footer-bottom-links a:hover { color: rgba(255,255,255,.7); }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .pillars-section, .req-section { padding: 60px 24px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      footer { padding: 40px 24px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav id="main-nav">
+  <a class="nav-brand" href="index.html">
+    <img class="site-logo" src="Images/logo.png" alt="Preos" style="height: 36px; width: auto; filter: brightness(0) invert(1);">
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="buscar.html">Comprar</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px; font-weight:500; color:inherit; text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle"><span>ES</span>&nbsp;|&nbsp;EN</div>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html">Comprar</a>
+  <a href="vender.html">Vender</a>
+  <a href="agentes.html">Agentes de bienes raíces</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
+</div>
+
+<main>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="hero-title">Conviértete en agente Preos</h1>
+    <p class="hero-subtitle">Un nuevo modelo de agencia inmobiliaria centrado en el cliente — con salario fijo, sin presión de comisiones.</p>
+  </div>
+</section>
+
+<!-- ═══ 3 PILARES ══════════════════════════════════════════════ -->
+<section class="pillars-section">
+  <div class="pillars-inner">
+    <div class="section-tag">Por qué Preos</div>
+    <h2 class="section-heading">Un modelo diferente</h2>
+    <div class="pillars-grid">
+
+      <div class="pillar-card">
+        <div class="pillar-icon">💰</div>
+        <div class="pillar-title">Salario fijo, sin comisiones</div>
+        <div class="pillar-desc">Olvídate de la presión de vender para cobrar. En Preos cobrarás un salario competitivo para que te centres en lo que importa: el cliente.</div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">⭐</div>
+        <div class="pillar-title">Éxito medido por satisfacción</div>
+        <div class="pillar-desc">Tu desempeño se mide por las valoraciones de tus clientes, no por el número de ventas. Calidad sobre cantidad.</div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">📈</div>
+        <div class="pillar-title">Crece con nosotros</div>
+        <div class="pillar-desc">Formación continua, herramientas digitales de última generación y un equipo que te apoya en cada paso.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ REQUISITOS ══════════════════════════════════════════════ -->
+<section class="req-section">
+  <div class="req-inner">
+    <div class="section-tag">Requisitos</div>
+    <h2 class="section-heading" style="margin-bottom:32px;">¿Qué buscamos?</h2>
+    <ul class="req-list">
+      <li>
+        <div class="req-check">✓</div>
+        Experiencia en inmobiliaria o atención al cliente
+      </li>
+      <li>
+        <div class="req-check">✓</div>
+        Pasión por ayudar a las personas
+      </li>
+      <li>
+        <div class="req-check">✓</div>
+        Basado/a en la zona de Málaga
+      </li>
+    </ul>
+    <button class="btn-red" onclick="openModal('modal-solicitud')">Solicitar información</button>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══ MODAL: SOLICITUD ════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-solicitud">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-solicitud')">✕</button>
+    <div class="modal-title">Solicitar información</div>
+    <div class="field">
+      <label>Nombre</label>
+      <input type="text" id="form-nombre" placeholder="Tu nombre completo">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="form-email" placeholder="tu@email.com">
+    </div>
+    <div class="field">
+      <label>Teléfono</label>
+      <input type="tel" id="form-telefono" placeholder="+34 600 000 000">
+    </div>
+    <div class="field">
+      <label>Años de experiencia</label>
+      <select id="form-experiencia">
+        <option value="">Selecciona...</option>
+        <option value="0">Sin experiencia previa</option>
+        <option value="1">Menos de 1 año</option>
+        <option value="1-3">1–3 años</option>
+        <option value="3-5">3–5 años</option>
+        <option value="5+">Más de 5 años</option>
+      </select>
+    </div>
+    <button class="modal-submit" onclick="submitSolicitud()">Enviar solicitud</button>
+  </div>
+</div>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="index.html" style="text-decoration:none;">
+        <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0) invert(1);">
+      </a>
+      <p class="footer-desc">La plataforma inmobiliaria más fácil de España. Encuentra, compra y vende propiedades con confianza.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explorar</h4>
+      <ul>
+        <li><a href="buscar.html">Comprar</a></li>
+        <li><a href="buscar.html?tipo=alquiler">Alquilar</a></li>
+        <li><a href="buscar.html?tipo=obra-nueva">Obra nueva</a></li>
+        <li><a href="buscar.html?tipo=local">Locales comerciales</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <ul>
+        <li><a href="#">Quiénes somos</a></li>
+        <li><a href="agentes.html">Agentes</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacidad</a></li>
+        <li><a href="#">Términos de uso</a></li>
+        <li><a href="#">Cookies</a></li>
+        <li><a href="#">Aviso legal</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Todos los derechos reservados.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Instagram</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script>
+  function openModal(id) {
+    var m = document.getElementById(id);
+    if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  }
+  function closeModal(id) {
+    var m = document.getElementById(id);
+    if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+  }
+  document.querySelectorAll('.modal-overlay').forEach(function(m) {
+    m.addEventListener('click', function(e) {
+      if (e.target === m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+    });
+  });
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  function submitSolicitud() {
+    closeModal('modal-solicitud');
+    showToast('¡Gracias! Te contactaremos pronto.');
+  }
+
+  // Nav scroll effect
+  window.addEventListener('scroll', function() {
+    var nav = document.getElementById('main-nav');
+    if (window.scrollY > 20) {
+      nav.classList.add('nav-scrolled');
+    } else {
+      nav.classList.remove('nav-scrolled');
+    }
+  });
+
+  // Hamburger
+  var _ham = document.getElementById('hamburger');
+  var _menu = document.getElementById('mobile-menu');
+  if (_ham && _menu) {
+    _ham.addEventListener('click', function() {
+      _ham.classList.toggle('open');
+      _menu.classList.toggle('open');
+    });
+  }
+</script>
+<script src="js/translations.js"></script>
+</body>
+</html>

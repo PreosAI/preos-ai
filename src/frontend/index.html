@@ -492,6 +492,21 @@
       .cards-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; }
     }
+
+    /* ─── MARKETING BANNER ──────────────────────────────────── */
+    .marketing-banner { background: #fff; padding: 64px 64px; border-bottom: 1px solid var(--border); }
+    .marketing-inner { max-width: 1160px; margin: 0 auto; }
+    .marketing-title { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 14px; letter-spacing: -0.5px; }
+    .marketing-sub { font-size: 15px; color: var(--muted); line-height: 1.75; max-width: 680px; margin-bottom: 40px; }
+    .marketing-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .marketing-card { background: #f9f9f9; border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; }
+    .marketing-card-icon { font-size: 28px; margin-bottom: 12px; }
+    .marketing-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .marketing-card-desc { font-size: 13.5px; color: var(--muted); line-height: 1.65; }
+    @media (max-width: 768px) {
+      .marketing-banner { padding: 40px 20px; }
+      .marketing-cards { grid-template-columns: 1fr; gap: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -504,8 +519,8 @@
 
   <ul class="nav-links">
     <li><a href="buscar.html">Comprar</a></li>
-    <li><a href="buscar.html?modo=vender">Vender</a></li>
-    <li><a href="#">Agentes de bienes raíces</a></li>
+    <li><a href="vender.html">Vender</a></li>
+    <li><a href="agentes.html">Agentes de bienes raíces</a></li>
   </ul>
 
   <div class="nav-right">
@@ -519,8 +534,8 @@
 </nav>
 <div class="mobile-menu" id="mobile-menu">
   <a href="buscar.html">Comprar</a>
-  <a href="buscar.html?modo=vender">Vender</a>
-  <a href="#">Agentes de bienes raíces</a>
+  <a href="vender.html">Vender</a>
+  <a href="agentes.html">Agentes de bienes raíces</a>
   <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin-top:8px;">Ingresar</a>
 </div>
 
@@ -537,7 +552,7 @@
       <button class="hero-tab" onclick="setTab(this)">Vender</button>
     </div>
 
-    <form class="hero-search" action="buscar.html" method="get" onsubmit="window.location='buscar.html'; return false;">
+    <form class="hero-search" action="buscar.html" method="get" onsubmit="var v=this.querySelector('input').value.trim();window.location=v?'buscar.html?q='+encodeURIComponent(v):'buscar.html';return false;">
       <input type="text" name="q" placeholder="Busca por ciudad, dirección o código postal" />
       <button type="submit" class="hero-search-btn" aria-label="Buscar">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -549,9 +564,36 @@
   </div>
 </section>
 
+<!-- ═══ MARKETING BANNER ════════════════════════════════════════ -->
+<section class="marketing-banner">
+  <div class="marketing-inner">
+    <div class="marketing-text">
+      <h2 class="marketing-title">La plataforma inmobiliaria más transparente de España</h2>
+      <p class="marketing-sub">En Preos encontrarás el precio real de cada propiedad, sin sorpresas ni comisiones ocultas. Datos en tiempo real, visitas virtuales 3D, y agentes certificados con salario fijo — alineados 100% con tus intereses.</p>
+    </div>
+    <div class="marketing-cards">
+      <div class="marketing-card">
+        <div class="marketing-card-icon">🏠</div>
+        <div class="marketing-card-title">Precios reales</div>
+        <div class="marketing-card-desc">Accede al historial de precios y estimaciones de valor de cada propiedad</div>
+      </div>
+      <div class="marketing-card">
+        <div class="marketing-card-icon">🤝</div>
+        <div class="marketing-card-title">Agentes con salario fijo</div>
+        <div class="marketing-card-desc">Nuestros agentes cobran salario, no comisiones. Su único objetivo es que estés feliz</div>
+      </div>
+      <div class="marketing-card">
+        <div class="marketing-card-icon">📊</div>
+        <div class="marketing-card-title">Datos en tiempo real</div>
+        <div class="marketing-card-desc">Conectados a las principales fuentes de datos del mercado español</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ PROPERTIES ═════════════════════════════════════════════ -->
 <div class="section-wrap">
-  <h2 class="section-title">Propiedades que te recomendamos ver</h2>
+  <h2 class="section-title" id="section-title-props">Propiedades que te recomendamos ver</h2>
 
   <div class="cards-grid" id="featured-grid">
     <!-- Populated dynamically by js/properties.js -->
@@ -582,7 +624,7 @@
       <h4>Empresa</h4>
       <ul>
         <li><a href="#">Quiénes somos</a></li>
-        <li><a href="#">Agentes</a></li>
+        <li><a href="agentes.html">Agentes</a></li>
         <li><a href="#">Blog</a></li>
         <li><a href="#">Contacto</a></li>
       </ul>
@@ -621,6 +663,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="js/auth-nav.js"></script>
   <script src="js/properties.js"></script>
+  <script src="js/translations.js"></script>
   <script>
     // Render first 4 featured properties
     (async () => {
@@ -630,6 +673,17 @@
       const SVG_HEART = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
 
       const props = await getAllProperties();
+
+      // Dynamic section title based on localStorage history
+      const lastSearch = localStorage.getItem('preos_last_search');
+      const viewed = JSON.parse(localStorage.getItem('preos_viewed') || '[]');
+      const titleEl = document.getElementById('section-title-props');
+      if (lastSearch) {
+        titleEl.textContent = 'Basado en tu búsqueda: ' + lastSearch;
+      } else if (viewed.length > 0) {
+        titleEl.textContent = 'Propiedades similares a las que has visto';
+      }
+
       const grid  = document.getElementById('featured-grid');
       grid.innerHTML = props.slice(0, 4).map(p => {
         const badges = [
