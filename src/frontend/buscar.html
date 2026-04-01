@@ -1781,6 +1781,9 @@
       if (isMapMode) {
         label.textContent = lang === 'en' ? 'List view' : 'Ver lista';
         btn.style.background = '#E51B27';
+        if (!window._currentResults || window._currentResults.length === 0) {
+          runSearch();
+        }
         buildMapCardsStrip();
         setTimeout(function() {
           if (window._map) window._map.invalidateSize();
