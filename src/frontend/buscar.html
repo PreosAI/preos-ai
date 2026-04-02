@@ -279,7 +279,7 @@
       position: fixed;
       top: var(--nav-h);
       left: 0; right: 0;
-      z-index: 190;
+      z-index: 1001;
       background: #fff;
       border-bottom: 1px solid var(--border);
       height: var(--filters-h);
@@ -295,7 +295,7 @@
       position: fixed;
       top: calc(var(--nav-h) + var(--filters-h));
       left: 0; right: 0;
-      z-index: 189;
+      z-index: 1000;
       background: #fafafa;
       border-bottom: 1px solid var(--border);
       overflow: hidden;
@@ -339,6 +339,9 @@
       font-family: 'Inter', sans-serif;
       font-size: 13px;
       transition: opacity .2s;
+      min-height: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .filter-apply-btn:hover { opacity: .88; }
     .filter-clear-btn {
@@ -350,16 +353,28 @@
       text-decoration: underline;
       font-family: 'Inter', sans-serif;
       font-size: 13px;
+      min-height: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .filter-checkbox-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 6px;
       cursor: pointer;
       font-size: 13px;
+      min-height: 44px;
+      padding: 4px 0;
+      touch-action: manipulation;
     }
-    .filter-checkbox-row input[type="checkbox"] { cursor: pointer; accent-color: #E51B27; }
+    .filter-checkbox-row input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #E51B27;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      touch-action: manipulation;
+    }
     .filters-expanded-footer {
       display: flex;
       align-items: center;
@@ -378,6 +393,8 @@
       background: #fff;
       cursor: pointer;
       outline: none;
+      min-height: 44px;
+      touch-action: manipulation;
     }
     .filter-size-row {
       display: flex;
@@ -410,6 +427,9 @@
       transition: background .15s, border-color .15s, color .15s;
       white-space: nowrap;
       font-family: 'Inter', sans-serif;
+      min-height: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .filter-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
     .filter-btn svg { width: 13px; height: 13px; transition: transform .2s; }
@@ -444,6 +464,11 @@
       cursor: pointer;
       transition: background .1s;
       white-space: nowrap;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .filter-option:hover { background: #f3f4f6; }
     .filter-option.selected { color: var(--red); font-weight: 600; background: rgba(204,31,31,.04); }
@@ -467,6 +492,8 @@
       background: #fff;
       cursor: pointer;
       outline: none;
+      min-height: 44px;
+      touch-action: manipulation;
     }
 
     /* ─── SPLIT LAYOUT ─────────────────────────────────────── */
@@ -1225,6 +1252,48 @@
   });
 
   document.getElementById('sort-select').addEventListener('change', applyFilters);
+
+  // ── Expanded filter controls — fire immediately on change ─────
+  // (no need to click Apply; Apply button still works as a confirm)
+  ['exp-bathrooms', 'exp-status', 'exp-year'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', function() {
+      state.bathrooms = parseInt(document.getElementById('exp-bathrooms').value) || 0;
+      state.status    = document.getElementById('exp-status').value || 'all';
+      state.yearRange = document.getElementById('exp-year').value || 'any';
+      updateMoreBadge();
+      applyFilters();
+    });
+  });
+
+  ['exp-size-min', 'exp-size-max'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', function() {
+      state.minSize = parseInt(document.getElementById('exp-size-min').value) || 0;
+      state.maxSize = parseInt(document.getElementById('exp-size-max').value) || 0;
+      updateMoreBadge();
+      applyFilters();
+    });
+  });
+
+  document.getElementById('exp-3d-tour').addEventListener('change', function() {
+    state.has3dTour = this.checked;
+    updateMoreBadge();
+    applyFilters();
+  });
+
+  document.querySelectorAll('.filter-checkbox-row input[data-feature]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+      state.features = [];
+      document.querySelectorAll('.filter-checkbox-row input[data-feature]:checked').forEach(function(c) {
+        state.features.push(c.getAttribute('data-feature'));
+      });
+      updateMoreBadge();
+      applyFilters();
+    });
+  });
 
   // ── Expanded filter panel ─────────────────────────────────────
   var _expandedOpen = false;
