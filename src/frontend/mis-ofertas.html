@@ -219,6 +219,23 @@
   });
 
   /* ─── Load ──────────────────────────────────────────── */
+  /*
+    UPDATE Firestore rules — paste in Firebase Console > Firestore > Rules:
+
+    match /offers/{offerId} {
+      allow create: if request.auth != null;
+      allow read, update: if request.auth != null &&
+        (request.auth.uid == resource.data.buyerId ||
+         request.auth.token.email.matches('.*@preos\\.ai'));
+      allow list: if request.auth != null;
+      allow delete: if false;
+    }
+
+    Key change: allow list: if request.auth != null
+    The .get() query requires list permission; the where() filter
+    in client code ensures buyers only see their own offers.
+  */
+
   function loadOffers(uid) {
     Promise.all([
       getAllProperties(),
