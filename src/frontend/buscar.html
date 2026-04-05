@@ -473,6 +473,32 @@
     .filter-option:hover { background: #f3f4f6; }
     .filter-option.selected { color: var(--red); font-weight: 600; background: rgba(204,31,31,.04); }
 
+    /* ── iOS: labels as full tap targets ── */
+    [class*="filter"] label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 4px;
+      min-height: 44px;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    [class*="filter"] input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: #E51B27;
+      touch-action: manipulation;
+    }
+    /* ── iOS: filter containers above Leaflet map ── */
+    .filters-panel, .filters-sidebar,
+    [class*="filter-panel"], [class*="filter-bar"] {
+      position: relative;
+      z-index: 1000;
+    }
+
     .filters-sort {
       margin-left: auto;
       display: flex;
@@ -1253,6 +1279,24 @@
 
   document.getElementById('sort-select').addEventListener('change', applyFilters);
 
+  // ── iOS touchend fix for .filter-option divs ─────────────────
+  // On iOS Safari, div click events can be unreliable even with cursor:pointer.
+  // touchend + preventDefault prevents the 300ms synthetic click, then
+  // el.click() fires the existing click handler immediately with full state logic.
+  document.querySelectorAll('.filter-option').forEach(function(el) {
+    el.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      el.click();
+    }, { passive: false });
+  });
+
+  // Prevent Leaflet map from swallowing scroll events inside filter panels
+  document.addEventListener('touchmove', function(e) {
+    if (e.target.closest('[class*="filter"]')) {
+      e.stopPropagation();
+    }
+  }, { passive: true });
+
   // ── Expanded filter controls — fire immediately on change ─────
   // (no need to click Apply; Apply button still works as a confirm)
   ['exp-bathrooms', 'exp-status', 'exp-year'].forEach(function(id) {
@@ -1716,6 +1760,9 @@
       }
     });
   }
+
+  // Expose globally so inline handlers and iOS touchend can reach it
+  window.runSearch = runSearch;
 
   // ── No-results empty state ────────────────────────────────────
   function renderEmptyState(query, allPropsForChips) {
