@@ -447,6 +447,10 @@
         📝 Leads de venta
         <span class="nav-badge hidden" id="badge-seller">0</span>
       </button>
+      <button class="crm-nav-item" data-section="ofertas">
+        💰 Ofertas
+        <span class="nav-badge hidden" id="badge-ofertas">0</span>
+      </button>
     </nav>
   </aside>
 
@@ -506,6 +510,13 @@
         <div class="leads-list" id="list-seller"></div>
       </div>
 
+      <!-- ── Section: Ofertas ──────────────────────────── -->
+      <div class="crm-section" id="section-ofertas">
+        <div class="section-title">💰 Ofertas</div>
+        <div class="section-subtitle" id="subtitle-ofertas">Ofertas recibidas sobre propiedades</div>
+        <div class="leads-list" id="list-ofertas"></div>
+      </div>
+
     </div><!-- .crm-content -->
   </div><!-- .crm-main -->
 </div><!-- .crm-wrap -->
@@ -556,6 +567,7 @@
   var _allBookings    = [];
   var _allProps       = [];
   var _allSellerLeads = [];
+  var _allOfertas     = [];
   var _currentFilter  = 'all';
 
   /* ─── Access control ───────────────────��─────────────────── */
@@ -587,7 +599,8 @@
     Promise.all([
       getAllProperties(),
       firebase.firestore().collection('bookings').get(),
-      firebase.firestore().collection('seller_leads').get()
+      firebase.firestore().collection('seller_leads').get(),
+      firebase.firestore().collection('offers').get()
     ]).then(function(results) {
       _allProps    = results[0];
       _allBookings = results[1].docs.map(function(doc) {
@@ -596,12 +609,16 @@
       _allSellerLeads = results[2].docs.map(function(doc) {
         return Object.assign({ id: doc.id }, doc.data());
       });
+      _allOfertas = results[3].docs.map(function(doc) {
+        return Object.assign({ id: doc.id }, doc.data());
+      });
       // Sort newest first in JS
       var sortNewest = function(a, b) {
         return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
       };
       _allBookings.sort(sortNewest);
       _allSellerLeads.sort(sortNewest);
+      _allOfertas.sort(sortNewest);
       document.getElementById('crm-loading').style.display = 'none';
       updateBadges();
       renderActiveSection();
@@ -632,6 +649,7 @@
     else if (section === 'todos')         renderTodos();
     else if (section === 'propiedades')   renderPropiedades();
     else if (section === 'seller-leads')  renderSellerLeads();
+    else if (section === 'ofertas')       renderOfertas();
   }
 
   /* ─── Badge counts ────────────────────────────���──────────── */
@@ -653,6 +671,13 @@
     }).length;
     if (sellerNew > 0) { sellerEl.textContent = sellerNew; sellerEl.classList.remove('hidden'); }
     else sellerEl.classList.add('hidden');
+
+    var ofertasEl  = document.getElementById('badge-ofertas');
+    var ofertasNew = _allOfertas.filter(function(o) {
+      return !o.agentStatus || o.agentStatus === 'nuevo';
+    }).length;
+    if (ofertasNew > 0) { ofertasEl.textContent = ofertasNew; ofertasEl.classList.remove('hidden'); }
+    else ofertasEl.classList.add('hidden');
 
     // Update global crm badge in navbar too
     var navBadge = document.getElementById('crm-unread-badge');
@@ -953,6 +978,98 @@
         .then(function() {
           var l = _allSellerLeads.find(function(x) { return x.id === lead.id; });
           if (l) l.agentNotes = val;
+          savedEl.style.display = 'inline';
+          setTimeout(function() { savedEl.style.display = 'none'; }, 2000);
+        }).catch(function(err) { console.error('Notes error:', err); });
+    });
+
+    return card;
+  }
+
+  /* ─── Section: Ofertas ───────────────────────────────────── */
+  function renderOfertas() {
+    var list = document.getElementById('list-ofertas');
+    list.innerHTML = '';
+    document.getElementById('subtitle-ofertas').textContent =
+      _allOfertas.length + ' oferta' + (_allOfertas.length !== 1 ? 's' : '') + ' recibida' + (_allOfertas.length !== 1 ? 's' : '');
+    if (_allOfertas.length === 0) {
+      list.innerHTML = '<div class="crm-empty"><div class="crm-empty-icon">💰</div><div class="crm-empty-text">Sin ofertas todavía</div><div class="crm-empty-sub">Las ofertas de compradores aparecerán aquí.</div></div>';
+      return;
+    }
+    _allOfertas.forEach(function(o) { list.appendChild(buildOfertaCard(o)); });
+  }
+
+  function buildOfertaCard(oferta) {
+    var card = document.createElement('div');
+    card.className = 'lead-card';
+
+    var prop = _allProps.find(function(p) { return p.id === oferta.propertyId; }) || {};
+    var propTitle = prop.title || oferta.propertyId || '—';
+    var dateStr = oferta.createdAt
+      ? new Date(oferta.createdAt.seconds * 1000).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+    var statusBadge = {
+      nuevo: '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Nueva</span>',
+      revisando: '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Revisando</span>',
+      aceptada: '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Aceptada</span>',
+      contraoferta: '<span style="background:#ede9fe;color:#5b21b6;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Contraoferta</span>',
+      rechazada: '<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Rechazada</span>'
+    }[oferta.agentStatus || 'nuevo'] || '';
+
+    var price = oferta.offerPrice ? Number(oferta.offerPrice).toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }) : '—';
+    var flags = '';
+    if (oferta.isCashBuyer) flags += ' · <strong>Contado</strong>';
+    if (oferta.hasMortgageApproval) flags += ' · Hipoteca aprobada';
+
+    card.innerHTML =
+      '<div class="lead-card-header">' +
+        '<div>' +
+          '<div class="lead-name">' + propTitle + '</div>' +
+          '<div class="lead-meta">' + dateStr + ' · ' + (oferta.buyerEmail || '—') + flags + '</div>' +
+        '</div>' +
+        '<div>' + statusBadge + '</div>' +
+      '</div>' +
+      '<div class="lead-details" style="margin-bottom:12px;">' +
+        '<span style="font-size:22px;font-weight:700;color:var(--red);">' + price + '</span>' +
+        (oferta.closingDate ? ' &nbsp;·&nbsp; Cierre: ' + oferta.closingDate : '') +
+        (oferta.coverLetter ? '<div style="margin-top:8px;font-size:13px;color:#555;font-style:italic;">"' + oferta.coverLetter.substring(0, 160) + (oferta.coverLetter.length > 160 ? '…' : '') + '"</div>' : '') +
+      '</div>' +
+      '<div class="lead-actions">' +
+        '<select id="sel-of-' + oferta.id + '" class="pipeline-select">' +
+          '<option value="nuevo"' + ((!oferta.agentStatus || oferta.agentStatus === 'nuevo') ? ' selected' : '') + '>Nueva</option>' +
+          '<option value="revisando"' + (oferta.agentStatus === 'revisando' ? ' selected' : '') + '>Revisando</option>' +
+          '<option value="aceptada"' + (oferta.agentStatus === 'aceptada' ? ' selected' : '') + '>Aceptada</option>' +
+          '<option value="contraoferta"' + (oferta.agentStatus === 'contraoferta' ? ' selected' : '') + '>Contraoferta</option>' +
+          '<option value="rechazada"' + (oferta.agentStatus === 'rechazada' ? ' selected' : '') + '>Rechazada</option>' +
+        '</select>' +
+        '<span id="of-saved-' + oferta.id + '" style="display:none;font-size:12px;color:green;margin-left:8px;">✓ Guardado</span>' +
+      '</div>' +
+      '<div style="margin-top:10px;">' +
+        '<textarea id="of-notes-' + oferta.id + '" class="notes-textarea" placeholder="Notas internas…">' + (oferta.agentNotes || '') + '</textarea>' +
+      '</div>';
+
+    var select = card.querySelector('#sel-of-' + oferta.id);
+    select.addEventListener('change', function() {
+      var newVal = this.value;
+      firebase.firestore().collection('offers').doc(oferta.id).update({
+        agentStatus: newVal,
+        status: newVal === 'aceptada' ? 'accepted' : newVal === 'rechazada' ? 'rejected' : newVal === 'contraoferta' ? 'countered' : 'pending',
+        agentUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        var o = _allOfertas.find(function(x) { return x.id === oferta.id; });
+        if (o) { o.agentStatus = newVal; }
+        updateBadges();
+      }).catch(function(err) { console.error('Offer pipeline update error:', err); });
+    });
+
+    var textarea = card.querySelector('#of-notes-' + oferta.id);
+    var savedEl  = card.querySelector('#of-saved-' + oferta.id);
+    textarea.addEventListener('blur', function() {
+      var val = this.value;
+      firebase.firestore().collection('offers').doc(oferta.id).update({ agentNotes: val })
+        .then(function() {
+          var o = _allOfertas.find(function(x) { return x.id === oferta.id; });
+          if (o) o.agentNotes = val;
           savedEl.style.display = 'inline';
           setTimeout(function() { savedEl.style.display = 'none'; }, 2000);
         }).catch(function(err) { console.error('Notes error:', err); });

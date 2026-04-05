@@ -1516,7 +1516,7 @@
         </div>
 
         <button class="btn-red" id="btn-programar">Programar recorrido</button>
-        <a href="#" class="btn-outline">Iniciar una oferta</a>
+        <a href="#" class="btn-outline" id="btn-iniciar-oferta">Iniciar una oferta</a>
 
         <div class="sidebar-phone">
           ¿Preguntas? Llámanos al <a href="tel:+34900123456">900 123 456</a>
@@ -1876,6 +1876,10 @@
     PRICE = p.price;
     document.getElementById('calc-precio').value = formatPrice(p.price);
     calcMortgage();
+
+    // Wire "Iniciar una oferta" button
+    const _ofertaBtn = document.getElementById('btn-iniciar-oferta');
+    if (_ofertaBtn) _ofertaBtn.href = 'oferta.html?id=' + p.id;
 
     // Restore favorites state
     const _favIds = JSON.parse(localStorage.getItem('favoritos') || '[]');

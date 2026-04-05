@@ -84,6 +84,7 @@ firebase.auth().onAuthStateChanged(function (user) {
     const myAccountLabel  = window.PreosLang ? window.PreosLang.t('nav_myaccount')  : 'Mi cuenta';
     const myFavsLabel     = window.PreosLang ? window.PreosLang.t('nav_myfavs')     : 'Mis favoritos';
     const myVisitsLabel   = window.PreosLang ? window.PreosLang.t('myVisits')        : 'Mis visitas';
+    const myOffersLabel   = window.PreosLang ? window.PreosLang.t('myOffers')        : 'Mis ofertas';
     const signOutLabel    = window.PreosLang ? window.PreosLang.t('nav_signout')     : 'Cerrar sesión';
 
     const isAgent = !!(user.email && user.email.endsWith('@preos.ai'));
@@ -104,6 +105,7 @@ firebase.auth().onAuthStateChanged(function (user) {
           <a href="dashboard.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myAccountLabel}</a>
           <a href="favoritos.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myFavsLabel}</a>
           <a href="visitas.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myVisitsLabel}</a>
+          <a href="mis-ofertas.html" style="display:block;padding:10px 16px;font-size:13px;color:#1a1a1a;text-decoration:none;white-space:nowrap;">${myOffersLabel}</a>
           ${agentCrmHTML}
           <hr style="margin:4px 0;border:none;border-top:1px solid #f0f0f0;">
           <button id="btn-cerrar-sesion" style="width:100%;background:none;border:none;cursor:pointer;padding:10px 16px;font-size:13px;color:#cc1f1f;text-align:left;white-space:nowrap;">${signOutLabel}</button>

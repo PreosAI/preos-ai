@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E51B27">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Preos">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Iniciar oferta — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --red:#cc1f1f; --red-b:#E51B27; --red-hover:#b01a1a;
+      --text:#1a1a1a; --muted:#6b7280; --border:#e5e7eb;
+      --bg:#f5f6f8; --nav-h:64px;
+    }
+    body { font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ── NAV ── */
+    nav { position:fixed; top:0; left:0; right:0; z-index:200; background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.08); height:var(--nav-h); display:flex; align-items:center; padding:0 32px; gap:24px; }
+    .nav-links { display:flex; gap:24px; list-style:none; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .nav-links a:hover { color:var(--red); }
+    .nav-right { margin-left:auto; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+    .btn-ingresar { background:var(--red); color:#fff; border:none; padding:7px 20px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
+    .lang-toggle { font-size:12px; font-weight:500; color:var(--text); cursor:pointer; user-select:none; }
+    .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; margin-left:8px; }
+    .hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; display:block; }
+    .mobile-menu { display:none; flex-direction:column; background:#fff; padding:8px 0; border-top:1px solid var(--border); }
+    .mobile-menu a { padding:12px 24px; font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .mobile-menu.open { display:flex; }
+
+    /* ── LAYOUT ── */
+    .page-wrap { margin-top:var(--nav-h); flex:1; }
+    .page-inner { max-width:640px; margin:0 auto; padding:40px 24px 80px; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { font-size:13px; color:var(--muted); margin-bottom:28px; }
+    .breadcrumb a { color:var(--muted); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--red); }
+    .breadcrumb span { margin:0 6px; }
+
+    /* ── PROPERTY STRIP ── */
+    .prop-strip { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin-bottom:28px; display:flex; align-items:center; gap:16px; }
+    .prop-strip-thumb { width:64px; height:48px; border-radius:8px; background:#f0f0f0; flex-shrink:0; overflow:hidden; }
+    .prop-strip-thumb img { width:100%; height:100%; object-fit:cover; }
+    .prop-strip-info { flex:1; min-width:0; }
+    .prop-strip-title { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .prop-strip-meta { font-size:13px; color:var(--muted); margin-top:2px; }
+
+    /* ── PROGRESS STEPPER ── */
+    .stepper { display:flex; align-items:center; margin-bottom:32px; gap:0; }
+    .step-item { display:flex; align-items:center; flex:1; }
+    .step-circle { width:28px; height:28px; border-radius:50%; border:2px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); flex-shrink:0; transition:all .2s; }
+    .step-circle.active { border-color:var(--red-b); background:var(--red-b); color:#fff; }
+    .step-circle.done { border-color:var(--red-b); background:var(--red-b); color:#fff; }
+    .step-line { flex:1; height:2px; background:var(--border); transition:background .2s; }
+    .step-line.done { background:var(--red-b); }
+
+    /* ── WIZARD CARD ── */
+    .wizard-card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:32px; }
+    .wizard-step { display:none; }
+    .wizard-step.active { display:block; }
+    .step-title { font-size:20px; font-weight:800; margin-bottom:6px; }
+    .step-subtitle { font-size:14px; color:var(--muted); margin-bottom:28px; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom:20px; }
+    .form-label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
+    .form-label .req { color:var(--red); margin-left:2px; }
+    .form-input { width:100%; border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:14px; font-family:inherit; color:var(--text); background:#fff; transition:border-color .15s; }
+    .form-input:focus { outline:none; border-color:var(--red-b); }
+    .price-display { font-size:32px; font-weight:800; color:var(--red-b); margin-bottom:12px; }
+    .asking-ref { font-size:13px; color:var(--muted); margin-bottom:16px; }
+    input[type="range"] { width:100%; accent-color:var(--red-b); cursor:pointer; }
+    .range-labels { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:6px; }
+
+    /* ── TOGGLE ROW ── */
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); }
+    .toggle-row:last-child { border-bottom:none; }
+    .toggle-label { font-size:14px; font-weight:500; }
+    .toggle-sublabel { font-size:12px; color:var(--muted); margin-top:2px; }
+    .toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-track { position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer; transition:background .2s; }
+    .toggle-track::after { content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .2s; }
+    .toggle-switch input:checked + .toggle-track { background:var(--red-b); }
+    .toggle-switch input:checked + .toggle-track::after { transform:translateX(20px); }
+
+    /* ── CONFIRM SUMMARY ── */
+    .summary-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px; }
+    .summary-row:last-child { border-bottom:none; }
+    .summary-key { color:var(--muted); }
+    .summary-val { font-weight:600; }
+    .summary-price { font-size:22px; font-weight:800; color:var(--red-b); }
+
+    /* ── BUTTONS ── */
+    .btn-row { display:flex; gap:12px; margin-top:28px; }
+    .btn-back { flex:1; border:1px solid var(--border); background:#fff; color:var(--text); border-radius:999px; padding:12px 20px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .btn-next { flex:2; background:var(--red-b); color:#fff; border:none; border-radius:999px; padding:12px 20px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .btn-next:hover { background:var(--red-hover); }
+    .btn-next:disabled { opacity:.5; cursor:not-allowed; }
+
+    /* ── SUCCESS STATE ── */
+    .success-wrap { display:none; text-align:center; padding:48px 0; }
+    .success-icon { font-size:64px; margin-bottom:16px; }
+    .success-title { font-size:24px; font-weight:800; margin-bottom:8px; }
+    .success-subtitle { font-size:15px; color:var(--muted); margin-bottom:28px; max-width:380px; margin-left:auto; margin-right:auto; }
+    .btn-success { display:inline-block; background:var(--red-b); color:#fff; text-decoration:none; border-radius:999px; padding:12px 28px; font-size:14px; font-weight:600; margin:4px; }
+    .btn-success-outline { display:inline-block; border:1px solid var(--border); color:var(--text); text-decoration:none; border-radius:999px; padding:12px 28px; font-size:14px; font-weight:600; margin:4px; }
+
+    /* ── ERROR ── */
+    .form-error { color:var(--red); font-size:13px; margin-top:4px; display:none; }
+    .form-error.show { display:block; }
+
+    /* ── LOADING ── */
+    .spinner-wrap { text-align:center; padding:60px; display:none; }
+    .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── AUTH GATE ── */
+    .auth-gate { display:none; text-align:center; padding:48px 24px; }
+    .auth-gate-icon { font-size:48px; margin-bottom:16px; }
+    .auth-gate-title { font-size:20px; font-weight:700; margin-bottom:8px; }
+    .auth-gate-sub { font-size:14px; color:var(--muted); margin-bottom:24px; }
+
+    /* ── FOOTER ── */
+    footer { background:#fff; border-top:1px solid var(--border); padding:24px 32px; }
+    .footer-bottom { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .footer-bottom span { font-size:13px; color:var(--muted); }
+    .footer-bottom-links { display:flex; gap:16px; }
+    .footer-bottom-links a { font-size:13px; color:var(--muted); text-decoration:none; }
+    .footer-bottom-links a:hover { color:var(--red); }
+
+    @media (max-width:640px) {
+      .page-inner { padding:24px 16px 60px; }
+      .wizard-card { padding:20px; }
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" id="nav-logo" style="display:flex;align-items:center;">
+    <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0);">
+  </a>
+  <ul class="nav-links">
+    <li><a href="buscar.html" data-i18n="nav_buy">Comprar</a></li>
+    <li><a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a></li>
+    <li><a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a></li>
+    <li><a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px;font-weight:500;color:inherit;text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle"><strong>ES</strong>&nbsp;|&nbsp;<span style="opacity:.45">EN</span></div>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html" data-i18n="nav_buy">Comprar</a>
+  <a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a>
+  <a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a>
+  <a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin:8px 24px;">Ingresar</a>
+</div>
+
+<div class="page-wrap">
+  <div class="page-inner">
+
+    <!-- Loading spinner -->
+    <div class="spinner-wrap" id="loading-wrap">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Auth gate -->
+    <div class="auth-gate" id="auth-gate">
+      <div class="auth-gate-icon">🔒</div>
+      <div class="auth-gate-title">Inicia sesión para continuar</div>
+      <div class="auth-gate-sub">Necesitas una cuenta Preos para enviar una oferta.</div>
+      <a href="ingresar.html" class="btn-success">Ingresar / Crear cuenta</a>
+    </div>
+
+    <!-- Wizard content (shown after auth + property load) -->
+    <div id="wizard-content" style="display:none;">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="buscar.html">Buscar</a>
+        <span>›</span>
+        <a href="#" id="bc-prop-link">Propiedad</a>
+        <span>›</span>
+        Iniciar oferta
+      </div>
+
+      <!-- Property strip -->
+      <div class="prop-strip" id="prop-strip">
+        <div class="prop-strip-thumb" id="prop-thumb"></div>
+        <div class="prop-strip-info">
+          <div class="prop-strip-title" id="prop-title">—</div>
+          <div class="prop-strip-meta" id="prop-meta">—</div>
+        </div>
+      </div>
+
+      <!-- Progress stepper -->
+      <div class="stepper" id="stepper">
+        <div class="step-item">
+          <div class="step-circle active" id="sc-1">1</div>
+          <div class="step-line" id="sl-1"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc-2">2</div>
+          <div class="step-line" id="sl-2"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc-3">3</div>
+          <div class="step-line" id="sl-3"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc-4">4</div>
+          <div class="step-line" id="sl-4"></div>
+        </div>
+        <div class="step-item" style="flex:0;">
+          <div class="step-circle" id="sc-5">5</div>
+        </div>
+      </div>
+
+      <!-- Wizard card -->
+      <div class="wizard-card">
+
+        <!-- ── Step 1: Price ── -->
+        <div class="wizard-step active" id="step-1">
+          <div class="step-title">Precio de oferta</div>
+          <div class="step-subtitle">¿Cuánto quieres ofrecer por esta propiedad?</div>
+          <div class="price-display" id="offer-price-display">—</div>
+          <div class="asking-ref" id="asking-ref">Precio de venta: —</div>
+          <input type="range" id="price-slider" min="0" max="1000000" step="5000" value="0">
+          <div class="range-labels">
+            <span id="slider-min">—</span>
+            <span id="slider-max">—</span>
+          </div>
+          <div class="form-group" style="margin-top:20px;">
+            <label class="form-label" for="price-input">O escribe el importe exacto</label>
+            <input type="number" id="price-input" class="form-input" placeholder="ej. 280000" min="0" step="1000">
+            <div class="form-error" id="err-price">Por favor introduce un precio válido.</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="window.history.back()">← Volver</button>
+            <button class="btn-next" id="btn-step1-next" onclick="goStep(2)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- ── Step 2: Buyer status ── -->
+        <div class="wizard-step" id="step-2">
+          <div class="step-title">Tu situación como comprador</div>
+          <div class="step-subtitle">Ayuda al vendedor a entender tu posición.</div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Comprador al contado</div>
+              <div class="toggle-sublabel">No necesito financiación hipotecaria</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-cash">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Aprobación hipotecaria</div>
+              <div class="toggle-sublabel">Tengo una hipoteca pre-aprobada por el banco</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-mortgage">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="goStep(1)">← Atrás</button>
+            <button class="btn-next" onclick="goStep(3)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- ── Step 3: Arras + dates ── -->
+        <div class="wizard-step" id="step-3">
+          <div class="step-title">Arras y plazos</div>
+          <div class="step-subtitle">Define los términos económicos y temporales de tu oferta.</div>
+          <div class="form-group">
+            <label class="form-label" for="arras-amount">Importe de arras (€)</label>
+            <input type="number" id="arras-amount" class="form-input" placeholder="ej. 10000" min="0" step="500">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arras-date">Fecha de firma de arras</label>
+            <input type="date" id="arras-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="closing-date">Fecha estimada de cierre (escritura)</label>
+            <input type="date" id="closing-date" class="form-input">
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="goStep(2)">← Atrás</button>
+            <button class="btn-next" onclick="goStep(4)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- ── Step 4: Cover letter ── -->
+        <div class="wizard-step" id="step-4">
+          <div class="step-title">Carta de presentación</div>
+          <div class="step-subtitle">Opcional — explica al vendedor por qué eres el comprador ideal.</div>
+          <div class="form-group">
+            <label class="form-label" for="cover-letter">Tu mensaje para el vendedor</label>
+            <textarea id="cover-letter" class="form-input" rows="6" maxlength="600" placeholder="Hola, somos una familia con dos hijos buscando nuestra primera vivienda en Marbella…" style="resize:vertical;"></textarea>
+            <div style="text-align:right;font-size:12px;color:var(--muted);margin-top:4px;"><span id="char-count">0</span>/600</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="conditions">Condiciones adicionales (opcional)</label>
+            <textarea id="conditions" class="form-input" rows="3" maxlength="300" placeholder="Sujeto a inspección técnica del edificio…" style="resize:vertical;"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="goStep(3)">← Atrás</button>
+            <button class="btn-next" onclick="goStep(5)">Revisar oferta →</button>
+          </div>
+        </div>
+
+        <!-- ── Step 5: Confirm ── -->
+        <div class="wizard-step" id="step-5">
+          <div class="step-title">Confirma tu oferta</div>
+          <div class="step-subtitle">Revisa los detalles antes de enviar. Podrás retirar la oferta desde <a href="mis-ofertas.html" style="color:var(--red);">Mis ofertas</a>.</div>
+          <div id="summary-rows"></div>
+          <div class="btn-row">
+            <button class="btn-back" onclick="goStep(4)">← Editar</button>
+            <button class="btn-next" id="btn-submit" onclick="submitOffer()">Enviar oferta</button>
+          </div>
+          <div class="form-error" id="err-submit" style="margin-top:12px;"></div>
+        </div>
+
+      </div><!-- .wizard-card -->
+
+      <!-- Success screen -->
+      <div class="success-wrap" id="success-wrap">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">¡Oferta enviada!</div>
+        <div class="success-subtitle">Tu oferta ha sido enviada al agente. Te notificaremos cuando haya novedades.</div>
+        <a href="mis-ofertas.html" class="btn-success">Ver mis ofertas</a>
+        <a href="buscar.html" class="btn-success-outline">Seguir buscando</a>
+      </div>
+
+    </div><!-- #wizard-content -->
+
+  </div>
+</div>
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Todos los derechos reservados.</span>
+    <div class="footer-bottom-links">
+      <a href="index.html">Inicio</a>
+      <a href="buscar.html">Comprar</a>
+      <a href="por-que-preos.html">¿Por qué Preos?</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/properties.js"></script>
+<script src="js/lang.js"></script>
+<script>
+  /* ─── State ──────────────────────────────────────────── */
+  var _currentStep = 1;
+  var _prop        = null;
+  var _user        = null;
+  var _propId      = new URLSearchParams(window.location.search).get('id') || '';
+
+  /* ─── Auth ───────────────────────────────────────────── */
+  firebase.auth().onAuthStateChanged(function(user) {
+    _user = user;
+    document.getElementById('loading-wrap').style.display = 'none';
+    if (!user) {
+      document.getElementById('auth-gate').style.display = 'block';
+      return;
+    }
+    loadProperty();
+  });
+
+  /* ─── Load property ──────────────────────────────────── */
+  function loadProperty() {
+    document.getElementById('loading-wrap').style.display = 'block';
+    getPropertyById(_propId).then(function(p) {
+      document.getElementById('loading-wrap').style.display = 'none';
+      if (!p) {
+        document.getElementById('wizard-content').style.display = 'block';
+        document.querySelector('.breadcrumb').innerHTML = '<a href="buscar.html">← Volver a buscar</a>';
+        document.querySelector('.wizard-card').innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);">Propiedad no encontrada.</div>';
+        return;
+      }
+      _prop = p;
+      renderPropStrip();
+      initSlider();
+      document.getElementById('wizard-content').style.display = 'block';
+    }).catch(function() {
+      document.getElementById('loading-wrap').style.display = 'none';
+      document.getElementById('wizard-content').style.display = 'block';
+    });
+  }
+
+  /* ─── Render property strip ──────────────────────────── */
+  function renderPropStrip() {
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    var title = lang === 'en' ? (_prop.title_en || _prop.title) : _prop.title;
+    document.getElementById('prop-title').textContent = title;
+    document.getElementById('prop-meta').textContent = formatPrice(_prop.price) + ' · ' + _prop.location;
+    document.getElementById('bc-prop-link').textContent = title;
+    document.getElementById('bc-prop-link').href = 'propiedad.html?id=' + _prop.id;
+    var thumb = document.getElementById('prop-thumb');
+    if (_prop.images && _prop.images[0]) {
+      thumb.innerHTML = '<img src="' + _prop.images[0] + '" alt="' + escHtml(title) + '">';
+    }
+  }
+
+  /* ─── Init price slider ──────────────────────────────── */
+  function initSlider() {
+    var price = _prop.price;
+    var min   = Math.floor(price * 0.70 / 5000) * 5000;
+    var max   = Math.ceil(price * 1.10 / 5000) * 5000;
+    var def   = price;
+
+    var slider = document.getElementById('price-slider');
+    slider.min   = min;
+    slider.max   = max;
+    slider.step  = 5000;
+    slider.value = def;
+
+    document.getElementById('slider-min').textContent = formatPrice(min);
+    document.getElementById('slider-max').textContent = formatPrice(max);
+    document.getElementById('asking-ref').textContent = 'Precio de venta: ' + formatPrice(price);
+
+    updatePriceDisplay(def);
+
+    slider.addEventListener('input', function() {
+      var v = parseInt(this.value);
+      document.getElementById('price-input').value = v;
+      updatePriceDisplay(v);
+    });
+    document.getElementById('price-input').addEventListener('input', function() {
+      var v = parseInt(this.value) || 0;
+      if (v >= min && v <= max) slider.value = v;
+      updatePriceDisplay(v);
+    });
+
+    // Set default in price input too
+    document.getElementById('price-input').value = def;
+  }
+
+  function updatePriceDisplay(val) {
+    document.getElementById('offer-price-display').textContent = formatPrice(val || 0);
+  }
+
+  /* ─── Character counter for cover letter ─────────────── */
+  document.getElementById('cover-letter').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = this.value.length;
+  });
+
+  /* ─── Step navigation ────────────────────────────────── */
+  function goStep(n) {
+    if (n === 2) {
+      var price = getOfferPrice();
+      if (!price || price < 1) {
+        document.getElementById('err-price').classList.add('show');
+        return;
+      }
+      document.getElementById('err-price').classList.remove('show');
+    }
+    if (n === 5) buildSummary();
+
+    document.getElementById('step-' + _currentStep).classList.remove('active');
+    _currentStep = n;
+    document.getElementById('step-' + n).classList.add('active');
+    updateStepper();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateStepper() {
+    for (var i = 1; i <= 5; i++) {
+      var circle = document.getElementById('sc-' + i);
+      circle.classList.remove('active', 'done');
+      if (i < _currentStep) {
+        circle.classList.add('done');
+        circle.innerHTML = '✓';
+      } else if (i === _currentStep) {
+        circle.classList.add('active');
+        circle.textContent = i;
+      } else {
+        circle.textContent = i;
+      }
+      if (i < 5) {
+        var line = document.getElementById('sl-' + i);
+        line.classList.toggle('done', i < _currentStep);
+      }
+    }
+  }
+
+  /* ─── Helpers ────────────────────────────────────────── */
+  function getOfferPrice() {
+    var inputVal = parseInt(document.getElementById('price-input').value);
+    if (inputVal && inputVal > 0) return inputVal;
+    return parseInt(document.getElementById('price-slider').value) || 0;
+  }
+
+  function escHtml(s) {
+    return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ─── Build confirm summary ──────────────────────────── */
+  function buildSummary() {
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    var propTitle = _prop ? (lang === 'en' ? (_prop.title_en || _prop.title) : _prop.title) : '—';
+    var price      = getOfferPrice();
+    var isCash     = document.getElementById('toggle-cash').checked;
+    var hasMortg   = document.getElementById('toggle-mortgage').checked;
+    var arrasAmt   = document.getElementById('arras-amount').value;
+    var arrasDate  = document.getElementById('arras-date').value;
+    var closeDate  = document.getElementById('closing-date').value;
+    var letter     = document.getElementById('cover-letter').value.trim();
+
+    var rows = [
+      ['Propiedad',          propTitle],
+      ['Precio de oferta',   formatPrice(price)],
+      ['Situación',          isCash ? 'Comprador al contado' : hasMortg ? 'Hipoteca aprobada' : 'Pendiente de financiación'],
+      ['Arras',              arrasAmt ? formatPrice(parseInt(arrasAmt)) : 'No especificado'],
+      ['Fecha arras',        arrasDate || 'No especificada'],
+      ['Fecha cierre',       closeDate || 'No especificada'],
+      ['Carta',              letter ? '"' + letter.substring(0, 80) + (letter.length > 80 ? '…' : '') + '"' : 'Sin carta']
+    ];
+
+    var html = '';
+    rows.forEach(function(r) {
+      var valClass = r[0] === 'Precio de oferta' ? 'summary-val summary-price' : 'summary-val';
+      html += '<div class="summary-row"><span class="summary-key">' + r[0] + '</span><span class="' + valClass + '">' + escHtml(r[1]) + '</span></div>';
+    });
+    document.getElementById('summary-rows').innerHTML = html;
+  }
+
+  /* ─── Submit to Firestore ────────────────────────────── */
+  function submitOffer() {
+    if (!_user) { window.location.href = 'ingresar.html'; return; }
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+
+    var offerData = {
+      propertyId:          _propId,
+      buyerId:             _user.uid,
+      buyerEmail:          _user.email || '',
+      buyerName:           _user.displayName || '',
+      offerPrice:          getOfferPrice(),
+      isCashBuyer:         document.getElementById('toggle-cash').checked,
+      hasMortgageApproval: document.getElementById('toggle-mortgage').checked,
+      arrasAmount:         parseInt(document.getElementById('arras-amount').value) || 0,
+      arrasDate:           document.getElementById('arras-date').value || '',
+      closingDate:         document.getElementById('closing-date').value || '',
+      coverLetter:         document.getElementById('cover-letter').value.trim(),
+      conditions:          document.getElementById('conditions').value.trim(),
+      status:              'pending',
+      agentStatus:         'nuevo',
+      createdAt:           firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    firebase.firestore().collection('offers').add(offerData)
+      .then(function() {
+        document.getElementById('step-5').style.display = 'none';
+        document.querySelector('.stepper').style.display = 'none';
+        document.querySelector('.prop-strip').style.display = 'none';
+        document.querySelector('.breadcrumb').style.display = 'none';
+        document.querySelector('.wizard-card').style.display = 'none';
+        document.getElementById('success-wrap').style.display = 'block';
+      })
+      .catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Enviar oferta';
+        var errEl = document.getElementById('err-submit');
+        errEl.textContent = 'Error al enviar la oferta. Por favor inténtalo de nuevo.';
+        errEl.classList.add('show');
+        console.error('Offer submit error:', err);
+      });
+  }
+
+  /* ─── Hamburger ──────────────────────────────────────── */
+  var _ham = document.getElementById('hamburger');
+  var _menu = document.getElementById('mobile-menu');
+  if (_ham && _menu) {
+    _ham.addEventListener('click', function() {
+      _ham.classList.toggle('open');
+      _menu.classList.toggle('open');
+    });
+  }
+</script>
+</body>
+</html>

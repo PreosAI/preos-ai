@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E51B27">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Preos">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mis ofertas — Preos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --red:#cc1f1f; --red-b:#E51B27; --red-hover:#b01a1a;
+      --text:#1a1a1a; --muted:#6b7280; --border:#e5e7eb;
+      --bg:#f5f6f8; --nav-h:64px; --tabs-h:48px;
+    }
+    body { font-family:'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ── NAV ── */
+    nav { position:fixed; top:0; left:0; right:0; z-index:200; background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.08); height:var(--nav-h); display:flex; align-items:center; padding:0 32px; gap:24px; }
+    .nav-links { display:flex; gap:24px; list-style:none; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .nav-links a:hover { color:var(--red); }
+    .nav-right { margin-left:auto; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+    .btn-ingresar { background:var(--red); color:#fff; border:none; padding:7px 20px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
+    .lang-toggle { font-size:12px; font-weight:500; color:var(--text); cursor:pointer; user-select:none; }
+    .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; margin-left:8px; }
+    .hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; display:block; }
+    .mobile-menu { display:none; flex-direction:column; background:#fff; padding:8px 0; border-top:1px solid var(--border); position:fixed; top:var(--nav-h); left:0; right:0; z-index:199; box-shadow:0 4px 12px rgba(0,0,0,.08); }
+    .mobile-menu a { padding:12px 24px; font-size:14px; font-weight:500; color:var(--text); text-decoration:none; }
+    .mobile-menu.open { display:flex; }
+
+    /* ── TABS BAR ── */
+    .tabs-bar {
+      position:fixed; top:var(--nav-h); left:0; right:0; z-index:190;
+      background:#fff; border-bottom:1px solid var(--border);
+      display:flex; gap:0; padding:0 32px; height:var(--tabs-h);
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
+    }
+    .tabs-bar::-webkit-scrollbar { display:none; }
+    .tab {
+      padding:0 16px; height:100%; display:flex; align-items:center;
+      font-size:14px; font-weight:500; color:var(--muted);
+      text-decoration:none; border-bottom:2px solid transparent;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .tab:hover { color:var(--text); }
+    .tab.active { color:var(--red-b); border-bottom-color:var(--red-b); font-weight:600; }
+
+    /* ── LAYOUT ── */
+    .page-body { margin-top:calc(var(--nav-h) + var(--tabs-h)); flex:1; max-width:800px; margin-left:auto; margin-right:auto; padding:32px 24px 80px; width:100%; }
+    .page-title { font-size:24px; font-weight:800; margin-bottom:24px; }
+
+    /* ── OFFER CARD ── */
+    .offer-card {
+      background:#fff; border:1px solid var(--border); border-radius:14px;
+      padding:20px 24px; margin-bottom:16px;
+    }
+    .offer-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .offer-prop-title { font-size:16px; font-weight:700; margin-bottom:2px; }
+    .offer-prop-title a { color:var(--text); text-decoration:none; }
+    .offer-prop-title a:hover { color:var(--red); }
+    .offer-date { font-size:12px; color:var(--muted); }
+    .status-badge { padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap; flex-shrink:0; }
+    .badge-pending   { background:#fef3c7; color:#92400e; }
+    .badge-accepted  { background:#d1fae5; color:#065f46; }
+    .badge-countered { background:#ede9fe; color:#5b21b6; }
+    .badge-rejected  { background:#fee2e2; color:#991b1b; }
+    .badge-withdrawn { background:#f3f4f6; color:#6b7280; }
+
+    .offer-price { font-size:28px; font-weight:800; color:var(--red-b); margin-bottom:8px; }
+    .offer-details { display:flex; flex-wrap:wrap; gap:6px 20px; font-size:13px; color:var(--muted); margin-bottom:12px; }
+    .offer-details strong { color:var(--text); }
+    .offer-letter { font-size:13px; color:#555; font-style:italic; margin-bottom:12px; padding:10px 14px; background:#f9fafb; border-radius:8px; border-left:3px solid var(--border); }
+
+    .offer-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .btn-view-prop { font-size:13px; font-weight:600; color:var(--red); text-decoration:none; }
+    .btn-view-prop:hover { text-decoration:underline; }
+    .btn-withdraw { font-size:13px; font-weight:500; color:var(--muted); background:none; border:1px solid var(--border); border-radius:999px; padding:6px 14px; cursor:pointer; font-family:inherit; }
+    .btn-withdraw:hover { border-color:#ccc; color:var(--text); }
+    .btn-new-offer { font-size:13px; font-weight:600; background:var(--red-b); color:#fff; border:none; border-radius:999px; padding:8px 18px; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+    .btn-new-offer:hover { background:var(--red-hover); }
+
+    /* ── COUNTERED BANNER ── */
+    .countered-banner { background:#faf5ff; border:1px solid #c4b5fd; border-radius:10px; padding:14px 16px; margin-bottom:12px; font-size:14px; }
+    .countered-banner strong { color:#5b21b6; }
+
+    /* ── EMPTY / LOADING ── */
+    .empty-wrap { text-align:center; padding:60px 24px; }
+    .empty-icon { font-size:48px; margin-bottom:16px; }
+    .empty-title { font-size:18px; font-weight:700; margin-bottom:8px; }
+    .empty-sub { font-size:14px; color:var(--muted); margin-bottom:24px; }
+    .spinner-wrap { text-align:center; padding:60px; }
+    .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer { background:#fff; border-top:1px solid var(--border); padding:24px 32px; }
+    .footer-bottom { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .footer-bottom span { font-size:13px; color:var(--muted); }
+    .footer-bottom-links { display:flex; gap:16px; }
+    .footer-bottom-links a { font-size:13px; color:var(--muted); text-decoration:none; }
+    .footer-bottom-links a:hover { color:var(--red); }
+
+    @media (max-width:640px) {
+      nav { padding:0 16px; }
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .tabs-bar { padding:0 16px; }
+      .page-body { padding:24px 16px 60px; }
+      .offer-card { padding:16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════════════════════ -->
+<nav>
+  <a href="index.html" id="nav-logo" style="display:flex;align-items:center;">
+    <img src="Images/logo.png" alt="Preos" style="height:36px;width:auto;filter:brightness(0);">
+  </a>
+  <ul class="nav-links">
+    <li><a href="buscar.html" data-i18n="nav_buy">Comprar</a></li>
+    <li><a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a></li>
+    <li><a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a></li>
+    <li><a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="nav-mi-cuenta"><a href="ingresar.html" style="font-size:13px;font-weight:500;color:inherit;text-decoration:none;">Mi cuenta</a></span>
+    <a href="ingresar.html" class="btn-ingresar" id="nav-ingresar-btn">Ingresar</a>
+    <div class="lang-toggle"><strong>ES</strong>&nbsp;|&nbsp;<span style="opacity:.45">EN</span></div>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="buscar.html" data-i18n="nav_buy">Comprar</a>
+  <a href="agentes-buscar.html?mode=vender" data-i18n="nav_sell">Vender</a>
+  <a href="agentes.html" data-i18n="nav_agents">Agentes Preos</a>
+  <a href="por-que-preos.html" data-i18n="nav_why">¿Por qué Preos?</a>
+  <a href="ingresar.html" class="btn-ingresar" style="display:inline-block;margin:8px 24px;">Ingresar</a>
+</div>
+
+<!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
+<div class="tabs-bar">
+  <a href="dashboard.html" class="tab">Panel de propietarios</a>
+  <a href="favoritos.html" class="tab">Mis favoritos</a>
+  <a href="visitas.html" class="tab">Mis visitas</a>
+  <a href="mis-ofertas.html" class="tab active">Mis ofertas</a>
+  <a href="perfil.html" class="tab">Configuración de mi perfil</a>
+</div>
+
+<!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
+<div class="page-body">
+
+  <div class="page-title" data-i18n="myOffers">Mis ofertas</div>
+
+  <!-- Loading -->
+  <div class="spinner-wrap" id="loading-wrap">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Offer list -->
+  <div id="offers-list" style="display:none;"></div>
+
+</div>
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Preos. Todos los derechos reservados.</span>
+    <div class="footer-bottom-links">
+      <a href="index.html">Inicio</a>
+      <a href="buscar.html">Comprar</a>
+      <a href="por-que-preos.html">¿Por qué Preos?</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Withdraw confirmation modal -->
+<div id="withdraw-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:28px 24px;max-width:380px;width:90%;text-align:center;">
+    <div style="font-size:24px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:8px;">¿Retirar oferta?</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:24px;">Esta acción no se puede deshacer.</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="modal-cancel" style="flex:1;border:1px solid var(--border);background:#fff;border-radius:999px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;">Cancelar</button>
+      <button id="modal-confirm" style="flex:1;background:var(--red-b);color:#fff;border:none;border-radius:999px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;">Retirar</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/logo-path.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/auth-nav.js"></script>
+<script src="js/properties.js"></script>
+<script src="js/lang.js"></script>
+<script>
+  var _props      = [];
+  var _offers     = [];
+  var _pendingWithdrawId = null;
+
+  /* ─── Auth ──────────────────────────────────────────── */
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = 'ingresar.html';
+      return;
+    }
+    loadOffers(user.uid);
+  });
+
+  /* ─── Load ──────────────────────────────────────────── */
+  function loadOffers(uid) {
+    Promise.all([
+      getAllProperties(),
+      firebase.firestore().collection('offers').get()
+    ]).then(function(results) {
+      _props = results[0];
+      var allOffers = results[1].docs.map(function(doc) {
+        return Object.assign({ id: doc.id }, doc.data());
+      });
+      // Filter to this buyer only
+      _offers = allOffers.filter(function(o) { return o.buyerId === uid; });
+      // Sort newest first
+      _offers.sort(function(a, b) {
+        return ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0);
+      });
+      render();
+    }).catch(function(err) {
+      console.error('Load offers error:', err);
+      render();
+    });
+  }
+
+  /* ─── Render ────────────────────────────────────────── */
+  function render() {
+    document.getElementById('loading-wrap').style.display = 'none';
+    var list = document.getElementById('offers-list');
+    list.style.display = 'block';
+
+    if (_offers.length === 0) {
+      list.innerHTML =
+        '<div class="empty-wrap">' +
+          '<div class="empty-icon">🏠</div>' +
+          '<div class="empty-title">No tienes ofertas activas</div>' +
+          '<div class="empty-sub">Cuando envíes una oferta sobre una propiedad, aparecerá aquí.</div>' +
+          '<a href="buscar.html" class="btn-new-offer">Buscar propiedades</a>' +
+        '</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    _offers.forEach(function(o) {
+      list.appendChild(buildOfferCard(o));
+    });
+  }
+
+  function buildOfferCard(o) {
+    var card = document.createElement('div');
+    card.className = 'offer-card';
+    card.id = 'offer-card-' + o.id;
+
+    var prop = _props.find(function(p) { return p.id === o.propertyId; }) || {};
+    var lang = localStorage.getItem('preos-lang') || 'es';
+    var propTitle = lang === 'en' ? (prop.title_en || prop.title || o.propertyId) : (prop.title || o.propertyId || '—');
+
+    var dateStr = o.createdAt
+      ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+
+    var statusMap = {
+      pending:   { label: 'Pendiente',    cls: 'badge-pending' },
+      nuevo:     { label: 'Enviada',      cls: 'badge-pending' },
+      accepted:  { label: 'Aceptada ✓',  cls: 'badge-accepted' },
+      countered: { label: 'Contraoferta', cls: 'badge-countered' },
+      rejected:  { label: 'Rechazada',    cls: 'badge-rejected' },
+      withdrawn: { label: 'Retirada',     cls: 'badge-withdrawn' },
+      aceptada:  { label: 'Aceptada ✓',  cls: 'badge-accepted' },
+      contraoferta: { label: 'Contraoferta', cls: 'badge-countered' },
+      rechazada: { label: 'Rechazada',    cls: 'badge-rejected' }
+    };
+    var agentSt = o.agentStatus || o.status || 'pending';
+    var stInfo  = statusMap[agentSt] || statusMap['pending'];
+
+    var price = o.offerPrice
+      ? Number(o.offerPrice).toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+      : '—';
+
+    var details = [];
+    if (o.isCashBuyer) details.push('<strong>Contado</strong>');
+    if (o.hasMortgageApproval) details.push('Hipoteca aprobada');
+    if (o.arrasAmount) details.push('Arras: ' + Number(o.arrasAmount).toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }));
+    if (o.arrasDate) details.push('Fecha arras: ' + o.arrasDate);
+    if (o.closingDate) details.push('Cierre: ' + o.closingDate);
+
+    var counteredBanner = '';
+    if (agentSt === 'countered' || agentSt === 'contraoferta') {
+      counteredBanner = '<div class="countered-banner"><strong>El agente ha enviado una contraoferta.</strong> Contacta con Preos para continuar la negociación.</div>';
+    }
+    var acceptedBanner = '';
+    if (agentSt === 'accepted' || agentSt === 'aceptada') {
+      acceptedBanner = '<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:14px;"><strong style="color:#065f46;">¡Tu oferta ha sido aceptada!</strong> El agente se pondrá en contacto contigo pronto.</div>';
+    }
+
+    var canWithdraw = (agentSt === 'pending' || agentSt === 'nuevo');
+    var withdrawBtn = canWithdraw
+      ? '<button class="btn-withdraw" data-id="' + escHtml(o.id) + '">Retirar oferta</button>'
+      : '';
+
+    card.innerHTML =
+      '<div class="offer-card-header">' +
+        '<div>' +
+          '<div class="offer-prop-title"><a href="propiedad.html?id=' + escHtml(o.propertyId) + '">' + escHtml(propTitle) + '</a></div>' +
+          '<div class="offer-date">Enviada el ' + dateStr + '</div>' +
+        '</div>' +
+        '<span class="status-badge ' + stInfo.cls + '">' + stInfo.label + '</span>' +
+      '</div>' +
+      (counteredBanner || acceptedBanner) +
+      '<div class="offer-price">' + price + '</div>' +
+      (details.length ? '<div class="offer-details">' + details.join('<span style="color:var(--border);">·</span>') + '</div>' : '') +
+      (o.coverLetter ? '<div class="offer-letter">"' + escHtml(o.coverLetter.substring(0, 200)) + (o.coverLetter.length > 200 ? '…' : '') + '"</div>' : '') +
+      '<div class="offer-actions">' +
+        '<a href="propiedad.html?id=' + escHtml(o.propertyId) + '" class="btn-view-prop">Ver propiedad →</a>' +
+        withdrawBtn +
+      '</div>';
+
+    if (canWithdraw) {
+      card.querySelector('.btn-withdraw').addEventListener('click', function() {
+        _pendingWithdrawId = o.id;
+        showWithdrawModal();
+      });
+    }
+
+    return card;
+  }
+
+  /* ─── Withdraw modal ────────────────────────────────── */
+  var _modal = document.getElementById('withdraw-modal');
+
+  function showWithdrawModal() {
+    _modal.style.display = 'flex';
+  }
+
+  document.getElementById('modal-cancel').addEventListener('click', function() {
+    _modal.style.display = 'none';
+    _pendingWithdrawId = null;
+  });
+
+  document.getElementById('modal-confirm').addEventListener('click', function() {
+    if (!_pendingWithdrawId) return;
+    var id = _pendingWithdrawId;
+    _modal.style.display = 'none';
+    _pendingWithdrawId = null;
+
+    firebase.firestore().collection('offers').doc(id).update({
+      status: 'withdrawn',
+      agentStatus: 'withdrawn',
+      withdrawnAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function() {
+      var o = _offers.find(function(x) { return x.id === id; });
+      if (o) { o.status = 'withdrawn'; o.agentStatus = 'withdrawn'; }
+      // Re-render just this card
+      var oldCard = document.getElementById('offer-card-' + id);
+      if (oldCard && o) {
+        var newCard = buildOfferCard(o);
+        oldCard.replaceWith(newCard);
+      }
+    }).catch(function(err) {
+      alert('Error al retirar la oferta. Por favor inténtalo de nuevo.');
+      console.error('Withdraw error:', err);
+    });
+  });
+
+  _modal.addEventListener('click', function(e) {
+    if (e.target === _modal) {
+      _modal.style.display = 'none';
+      _pendingWithdrawId = null;
+    }
+  });
+
+  /* ─── Helpers ───────────────────────────────────────── */
+  function escHtml(s) {
+    return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ─── Hamburger ─────────────────────────────────────── */
+  var _ham = document.getElementById('hamburger');
+  var _hmenu = document.getElementById('mobile-menu');
+  if (_ham && _hmenu) {
+    _ham.addEventListener('click', function() {
+      _ham.classList.toggle('open');
+      _hmenu.classList.toggle('open');
+    });
+  }
+</script>
+</body>
+</html>
