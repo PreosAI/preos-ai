@@ -440,18 +440,14 @@
     }
     .filter-btn.open svg { transform: rotate(180deg); }
 
-    /* Filter dropdown */
+    /* Filter dropdown — portalled to <body> on open, so no position:absolute needed */
     .filter-dropdown {
       display: none;
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,.12);
       min-width: 200px;
-      z-index: 300;
       overflow: hidden;
     }
     .filter-dropdown.open { display: block; }
@@ -1187,48 +1183,93 @@
   // Map dropdown tipo values to JSON type values
   const tipoMap = { piso: 'Apartamento', villa: 'Villa', adosado: 'Adosado' };
 
-  // ── Dropdown toggle ───────────────────────────────────────────
-  const dropdowns = [
-    { btn: document.getElementById('btn-precio'), dd: document.getElementById('dd-precio') },
-    { btn: document.getElementById('btn-hab'),    dd: document.getElementById('dd-hab')    },
-    { btn: document.getElementById('btn-tipo'),   dd: document.getElementById('dd-tipo')   },
-  ];
+  // ── Dropdown portal — open at body level to escape fixed-parent touch trap ──
+  var _ddOriginalParents = {};
+  var _ddIds = ['dd-precio', 'dd-hab', 'dd-tipo'];
+  var _btnIds = { 'dd-precio': 'btn-precio', 'dd-hab': 'btn-hab', 'dd-tipo': 'btn-tipo' };
 
-  dropdowns.forEach(({ btn, dd }) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = dd.classList.contains('open');
-      closeAll();
-      if (!isOpen) { dd.classList.add('open'); btn.classList.add('open'); }
-    });
-  });
+  function openDropdown(btnId, ddId) {
+    closeAll();
+    var btn = document.getElementById(btnId);
+    var dd  = document.getElementById(ddId);
+    if (!btn || !dd) return;
 
-  // ── iOS touch guard — prevents closeAll racing touchend ─────────
-  var _touchingFilter = false;
-  document.addEventListener('touchstart', function(e) {
-    if (e.target.closest('.filter-dropdown, .filter-option, .filter-btn')) {
-      _touchingFilter = true;
+    // Remember original parent so we can restore it on close
+    if (!_ddOriginalParents[ddId]) {
+      _ddOriginalParents[ddId] = dd.parentElement;
     }
-  }, { passive: true });
-  document.addEventListener('touchend', function() {
-    setTimeout(function() { _touchingFilter = false; }, 300);
-  }, { passive: true });
 
-  function closeAll() {
-    if (_touchingFilter) return; // don't close during a touch interaction
-    dropdowns.forEach(({ btn, dd }) => { dd.classList.remove('open'); btn.classList.remove('open'); });
+    // Portal to <body> and position with fixed coords from getBoundingClientRect
+    var rect = btn.getBoundingClientRect();
+    document.body.appendChild(dd);
+    dd.style.position = 'fixed';
+    dd.style.top      = (rect.bottom + 4) + 'px';
+    dd.style.left     = rect.left + 'px';
+    dd.style.zIndex   = '99999';
+    dd.style.minWidth = Math.max(rect.width, 180) + 'px';
+    dd.classList.add('open');
+    btn.classList.add('open');
+
+    // Clamp to right edge
+    requestAnimationFrame(function() {
+      var ddRect = dd.getBoundingClientRect();
+      if (ddRect.right > window.innerWidth - 8) {
+        dd.style.left = (window.innerWidth - ddRect.width - 8) + 'px';
+      }
+    });
   }
 
-  // Guard: don't close if click originated inside any filter element
-  document.addEventListener('click', function(e) {
+  function closeAll() {
+    _ddIds.forEach(function(ddId) {
+      var dd  = document.getElementById(ddId);
+      var btn = document.getElementById(_btnIds[ddId]);
+      if (!dd) return;
+      dd.classList.remove('open');
+      if (btn) btn.classList.remove('open');
+      // Return to original parent if portalled
+      if (_ddOriginalParents[ddId] && dd.parentElement === document.body) {
+        _ddOriginalParents[ddId].appendChild(dd);
+        dd.style.position = '';
+        dd.style.top      = '';
+        dd.style.left     = '';
+        dd.style.zIndex   = '';
+        dd.style.minWidth = '';
+      }
+    });
+  }
+
+  // Wire filter buttons
+  document.getElementById('btn-precio').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = document.getElementById('dd-precio').classList.contains('open');
+    closeAll();
+    if (!isOpen) openDropdown('btn-precio', 'dd-precio');
+  });
+  document.getElementById('btn-hab').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = document.getElementById('dd-hab').classList.contains('open');
+    closeAll();
+    if (!isOpen) openDropdown('btn-hab', 'dd-hab');
+  });
+  document.getElementById('btn-tipo').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = document.getElementById('dd-tipo').classList.contains('open');
+    closeAll();
+    if (!isOpen) openDropdown('btn-tipo', 'dd-tipo');
+  });
+
+  // Close on tap/click outside any open dropdown
+  document.addEventListener('pointerdown', function(e) {
+    var openDd = document.querySelector('.filter-dropdown.open');
+    if (!openDd) return;
     if (e.target.closest('.filter-dropdown') ||
-        e.target.closest('.filter-option') ||
-        e.target.closest('.filter-btn')) {
-      return;
-    }
+        e.target.closest('.filter-btn') ||
+        e.target.closest('.filter-wrap')) return;
     closeAll();
   });
-  document.querySelectorAll('.filter-dropdown').forEach(dd => dd.addEventListener('click', e => e.stopPropagation()));
+
+  window.addEventListener('resize', closeAll);
+  window.addEventListener('scroll', closeAll, { passive: true });
 
   // ── Filter option listeners ───────────────────────────────────
   function _setFilterLabel(btnId, i18nKey, activeText) {
@@ -1246,7 +1287,7 @@
   }
 
   document.querySelectorAll('#dd-precio .filter-option').forEach(function(opt) {
-    function selectPrecio() {
+    opt.addEventListener('click', function() {
       document.querySelectorAll('#dd-precio .filter-option').forEach(function(o) { o.classList.remove('selected'); });
       opt.classList.add('selected');
       state.precioBand = parseInt(opt.dataset.value);
@@ -1254,13 +1295,11 @@
       document.getElementById('btn-precio').classList.toggle('active', !isDefault);
       _setFilterLabel('btn-precio', 'filter_price', isDefault ? null : opt.textContent.trim());
       applyFilters(); closeAll();
-    }
-    opt.addEventListener('click', selectPrecio);
-    opt.addEventListener('touchend', function(e) { e.stopPropagation(); selectPrecio(); }, { passive: false });
+    });
   });
 
   document.querySelectorAll('#dd-hab .filter-option').forEach(function(opt) {
-    function selectHab() {
+    opt.addEventListener('click', function() {
       document.querySelectorAll('#dd-hab .filter-option').forEach(function(o) { o.classList.remove('selected'); });
       opt.classList.add('selected');
       state.beds = parseInt(opt.dataset.value);
@@ -1268,13 +1307,11 @@
       document.getElementById('btn-hab').classList.toggle('active', !isDefault);
       _setFilterLabel('btn-hab', 'filter_rooms', isDefault ? null : opt.textContent.trim() + ' hab.');
       applyFilters(); closeAll();
-    }
-    opt.addEventListener('click', selectHab);
-    opt.addEventListener('touchend', function(e) { e.stopPropagation(); selectHab(); }, { passive: false });
+    });
   });
 
   document.querySelectorAll('#dd-tipo .filter-option').forEach(function(opt) {
-    function selectTipo() {
+    opt.addEventListener('click', function() {
       document.querySelectorAll('#dd-tipo .filter-option').forEach(function(o) { o.classList.remove('selected'); });
       opt.classList.add('selected');
       state.tipo = opt.dataset.value;
@@ -1282,9 +1319,7 @@
       document.getElementById('btn-tipo').classList.toggle('active', !isDefault);
       _setFilterLabel('btn-tipo', 'filter_type', isDefault ? null : opt.textContent.trim());
       applyFilters(); closeAll();
-    }
-    opt.addEventListener('click', selectTipo);
-    opt.addEventListener('touchend', function(e) { e.stopPropagation(); selectTipo(); }, { passive: false });
+    });
   });
 
   // Re-translate active filter button labels when language is switched
