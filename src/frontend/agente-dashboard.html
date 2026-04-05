@@ -567,7 +567,7 @@
   var _allBookings    = [];
   var _allProps       = [];
   var _allSellerLeads = [];
-  var _allOfertas     = [];
+  var _allOffers      = [];
   var _currentFilter  = 'all';
 
   /* ─── Access control ───────────────────��─────────────────── */
@@ -601,6 +601,7 @@
       firebase.firestore().collection('bookings').get(),
       firebase.firestore().collection('seller_leads').get(),
       firebase.firestore().collection('offers').get()
+        .catch(function() { return { docs: [] }; })
     ]).then(function(results) {
       _allProps    = results[0];
       _allBookings = results[1].docs.map(function(doc) {
@@ -609,7 +610,7 @@
       _allSellerLeads = results[2].docs.map(function(doc) {
         return Object.assign({ id: doc.id }, doc.data());
       });
-      _allOfertas = results[3].docs.map(function(doc) {
+      _allOffers = results[3].docs.map(function(doc) {
         return Object.assign({ id: doc.id }, doc.data());
       });
       // Sort newest first in JS
@@ -618,7 +619,7 @@
       };
       _allBookings.sort(sortNewest);
       _allSellerLeads.sort(sortNewest);
-      _allOfertas.sort(sortNewest);
+      _allOffers.sort(sortNewest);
       document.getElementById('crm-loading').style.display = 'none';
       updateBadges();
       renderActiveSection();
@@ -673,7 +674,7 @@
     else sellerEl.classList.add('hidden');
 
     var ofertasEl  = document.getElementById('badge-ofertas');
-    var ofertasNew = _allOfertas.filter(function(o) {
+    var ofertasNew = (_allOffers || []).filter(function(o) {
       return !o.agentStatus || o.agentStatus === 'nuevo';
     }).length;
     if (ofertasNew > 0) { ofertasEl.textContent = ofertasNew; ofertasEl.classList.remove('hidden'); }
@@ -991,12 +992,12 @@
     var list = document.getElementById('list-ofertas');
     list.innerHTML = '';
     document.getElementById('subtitle-ofertas').textContent =
-      _allOfertas.length + ' oferta' + (_allOfertas.length !== 1 ? 's' : '') + ' recibida' + (_allOfertas.length !== 1 ? 's' : '');
-    if (_allOfertas.length === 0) {
+      _allOffers.length + ' oferta' + (_allOffers.length !== 1 ? 's' : '') + ' recibida' + (_allOffers.length !== 1 ? 's' : '');
+    if (_allOffers.length === 0) {
       list.innerHTML = '<div class="crm-empty"><div class="crm-empty-icon">💰</div><div class="crm-empty-text">Sin ofertas todavía</div><div class="crm-empty-sub">Las ofertas de compradores aparecerán aquí.</div></div>';
       return;
     }
-    _allOfertas.forEach(function(o) { list.appendChild(buildOfertaCard(o)); });
+    _allOffers.forEach(function(o) { list.appendChild(buildOfertaCard(o)); });
   }
 
   function buildOfertaCard(oferta) {
@@ -1056,7 +1057,7 @@
         status: newVal === 'aceptada' ? 'accepted' : newVal === 'rechazada' ? 'rejected' : newVal === 'contraoferta' ? 'countered' : 'pending',
         agentUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function() {
-        var o = _allOfertas.find(function(x) { return x.id === oferta.id; });
+        var o = _allOffers.find(function(x) { return x.id === oferta.id; });
         if (o) { o.agentStatus = newVal; }
         updateBadges();
       }).catch(function(err) { console.error('Offer pipeline update error:', err); });
@@ -1068,7 +1069,7 @@
       var val = this.value;
       firebase.firestore().collection('offers').doc(oferta.id).update({ agentNotes: val })
         .then(function() {
-          var o = _allOfertas.find(function(x) { return x.id === oferta.id; });
+          var o = _allOffers.find(function(x) { return x.id === oferta.id; });
           if (o) o.agentNotes = val;
           savedEl.style.display = 'inline';
           setTimeout(function() { savedEl.style.display = 'none'; }, 2000);
