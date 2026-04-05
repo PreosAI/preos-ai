@@ -117,6 +117,9 @@
     .btn-success { display:inline-block; background:var(--red-b); color:#fff; text-decoration:none; border-radius:999px; padding:12px 28px; font-size:14px; font-weight:600; margin:4px; }
     .btn-success-outline { display:inline-block; border:1px solid var(--border); color:var(--text); text-decoration:none; border-radius:999px; padding:12px 28px; font-size:14px; font-weight:600; margin:4px; }
 
+    /* ── SUMMARY LETTER ── */
+    .summary-letter { background:#f9fafb; border-left:3px solid var(--border); border-radius:6px; padding:10px 14px; margin-top:12px; }
+
     /* ── ERROR ── */
     .form-error { color:var(--red); font-size:13px; margin-top:4px; display:none; }
     .form-error.show { display:block; }
@@ -250,7 +253,9 @@
             <span id="slider-min">—</span>
             <span id="slider-max">—</span>
           </div>
-          <div class="form-group" style="margin-top:20px;">
+          <div id="price-diff-helper" style="font-size:14px;font-weight:600;margin:8px 0 4px;min-height:20px;text-align:center;"></div>
+          <div id="market-price-line" style="font-size:13px;color:#6b7280;text-align:center;margin-bottom:8px;"></div>
+          <div class="form-group" style="margin-top:16px;">
             <label class="form-label" for="price-input">O escribe el importe exacto</label>
             <input type="number" id="price-input" class="form-input" placeholder="ej. 280000" min="0" step="1000">
             <div class="form-error" id="err-price">Por favor introduce un precio válido.</div>
@@ -298,6 +303,7 @@
           <div class="form-group">
             <label class="form-label" for="arras-amount">Importe de arras (€)</label>
             <input type="number" id="arras-amount" class="form-input" placeholder="ej. 10000" min="0" step="500">
+            <div id="arras-helper" style="font-size:13px;color:#6b7280;margin-top:4px;"></div>
           </div>
           <div class="form-group">
             <label class="form-label" for="arras-date">Fecha de firma de arras</label>
@@ -412,6 +418,25 @@
       renderPropStrip();
       initSlider();
       document.getElementById('wizard-content').style.display = 'block';
+      // Market price benchmark (silent fail)
+      fetch('data/market-prices.json')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var cityKey = (_prop.city || '').toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/\s+/g, '-');
+          var cityData = data[cityKey] || data[Object.keys(data)[0]];
+          if (cityData && cityData.pricePerM2) {
+            var latest = cityData.pricePerM2[cityData.pricePerM2.length - 1];
+            var el = document.getElementById('market-price-line');
+            if (el && latest) {
+              el.textContent = 'Precio medio en ' + (_prop.city || _prop.location)
+                + ': €' + latest.price.toLocaleString('es-ES') + '/m²'
+                + ' (Fuente: Notariado)';
+            }
+          }
+        })
+        .catch(function() {});
     }).catch(function() {
       document.getElementById('loading-wrap').style.display = 'none';
       document.getElementById('wizard-content').style.display = 'block';
@@ -468,11 +493,56 @@
 
   function updatePriceDisplay(val) {
     document.getElementById('offer-price-display').textContent = formatPrice(val || 0);
+    if (!val || !_prop) return;
+    var asking = _prop.price;
+    var diff = val - asking;
+    var pct = ((diff / asking) * 100).toFixed(1);
+    var sign = diff >= 0 ? '+' : '';
+    var color = diff > 0 ? '#E51B27' : diff < 0 ? '#16a34a' : '#6b7280';
+    var msg = diff === 0
+      ? 'Igual al precio de salida'
+      : sign + pct + '% ' + (diff > 0 ? 'por encima' : 'por debajo') + ' del precio de salida';
+    var helperEl = document.getElementById('price-diff-helper');
+    if (helperEl) { helperEl.textContent = msg; helperEl.style.color = color; }
+    // Keep arras default in sync unless user has typed it manually
+    var arrasEl = document.getElementById('arras-amount');
+    if (arrasEl && !arrasEl.dataset.userEdited) {
+      var defaultArras = Math.round(val * 0.10 / 1000) * 1000;
+      arrasEl.value = defaultArras;
+      updateArrasHelper(defaultArras);
+    }
+  }
+
+  function updateArrasHelper(val) {
+    var el = document.getElementById('arras-helper');
+    if (!el) return;
+    var offerPrice = getOfferPrice();
+    var pct = offerPrice > 0 ? ((val / offerPrice) * 100).toFixed(0) : 0;
+    el.textContent = 'Se recomienda el 10% — €'
+      + Math.round(offerPrice * 0.10).toLocaleString('es-ES')
+      + ' · Estás proponiendo el ' + pct + '%';
   }
 
   /* ─── Character counter for cover letter ─────────────── */
   document.getElementById('cover-letter').addEventListener('input', function() {
     document.getElementById('char-count').textContent = this.value.length;
+  });
+
+  /* ─── Arras listeners ────────────────────────────────── */
+  document.getElementById('arras-amount').addEventListener('input', function() {
+    this.dataset.userEdited = 'true';
+    updateArrasHelper(parseInt(this.value) || 0);
+  });
+  document.getElementById('arras-date').addEventListener('change', function() {
+    var minClose = new Date(this.value);
+    minClose.setDate(minClose.getDate() + 30);
+    var closingEl = document.getElementById('closing-date');
+    if (closingEl) {
+      closingEl.min = minClose.toISOString().split('T')[0];
+      if (!closingEl.value || closingEl.value < closingEl.min) {
+        closingEl.value = closingEl.min;
+      }
+    }
   });
 
   /* ─── Step navigation ────────────────────────────────── */
@@ -484,6 +554,33 @@
         return;
       }
       document.getElementById('err-price').classList.remove('show');
+    }
+    if (n === 3) {
+      var arrasEl = document.getElementById('arras-amount');
+      if (arrasEl && !arrasEl.dataset.userEdited) {
+        var offerPrice = getOfferPrice();
+        var defaultArras = Math.round(offerPrice * 0.10 / 1000) * 1000;
+        arrasEl.value = defaultArras;
+        updateArrasHelper(defaultArras);
+      }
+      var arrasDateEl = document.getElementById('arras-date');
+      if (arrasDateEl && !arrasDateEl.value) {
+        var arrasDefault = new Date();
+        arrasDefault.setDate(arrasDefault.getDate() + 14);
+        arrasDateEl.value = arrasDefault.toISOString().split('T')[0];
+        arrasDateEl.min = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+      }
+      var closingEl = document.getElementById('closing-date');
+      if (closingEl && !closingEl.value) {
+        var closingDefault = new Date();
+        closingDefault.setDate(closingDefault.getDate() + 59);
+        closingEl.value = closingDefault.toISOString().split('T')[0];
+        if (arrasDateEl && arrasDateEl.value) {
+          var minClose = new Date(arrasDateEl.value);
+          minClose.setDate(minClose.getDate() + 30);
+          closingEl.min = minClose.toISOString().split('T')[0];
+        }
+      }
     }
     if (n === 5) buildSummary();
 
@@ -529,22 +626,24 @@
   function buildSummary() {
     var lang = localStorage.getItem('preos-lang') || 'es';
     var propTitle = _prop ? (lang === 'en' ? (_prop.title_en || _prop.title) : _prop.title) : '—';
-    var price      = getOfferPrice();
-    var isCash     = document.getElementById('toggle-cash').checked;
-    var hasMortg   = document.getElementById('toggle-mortgage').checked;
-    var arrasAmt   = document.getElementById('arras-amount').value;
-    var arrasDate  = document.getElementById('arras-date').value;
-    var closeDate  = document.getElementById('closing-date').value;
-    var letter     = document.getElementById('cover-letter').value.trim();
+    var price     = getOfferPrice();
+    var isCash    = document.getElementById('toggle-cash').checked;
+    var hasMortg  = document.getElementById('toggle-mortgage').checked;
+    var arrasAmt  = document.getElementById('arras-amount').value;
+    var arrasDate = document.getElementById('arras-date').value;
+    var closeDate = document.getElementById('closing-date').value;
+    var letterEl  = document.getElementById('cover-letter')
+                 || document.getElementById('buyer-letter')
+                 || document.querySelector('textarea[id*="letter"], textarea[id*="carta"]');
+    var letter    = letterEl ? letterEl.value.trim() : '';
 
     var rows = [
-      ['Propiedad',          propTitle],
-      ['Precio de oferta',   formatPrice(price)],
-      ['Situación',          isCash ? 'Comprador al contado' : hasMortg ? 'Hipoteca aprobada' : 'Pendiente de financiación'],
-      ['Arras',              arrasAmt ? formatPrice(parseInt(arrasAmt)) : 'No especificado'],
-      ['Fecha arras',        arrasDate || 'No especificada'],
-      ['Fecha cierre',       closeDate || 'No especificada'],
-      ['Carta',              letter ? '"' + letter.substring(0, 80) + (letter.length > 80 ? '…' : '') + '"' : 'Sin carta']
+      ['Propiedad',        propTitle],
+      ['Precio de oferta', formatPrice(price)],
+      ['Situación',        isCash ? 'Comprador al contado' : hasMortg ? 'Hipoteca aprobada' : 'Pendiente de financiación'],
+      ['Arras',            arrasAmt ? formatPrice(parseInt(arrasAmt)) : 'No especificado'],
+      ['Fecha arras',      arrasDate || 'No especificada'],
+      ['Fecha cierre',     closeDate || 'No especificada']
     ];
 
     var html = '';
@@ -552,6 +651,12 @@
       var valClass = r[0] === 'Precio de oferta' ? 'summary-val summary-price' : 'summary-val';
       html += '<div class="summary-row"><span class="summary-key">' + r[0] + '</span><span class="' + valClass + '">' + escHtml(r[1]) + '</span></div>';
     });
+    if (letter) {
+      html += '<div class="summary-letter">'
+        + '<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">Tu carta al vendedor:</div>'
+        + '<div style="font-style:italic;color:#374151;">"' + escHtml(letter.substring(0, 150)) + (letter.length > 150 ? '…' : '') + '"</div>'
+        + '</div>';
+    }
     document.getElementById('summary-rows').innerHTML = html;
   }
 
@@ -577,6 +682,16 @@
       conditions:          document.getElementById('conditions').value.trim(),
       status:              'pending',
       agentStatus:         'nuevo',
+      // Property context
+      propertyTitle:       _prop ? _prop.title : '',
+      propertyPrice:       _prop ? _prop.price : 0,
+      propertyCity:        _prop ? (_prop.city || _prop.location || '') : '',
+      // Listing agent info
+      listingAgentEmail:   _prop ? (_prop.agent_email || '') : '',
+      listingAgentPhone:   _prop ? (_prop.agent_phone || '') : '',
+      listingAgencyName:   _prop ? (_prop.agency || 'Preos') : 'Preos',
+      // Offer context
+      offerPct:            _prop ? Math.round((getOfferPrice() / _prop.price) * 100) : 0,
       createdAt:           firebase.firestore.FieldValue.serverTimestamp()
     };
 

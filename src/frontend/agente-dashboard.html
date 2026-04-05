@@ -1028,6 +1028,13 @@
     if (oferta.isCashBuyer) flags += ' · <strong>Contado</strong>';
     if (oferta.hasMortgageApproval) flags += ' · Hipoteca aprobada';
 
+    var askingPrice = oferta.propertyPrice || (prop.price ? prop.price : 0);
+    var askingFmt   = askingPrice ? '€' + Number(askingPrice).toLocaleString('es-ES') : '—';
+    var offerPct    = oferta.offerPct || (askingPrice && oferta.offerPrice ? Math.round((oferta.offerPrice / askingPrice) * 100) : 0);
+    var buyerStatus = oferta.isCashBuyer ? 'Comprador al contado'
+                    : oferta.hasMortgageApproval ? 'Hipoteca aprobada'
+                    : 'Pendiente financiación';
+
     card.innerHTML =
       '<div class="lead-card-header">' +
         '<div>' +
@@ -1036,10 +1043,49 @@
         '</div>' +
         '<div>' + statusBadge + '</div>' +
       '</div>' +
-      '<div class="lead-details" style="margin-bottom:12px;">' +
-        '<span style="font-size:22px;font-weight:700;color:var(--red);">' + price + '</span>' +
-        (oferta.closingDate ? ' &nbsp;·&nbsp; Cierre: ' + oferta.closingDate : '') +
-        (oferta.coverLetter ? '<div style="margin-top:8px;font-size:13px;color:#555;font-style:italic;">"' + oferta.coverLetter.substring(0, 160) + (oferta.coverLetter.length > 160 ? '…' : '') + '"</div>' : '') +
+      // ── PROPERTY / LISTING AGENT ──
+      '<div style="background:#f9fafb;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;">' +
+        '<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:6px;">PROPIEDAD / AGENTE VENDEDOR</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<span style="color:#6b7280;">Propiedad</span>' +
+          '<a href="propiedad.html?id=' + oferta.propertyId + '" target="_blank" style="font-weight:600;color:var(--red);text-decoration:none;max-width:60%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (oferta.propertyTitle || propTitle) + '</a>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<span style="color:#6b7280;">Precio salida</span><strong>' + askingFmt + '</strong>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<span style="color:#6b7280;">Oferta</span>' +
+          '<strong style="color:var(--red);">' + price + (offerPct ? ' <span style="font-weight:400;color:#6b7280;">(' + offerPct + '%)</span>' : '') + '</strong>' +
+        '</div>' +
+        (oferta.listingAgencyName && oferta.listingAgencyName !== 'Preos'
+          ? '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:#6b7280;">Agencia vendedora</span><span>' + oferta.listingAgencyName + '</span></div>'
+          : '') +
+        (oferta.listingAgentEmail
+          ? '<div style="display:flex;justify-content:space-between;"><span style="color:#6b7280;">Agente vendedor</span><a href="mailto:' + oferta.listingAgentEmail + '" style="color:var(--red);">' + oferta.listingAgentEmail + '</a></div>'
+          : '') +
+      '</div>' +
+      // ── OFFER TERMS ──
+      '<div style="background:#f9fafb;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;">' +
+        '<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:6px;">TÉRMINOS DE OFERTA</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<span style="color:#6b7280;">Arras</span>' +
+          '<strong>' + (oferta.arrasAmount ? '€' + Number(oferta.arrasAmount).toLocaleString('es-ES') : '—') + '</strong>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<span style="color:#6b7280;">Fecha arras</span><span>' + (oferta.arrasDate || '—') + '</span>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+          '<span style="color:#6b7280;">Fecha cierre</span><span>' + (oferta.closingDate || '—') + '</span>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;">' +
+          '<span style="color:#6b7280;">Condiciones</span><span>' + buyerStatus + '</span>' +
+        '</div>' +
+        (oferta.coverLetter
+          ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">' +
+              '<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:4px;">CARTA AL VENDEDOR</div>' +
+              '<div style="font-style:italic;color:#555;">"' + oferta.coverLetter + '"</div>' +
+            '</div>'
+          : '') +
       '</div>' +
       '<div class="lead-actions">' +
         '<select id="sel-of-' + oferta.id + '" class="pipeline-select">' +
