@@ -1203,11 +1203,31 @@
     });
   });
 
+  // ── iOS touch guard — prevents closeAll racing touchend ─────────
+  var _touchingFilter = false;
+  document.addEventListener('touchstart', function(e) {
+    if (e.target.closest('.filter-dropdown, .filter-option, .filter-btn')) {
+      _touchingFilter = true;
+    }
+  }, { passive: true });
+  document.addEventListener('touchend', function() {
+    setTimeout(function() { _touchingFilter = false; }, 300);
+  }, { passive: true });
+
   function closeAll() {
+    if (_touchingFilter) return; // don't close during a touch interaction
     dropdowns.forEach(({ btn, dd }) => { dd.classList.remove('open'); btn.classList.remove('open'); });
   }
 
-  document.addEventListener('click', closeAll);
+  // Guard: don't close if click originated inside any filter element
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.filter-dropdown') ||
+        e.target.closest('.filter-option') ||
+        e.target.closest('.filter-btn')) {
+      return;
+    }
+    closeAll();
+  });
   document.querySelectorAll('.filter-dropdown').forEach(dd => dd.addEventListener('click', e => e.stopPropagation()));
 
   // ── Filter option listeners ───────────────────────────────────
@@ -1225,40 +1245,46 @@
     }
   }
 
-  document.querySelectorAll('#dd-precio .filter-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('#dd-precio .filter-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('#dd-precio .filter-option').forEach(function(opt) {
+    function selectPrecio() {
+      document.querySelectorAll('#dd-precio .filter-option').forEach(function(o) { o.classList.remove('selected'); });
       opt.classList.add('selected');
       state.precioBand = parseInt(opt.dataset.value);
-      const isDefault = state.precioBand === 0;
+      var isDefault = state.precioBand === 0;
       document.getElementById('btn-precio').classList.toggle('active', !isDefault);
       _setFilterLabel('btn-precio', 'filter_price', isDefault ? null : opt.textContent.trim());
       applyFilters(); closeAll();
-    });
+    }
+    opt.addEventListener('click', selectPrecio);
+    opt.addEventListener('touchend', function(e) { e.stopPropagation(); selectPrecio(); }, { passive: false });
   });
 
-  document.querySelectorAll('#dd-hab .filter-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('#dd-hab .filter-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('#dd-hab .filter-option').forEach(function(opt) {
+    function selectHab() {
+      document.querySelectorAll('#dd-hab .filter-option').forEach(function(o) { o.classList.remove('selected'); });
       opt.classList.add('selected');
       state.beds = parseInt(opt.dataset.value);
-      const isDefault = state.beds === 0;
+      var isDefault = state.beds === 0;
       document.getElementById('btn-hab').classList.toggle('active', !isDefault);
       _setFilterLabel('btn-hab', 'filter_rooms', isDefault ? null : opt.textContent.trim() + ' hab.');
       applyFilters(); closeAll();
-    });
+    }
+    opt.addEventListener('click', selectHab);
+    opt.addEventListener('touchend', function(e) { e.stopPropagation(); selectHab(); }, { passive: false });
   });
 
-  document.querySelectorAll('#dd-tipo .filter-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('#dd-tipo .filter-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('#dd-tipo .filter-option').forEach(function(opt) {
+    function selectTipo() {
+      document.querySelectorAll('#dd-tipo .filter-option').forEach(function(o) { o.classList.remove('selected'); });
       opt.classList.add('selected');
       state.tipo = opt.dataset.value;
-      const isDefault = state.tipo === 'todos';
+      var isDefault = state.tipo === 'todos';
       document.getElementById('btn-tipo').classList.toggle('active', !isDefault);
       _setFilterLabel('btn-tipo', 'filter_type', isDefault ? null : opt.textContent.trim());
       applyFilters(); closeAll();
-    });
+    }
+    opt.addEventListener('click', selectTipo);
+    opt.addEventListener('touchend', function(e) { e.stopPropagation(); selectTipo(); }, { passive: false });
   });
 
   // Re-translate active filter button labels when language is switched
@@ -1278,24 +1304,6 @@
   });
 
   document.getElementById('sort-select').addEventListener('change', applyFilters);
-
-  // ── iOS touchend fix for .filter-option divs ─────────────────
-  // On iOS Safari, div click events can be unreliable even with cursor:pointer.
-  // touchend + preventDefault prevents the 300ms synthetic click, then
-  // el.click() fires the existing click handler immediately with full state logic.
-  document.querySelectorAll('.filter-option').forEach(function(el) {
-    el.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      el.click();
-    }, { passive: false });
-  });
-
-  // Prevent Leaflet map from swallowing scroll events inside filter panels
-  document.addEventListener('touchmove', function(e) {
-    if (e.target.closest('[class*="filter"]')) {
-      e.stopPropagation();
-    }
-  }, { passive: true });
 
   // ── Expanded filter controls — fire immediately on change ─────
   // (no need to click Apply; Apply button still works as a confirm)
