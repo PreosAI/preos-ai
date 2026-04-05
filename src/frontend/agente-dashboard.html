@@ -85,33 +85,39 @@
     }
 
     .crm-nav {
-      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
       flex: 1;
+      gap: 4px;
+      padding: 8px 0;
+      position: relative;
+      width: 100%;
+      overflow-y: auto;
     }
 
     .crm-nav-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      cursor: pointer;
+      padding: 10px 16px;
       border: none;
       background: none;
       width: 100%;
       text-align: left;
-      border-left: 3px solid transparent;
-      transition: background .12s, color .12s;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #374151;
+      white-space: nowrap;
       font-family: 'Inter', sans-serif;
+      transition: background .12s, color .12s;
     }
-    .crm-nav-item:hover { background: #fafafa; }
+    .crm-nav-item:hover,
     .crm-nav-item.active {
-      color: var(--red-b);
-      background: #fff5f5;
-      border-left-color: var(--red-b);
+      background: #fef2f2;
+      color: #E51B27;
       font-weight: 600;
+      border-left: 3px solid #E51B27;
     }
 
     .nav-badge {
