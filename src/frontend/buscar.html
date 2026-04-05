@@ -1218,6 +1218,7 @@
       }
     });
   }
+  window.openDropdown = openDropdown;
 
   function closeAll() {
     _ddIds.forEach(function(ddId) {
@@ -1237,6 +1238,8 @@
       }
     });
   }
+  window.openDropdown = openDropdown;
+  window.closeAll = closeAll;
 
   // Wire filter buttons
   document.getElementById('btn-precio').addEventListener('click', function(e) {
