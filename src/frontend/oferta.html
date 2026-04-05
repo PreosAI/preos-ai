@@ -304,9 +304,18 @@
           <div class="step-title">Arras y plazos</div>
           <div class="step-subtitle">Define los términos económicos y temporales de tu oferta.</div>
           <div class="form-group">
-            <label class="form-label" for="arras-amount">Importe de arras (€)</label>
-            <input type="number" id="arras-amount" class="form-input" placeholder="ej. 10000" min="0" step="500">
-            <div id="arras-helper" style="font-size:13px;color:#6b7280;margin-top:4px;"></div>
+            <div class="price-display" id="arras-pct-display">10%</div>
+            <div class="asking-ref" id="arras-amount-display">Calculando…</div>
+            <input type="range" id="arras-pct-slider" min="5" max="20" step="1" value="10">
+            <div class="range-labels">
+              <span>5%</span>
+              <span>20%</span>
+            </div>
+            <div id="arras-diff-helper" style="font-size:14px;font-weight:600;margin:8px 0 4px;min-height:20px;text-align:center;"></div>
+            <div style="font-size:13px;color:#6b7280;text-align:center;margin-bottom:8px;">
+              💡 Lo habitual en España es el 10% del precio de oferta
+            </div>
+            <input type="hidden" id="arras-amount" value="0">
           </div>
           <div class="form-group">
             <label class="form-label" for="arras-date">Fecha de firma de arras</label>
@@ -494,6 +503,31 @@
 
     // Set default in price input too
     document.getElementById('price-input').value = def;
+    updateArrasSlider();
+  }
+
+  function updateArrasSlider() {
+    var offerPrice = getOfferPrice();
+    var pctSlider = document.getElementById('arras-pct-slider');
+    if (!pctSlider) return;
+    var pct = parseInt(pctSlider.value) || 10;
+    var arrasAmount = Math.round(offerPrice * pct / 100);
+    document.getElementById('arras-amount').value = arrasAmount;
+    document.getElementById('arras-pct-display').textContent = pct + '%';
+    document.getElementById('arras-amount-display').textContent =
+      '€' + arrasAmount.toLocaleString('es-ES') + ' de arras';
+    var diff = pct - 10;
+    var helperEl = document.getElementById('arras-diff-helper');
+    if (helperEl) {
+      if (diff === 0) {
+        helperEl.textContent = 'Igual al 10% recomendado';
+        helperEl.style.color = '#6b7280';
+      } else {
+        helperEl.textContent = (diff > 0 ? '+' : '') + diff + ' puntos '
+          + (diff > 0 ? 'por encima' : 'por debajo') + ' del 10% recomendado';
+        helperEl.style.color = diff > 0 ? '#E51B27' : '#16a34a';
+      }
+    }
   }
 
   function updatePriceDisplay(val) {
@@ -509,23 +543,7 @@
       : sign + pct + '% ' + (diff > 0 ? 'por encima' : 'por debajo') + ' del precio de salida';
     var helperEl = document.getElementById('price-diff-helper');
     if (helperEl) { helperEl.textContent = msg; helperEl.style.color = color; }
-    // Keep arras default in sync unless user has typed it manually
-    var arrasEl = document.getElementById('arras-amount');
-    if (arrasEl && !arrasEl.dataset.userEdited) {
-      var defaultArras = Math.round(val * 0.10 / 1000) * 1000;
-      arrasEl.value = defaultArras;
-      updateArrasHelper(defaultArras);
-    }
-  }
-
-  function updateArrasHelper(val) {
-    var el = document.getElementById('arras-helper');
-    if (!el) return;
-    var offerPrice = getOfferPrice();
-    var pct = offerPrice > 0 ? ((val / offerPrice) * 100).toFixed(0) : 0;
-    el.textContent = 'Se recomienda el 10% — €'
-      + Math.round(offerPrice * 0.10).toLocaleString('es-ES')
-      + ' · Estás proponiendo el ' + pct + '%';
+    updateArrasSlider();
   }
 
   /* ─── Character counter for cover letter ─────────────── */
@@ -533,11 +551,16 @@
     document.getElementById('char-count').textContent = this.value.length;
   });
 
-  /* ─── Arras listeners ────────────────────────────────── */
-  document.getElementById('arras-amount').addEventListener('input', function() {
-    this.dataset.userEdited = 'true';
-    updateArrasHelper(parseInt(this.value) || 0);
+  /* ─── Buyer status: mutually exclusive toggles ────────── */
+  document.getElementById('toggle-cash').addEventListener('change', function() {
+    if (this.checked) document.getElementById('toggle-mortgage').checked = false;
   });
+  document.getElementById('toggle-mortgage').addEventListener('change', function() {
+    if (this.checked) document.getElementById('toggle-cash').checked = false;
+  });
+
+  /* ─── Arras listeners ────────────────────────────────── */
+  document.getElementById('arras-pct-slider').addEventListener('input', updateArrasSlider);
   document.getElementById('arras-date').addEventListener('change', function() {
     this.dataset.userSet = 'true';
     var minClose = new Date(this.value);
@@ -567,14 +590,8 @@
       document.getElementById('err-price').classList.remove('show');
     }
     if (n === 3) {
+      updateArrasSlider();
       var today = new Date();
-      var arrasEl2 = document.getElementById('arras-amount');
-      if (arrasEl2 && !arrasEl2.dataset.userEdited) {
-        var offerPrice3 = getOfferPrice();
-        var defaultArras3 = Math.round(offerPrice3 * 0.10 / 1000) * 1000;
-        arrasEl2.value = defaultArras3;
-        updateArrasHelper(defaultArras3);
-      }
       var arrasDateEl = document.getElementById('arras-date');
       if (arrasDateEl) {
         var minArras = new Date(today);
@@ -660,7 +677,7 @@
       ['Propiedad',        propTitle],
       ['Precio de oferta', formatPrice(price)],
       ['Situación',        isCash ? 'Comprador al contado' : hasMortg ? 'Hipoteca aprobada' : 'Pendiente de financiación'],
-      ['Arras',            arrasAmt ? formatPrice(parseInt(arrasAmt)) : 'No especificado'],
+      ['Arras',            arrasAmt ? (document.getElementById('arras-pct-slider').value + '% — ' + formatPrice(parseInt(arrasAmt))) : 'No especificado'],
       ['Fecha arras',      arrasDate || 'No especificada'],
       ['Fecha cierre',     closeDate || 'No especificada']
     ];
@@ -706,6 +723,7 @@
       isCashBuyer:         document.getElementById('toggle-cash').checked,
       hasMortgageApproval: document.getElementById('toggle-mortgage').checked,
       arrasAmount:         parseInt(document.getElementById('arras-amount').value) || 0,
+      arrasPct:            parseInt(document.getElementById('arras-pct-slider').value) || 10,
       arrasDate:           document.getElementById('arras-date').value || '',
       closingDate:         document.getElementById('closing-date').value || '',
       coverLetter:         document.getElementById('cover-letter').value.trim(),

@@ -344,6 +344,7 @@
       (counteredBanner || acceptedBanner) +
       '<div class="offer-price">' + price + '</div>' +
       (details.length ? '<div class="offer-details">' + details.join('<span style="color:var(--border);">·</span>') + '</div>' : '') +
+      (o.conditions ? '<div style="font-size:13px;color:#374151;margin-bottom:8px;padding:8px 12px;background:#f9fafb;border-radius:6px;"><span style="font-weight:600;color:#6b7280;">Condiciones: </span>' + escHtml(o.conditions) + '</div>' : '') +
       (o.coverLetter ? '<div class="offer-letter">"' + escHtml(o.coverLetter.substring(0, 200)) + (o.coverLetter.length > 200 ? '…' : '') + '"</div>' : '') +
       '<div class="offer-actions">' +
         '<a href="propiedad.html?id=' + escHtml(o.propertyId) + '" class="btn-view-prop">Ver propiedad →</a>' +
