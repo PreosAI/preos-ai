@@ -1080,13 +1080,81 @@
         '<div style="display:flex;justify-content:space-between;">' +
           '<span style="color:#6b7280;">Condiciones</span><span>' + buyerStatus + '</span>' +
         '</div>' +
+        (oferta.conditions
+          ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">' +
+              '<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:4px;">CONDICIONES ADICIONALES</div>' +
+              '<div style="font-size:13px;color:#374151;"><em>' + oferta.conditions + '</em></div>' +
+            '</div>'
+          : '') +
         (oferta.coverLetter
           ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">' +
               '<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:4px;">CARTA AL VENDEDOR</div>' +
-              '<div style="font-style:italic;color:#555;">"' + oferta.coverLetter + '"</div>' +
+              '<div style="font-style:italic;color:#555;">&ldquo;' + oferta.coverLetter + '&rdquo;</div>' +
             '</div>'
           : '') +
       '</div>' +
+      // ── SEND OFFER TO SELLER ──
+      (function() {
+        var offerSummary =
+          'Estimado/a agente,\n\n'
+          + 'Les transmitimos una oferta formal de nuestro cliente para la propiedad '
+          + (oferta.propertyTitle || propTitle) + ':\n\n'
+          + '• Precio ofertado: €' + (oferta.offerPrice || 0).toLocaleString('es-ES') + '\n'
+          + '• Arras propuestas: €' + (oferta.arrasAmount || 0).toLocaleString('es-ES') + '\n'
+          + '• Fecha arras: ' + (oferta.arrasDate || 'a convenir') + '\n'
+          + '• Fecha cierre: ' + (oferta.closingDate || 'a convenir') + '\n'
+          + '• Condiciones: ' + buyerStatus + '\n'
+          + (oferta.conditions ? '• Otras condiciones: ' + oferta.conditions + '\n' : '')
+          + (oferta.coverLetter ? '\nCarta del comprador:\n"' + oferta.coverLetter + '"\n' : '')
+          + '\nQuedamos a su disposición para coordinar los siguientes pasos.\n\n'
+          + 'Un cordial saludo,\nEquipo Preos';
+
+        var emailSubj = encodeURIComponent('Oferta para ' + (oferta.propertyTitle || propTitle));
+        var emailBody = encodeURIComponent(offerSummary);
+        var offerSummaryJson = JSON.stringify(offerSummary);
+
+        var html =
+          '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;">' +
+          '<div style="font-size:11px;font-weight:700;color:#92400e;letter-spacing:.06em;margin-bottom:8px;">📤 ENVIAR OFERTA AL VENDEDOR</div>';
+
+        if (oferta.listingAgentEmail) {
+          html +=
+            '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+              '<span style="color:#6b7280;">Agente vendedor</span>' +
+              '<a href="mailto:' + oferta.listingAgentEmail + '" style="color:var(--red);">' + oferta.listingAgentEmail + '</a>' +
+            '</div>';
+          if (oferta.listingAgentPhone) {
+            html +=
+              '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+                '<span style="color:#6b7280;">Teléfono</span>' +
+                '<a href="tel:' + oferta.listingAgentPhone + '" style="color:var(--red);">' + oferta.listingAgentPhone + '</a>' +
+              '</div>';
+          }
+        } else {
+          html += '<div style="color:#6b7280;font-size:12px;margin-bottom:8px;">Agente vendedor no identificado aún — disponible cuando se integre el MLS (Resales Online)</div>';
+        }
+
+        html +=
+          '<div style="margin-top:8px;">' +
+            '<label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Nota adicional para el agente vendedor (opcional):</label>' +
+            '<textarea class="notes-textarea" id="seller-note-' + oferta.id + '" placeholder="Añade cualquier nota adicional antes de enviar..." style="min-height:60px;"></textarea>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">';
+
+        if (oferta.listingAgentPhone) {
+          var phoneDigits = (oferta.listingAgentPhone || '').replace(/\D/g, '');
+          html += '<a href="https://wa.me/' + phoneDigits + '?text=' + encodeURIComponent(offerSummary) + '" '
+            + 'target="_blank" style="font-size:13px;font-weight:600;background:#25d366;color:#fff;border:none;border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap;">💬 WhatsApp</a>';
+        }
+        if (oferta.listingAgentEmail) {
+          html += '<a href="mailto:' + oferta.listingAgentEmail + '?subject=' + emailSubj + '&body=' + emailBody + '" '
+            + 'style="font-size:13px;font-weight:600;background:var(--red-b);color:#fff;border:none;border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap;">✉️ Enviar email</a>';
+        }
+        html += '<button style="font-size:13px;font-weight:600;background:#fff;color:#374151;border:1px solid #e5e7eb;border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;font-family:inherit;" '
+          + 'id="copy-offer-' + oferta.id + '">📋 Copiar oferta</button>';
+        html += '</div></div>';
+        return html;
+      })() +
       '<div class="lead-actions">' +
         '<select id="sel-of-' + oferta.id + '" class="pipeline-select">' +
           '<option value="nuevo"' + ((!oferta.agentStatus || oferta.agentStatus === 'nuevo') ? ' selected' : '') + '>Nueva</option>' +
@@ -1114,6 +1182,33 @@
         updateBadges();
       }).catch(function(err) { console.error('Offer pipeline update error:', err); });
     });
+
+    // Clipboard copy button
+    var copyBtn = card.querySelector('#copy-offer-' + oferta.id);
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        var noteEl = card.querySelector('#seller-note-' + oferta.id);
+        var offerSummary =
+          'Estimado/a agente,\n\n'
+          + 'Les transmitimos una oferta formal de nuestro cliente para la propiedad '
+          + (oferta.propertyTitle || propTitle) + ':\n\n'
+          + '• Precio ofertado: €' + (oferta.offerPrice || 0).toLocaleString('es-ES') + '\n'
+          + '• Arras propuestas: €' + (oferta.arrasAmount || 0).toLocaleString('es-ES') + '\n'
+          + '• Fecha arras: ' + (oferta.arrasDate || 'a convenir') + '\n'
+          + '• Fecha cierre: ' + (oferta.closingDate || 'a convenir') + '\n'
+          + '• Condiciones: ' + buyerStatus + '\n'
+          + (oferta.conditions ? '• Otras condiciones: ' + oferta.conditions + '\n' : '')
+          + (oferta.coverLetter ? '\nCarta del comprador:\n"' + oferta.coverLetter + '"\n' : '')
+          + '\nQuedamos a su disposición para coordinar los siguientes pasos.\n\n'
+          + 'Un cordial saludo,\nEquipo Preos';
+        var note = noteEl ? noteEl.value.trim() : '';
+        if (note) offerSummary += '\n\nNota adicional: ' + note;
+        navigator.clipboard.writeText(offerSummary).then(function() {
+          copyBtn.textContent = '✓ Copiado';
+          setTimeout(function() { copyBtn.textContent = '📋 Copiar oferta'; }, 2500);
+        }).catch(function() {});
+      });
+    }
 
     var textarea = card.querySelector('#of-notes-' + oferta.id);
     var savedEl  = card.querySelector('#of-saved-' + oferta.id);

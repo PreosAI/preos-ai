@@ -120,6 +120,9 @@
     /* ── SUMMARY LETTER ── */
     .summary-letter { background:#f9fafb; border-left:3px solid var(--border); border-radius:6px; padding:10px 14px; margin-top:12px; }
 
+    /* ── DATE HELPER ── */
+    .date-helper { font-size:12px; color:#6b7280; margin-top:4px; margin-bottom:12px; line-height:1.4; }
+
     /* ── ERROR ── */
     .form-error { color:var(--red); font-size:13px; margin-top:4px; display:none; }
     .form-error.show { display:block; }
@@ -308,10 +311,12 @@
           <div class="form-group">
             <label class="form-label" for="arras-date">Fecha de firma de arras</label>
             <input type="date" id="arras-date" class="form-input">
+            <div class="date-helper">💡 Mínimo 7 días — recomendamos al menos 2 semanas para preparar la documentación</div>
           </div>
           <div class="form-group">
             <label class="form-label" for="closing-date">Fecha estimada de cierre (escritura)</label>
             <input type="date" id="closing-date" class="form-input">
+            <div class="date-helper">💡 Mínimo 30 días desde las arras — recomendamos 45–60 días para tramitar hipoteca y notaría</div>
           </div>
           <div class="btn-row">
             <button class="btn-back" onclick="goStep(2)">← Atrás</button>
@@ -534,15 +539,21 @@
     updateArrasHelper(parseInt(this.value) || 0);
   });
   document.getElementById('arras-date').addEventListener('change', function() {
+    this.dataset.userSet = 'true';
     var minClose = new Date(this.value);
     minClose.setDate(minClose.getDate() + 30);
     var closingEl = document.getElementById('closing-date');
     if (closingEl) {
       closingEl.min = minClose.toISOString().split('T')[0];
-      if (!closingEl.value || closingEl.value < closingEl.min) {
-        closingEl.value = closingEl.min;
+      if (!closingEl.dataset.userSet || closingEl.value < closingEl.min) {
+        var newClose = new Date(this.value);
+        newClose.setDate(newClose.getDate() + 45);
+        closingEl.value = newClose.toISOString().split('T')[0];
       }
     }
+  });
+  document.getElementById('closing-date').addEventListener('change', function() {
+    this.dataset.userSet = 'true';
   });
 
   /* ─── Step navigation ────────────────────────────────── */
@@ -556,29 +567,35 @@
       document.getElementById('err-price').classList.remove('show');
     }
     if (n === 3) {
-      var arrasEl = document.getElementById('arras-amount');
-      if (arrasEl && !arrasEl.dataset.userEdited) {
-        var offerPrice = getOfferPrice();
-        var defaultArras = Math.round(offerPrice * 0.10 / 1000) * 1000;
-        arrasEl.value = defaultArras;
-        updateArrasHelper(defaultArras);
+      var today = new Date();
+      var arrasEl2 = document.getElementById('arras-amount');
+      if (arrasEl2 && !arrasEl2.dataset.userEdited) {
+        var offerPrice3 = getOfferPrice();
+        var defaultArras3 = Math.round(offerPrice3 * 0.10 / 1000) * 1000;
+        arrasEl2.value = defaultArras3;
+        updateArrasHelper(defaultArras3);
       }
       var arrasDateEl = document.getElementById('arras-date');
-      if (arrasDateEl && !arrasDateEl.value) {
-        var arrasDefault = new Date();
-        arrasDefault.setDate(arrasDefault.getDate() + 14);
-        arrasDateEl.value = arrasDefault.toISOString().split('T')[0];
-        arrasDateEl.min = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+      if (arrasDateEl) {
+        var minArras = new Date(today);
+        minArras.setDate(minArras.getDate() + 7);
+        arrasDateEl.min = minArras.toISOString().split('T')[0];
+        if (!arrasDateEl.dataset.userSet) {
+          var defaultArrasDate = new Date(today);
+          defaultArrasDate.setDate(defaultArrasDate.getDate() + 14);
+          arrasDateEl.value = defaultArrasDate.toISOString().split('T')[0];
+        }
       }
       var closingEl = document.getElementById('closing-date');
-      if (closingEl && !closingEl.value) {
-        var closingDefault = new Date();
-        closingDefault.setDate(closingDefault.getDate() + 59);
-        closingEl.value = closingDefault.toISOString().split('T')[0];
-        if (arrasDateEl && arrasDateEl.value) {
-          var minClose = new Date(arrasDateEl.value);
-          minClose.setDate(minClose.getDate() + 30);
-          closingEl.min = minClose.toISOString().split('T')[0];
+      if (closingEl) {
+        var arrasBase = arrasDateEl && arrasDateEl.value ? new Date(arrasDateEl.value) : new Date(today);
+        var minClosing = new Date(arrasBase);
+        minClosing.setDate(minClosing.getDate() + 30);
+        closingEl.min = minClosing.toISOString().split('T')[0];
+        if (!closingEl.dataset.userSet) {
+          var defaultClosing = new Date(arrasBase);
+          defaultClosing.setDate(defaultClosing.getDate() + 45);
+          closingEl.value = defaultClosing.toISOString().split('T')[0];
         }
       }
     }
@@ -632,10 +649,12 @@
     var arrasAmt  = document.getElementById('arras-amount').value;
     var arrasDate = document.getElementById('arras-date').value;
     var closeDate = document.getElementById('closing-date').value;
-    var letterEl  = document.getElementById('cover-letter')
-                 || document.getElementById('buyer-letter')
-                 || document.querySelector('textarea[id*="letter"], textarea[id*="carta"]');
-    var letter    = letterEl ? letterEl.value.trim() : '';
+    var conditionsEl = document.getElementById('conditions');
+    var conditions   = conditionsEl ? conditionsEl.value.trim() : '';
+    var letterEl     = document.getElementById('cover-letter')
+                    || document.getElementById('buyer-letter')
+                    || document.querySelector('textarea[id*="letter"], textarea[id*="carta"]');
+    var letter       = letterEl ? letterEl.value.trim() : '';
 
     var rows = [
       ['Propiedad',        propTitle],
@@ -651,11 +670,22 @@
       var valClass = r[0] === 'Precio de oferta' ? 'summary-val summary-price' : 'summary-val';
       html += '<div class="summary-row"><span class="summary-key">' + r[0] + '</span><span class="' + valClass + '">' + escHtml(r[1]) + '</span></div>';
     });
-    if (letter) {
-      html += '<div class="summary-letter">'
-        + '<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">Tu carta al vendedor:</div>'
-        + '<div style="font-style:italic;color:#374151;">"' + escHtml(letter.substring(0, 150)) + (letter.length > 150 ? '…' : '') + '"</div>'
+    if (conditions) {
+      html += '<div class="summary-row summary-row-full">'
+        + '<span class="summary-key">Condiciones adicionales</span>'
+        + '<span class="summary-val"><em>' + escHtml(conditions) + '</em></span>'
         + '</div>';
+    }
+    if (letter) {
+      html += '<div class="summary-row summary-row-full">'
+        + '<span class="summary-key">Carta al vendedor</span>'
+        + '<span class="summary-val" style="font-style:italic;color:#374151;">'
+        + '&ldquo;' + escHtml(letter) + '&rdquo;'
+        + '</span>'
+        + '</div>';
+    } else {
+      html += '<div class="summary-row"><span class="summary-key">Carta al vendedor</span>'
+        + '<span class="summary-val" style="color:#9ca3af;">Sin carta</span></div>';
     }
     document.getElementById('summary-rows').innerHTML = html;
   }
