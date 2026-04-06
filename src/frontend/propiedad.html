@@ -1899,24 +1899,32 @@
 
     function tr(key) { return (window.PreosLang && PreosLang.t) ? PreosLang.t(key) : key; }
 
+    function renderScoreCard(card, type, score, label) {
+      var circle = card.querySelector(
+        '.score-circle, .lifestyle-score, ' +
+        '[class*="score-circle"], [class*="lifestyle-score"]'
+      ) || card.querySelector('div:first-child');
+      var labelEl = card.querySelector('.lifestyle-label');
+      console.log('[renderScoreCard]', type, score, 'circle:', circle, 'label:', labelEl);
+      if (score === null || score === undefined) {
+        if (circle) circle.textContent = '—';
+        if (labelEl) labelEl.textContent = tr('nb_error');
+        return;
+      }
+      if (circle) circle.textContent = score.toFixed(1);
+      if (labelEl) {
+        var key = LABEL_KEY[label];
+        labelEl.textContent = key ? tr(key) : (label || '—');
+      }
+    }
+
     function applyScores(scores) {
       window._lastNbScores = scores;
       SCORE_TYPES.forEach(function(type) {
         var card = document.querySelector('.lifestyle-card[data-score-type="' + type + '"]');
         if (!card) return;
-        var scoreEl = card.querySelector('.lifestyle-score');
-        var labelEl = card.querySelector('.lifestyle-label');
         var data = scores[type];
-        if (!data || data.score === null) {
-          if (scoreEl) scoreEl.textContent = '—';
-          if (labelEl) labelEl.textContent = tr('nb_error');
-          return;
-        }
-        if (scoreEl) scoreEl.textContent = data.score.toFixed(1);
-        if (labelEl) {
-          var key = LABEL_KEY[data.label];
-          labelEl.textContent = key ? tr(key) : (data.label || '—');
-        }
+        renderScoreCard(card, type, data ? data.score : null, data ? data.label : null);
       });
       var srcEl = document.getElementById('nb-source');
       if (srcEl) srcEl.textContent = tr('nb_source');
@@ -2182,8 +2190,13 @@
       if (_fsvg) { _fsvg.setAttribute('fill', 'var(--red)'); _fsvg.setAttribute('stroke', 'var(--red)'); }
     }
 
-    // Load neighborhood scores
-    if (window.loadNeighborhoodScores) loadNeighborhoodScores(p).catch(function() {});
+    // Load neighborhood scores (non-blocking)
+    if (typeof loadNeighborhoodScores === 'function') {
+      loadNeighborhoodScores(p)
+        .catch(function(e) {
+          console.warn('[neighborhood] failed:', e);
+        });
+    }
   })();
 </script>
 
