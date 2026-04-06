@@ -40,7 +40,7 @@ async function overpassCount(query) {
     method:  'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body:    `data=${encodeURIComponent(query)}`,
-    timeout: 12000
+    timeout: 20000
   });
   if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
   const data = await res.json();
@@ -113,14 +113,14 @@ app.http('neighborhood', {
     // All use "out count;" for efficiency — returns just the total count
 
     const queries = {
-      walk: `[out:json][timeout:10];
+      walk: `[out:json][timeout:25];
 (
   node["shop"](around:500,${lat},${lng});
   node["amenity"~"restaurant|cafe|fast_food|bar|pub|supermarket|convenience|pharmacy|bank|post_office"](around:500,${lat},${lng});
 );
 out count;`,
 
-      transit: `[out:json][timeout:10];
+      transit: `[out:json][timeout:25];
 (
   node["highway"="bus_stop"](around:800,${lat},${lng});
   node["amenity"="bus_station"](around:800,${lat},${lng});
@@ -128,7 +128,7 @@ out count;`,
 );
 out count;`,
 
-      bike: `[out:json][timeout:10];
+      bike: `[out:json][timeout:25];
 (
   way["highway"="cycleway"](around:1000,${lat},${lng});
   way["cycleway"~"lane|track|opposite_lane|opposite_track"](around:1000,${lat},${lng});
@@ -137,7 +137,7 @@ out count;`,
 );
 out count;`,
 
-      noise: `[out:json][timeout:10];
+      noise: `[out:json][timeout:25];
 (
   way["highway"~"motorway|trunk|primary|secondary"](around:300,${lat},${lng});
   way["railway"="rail"](around:300,${lat},${lng});
@@ -145,7 +145,7 @@ out count;`,
 );
 out count;`,
 
-      wellness: `[out:json][timeout:10];
+      wellness: `[out:json][timeout:25];
 (
   node["amenity"~"pharmacy|hospital|clinic|doctors|dentist"](around:800,${lat},${lng});
   node["leisure"~"fitness_centre|sports_centre|swimming_pool|gym"](around:800,${lat},${lng});
@@ -153,7 +153,7 @@ out count;`,
 );
 out count;`,
 
-      green: `[out:json][timeout:10];
+      green: `[out:json][timeout:25];
 (
   way["leisure"~"park|garden|nature_reserve|pitch|playground"](around:800,${lat},${lng});
   way["landuse"~"grass|meadow|forest|recreation_ground|village_green"](around:800,${lat},${lng});
@@ -163,19 +163,18 @@ out count;`,
 out count;`
     };
 
-    // Run all 5 queries in parallel
+    // Run queries sequentially to avoid Overpass rate limiting
     const counts = {};
-    await Promise.all(
-      Object.entries(queries).map(async ([key, q]) => {
-        try {
-          counts[key] = await overpassCount(q);
-          context.log(`  ${key}: ${counts[key]}`);
-        } catch (e) {
-          context.log(`  ${key} error: ${e.message}`);
-          counts[key] = null;
-        }
-      })
-    );
+    const queryEntries = Object.entries(queries);
+    for (const [key, q] of queryEntries) {
+      try {
+        counts[key] = await overpassCount(q);
+        context.log(`  ${key}: ${counts[key]}`);
+      } catch (e) {
+        context.log(`  ${key} error: ${e.message}`);
+        counts[key] = null;
+      }
+    }
 
     // ── Normalise ─────────────────────────────────────────────────────────────
     // Thresholds calibrated for Costa del Sol urban areas:
