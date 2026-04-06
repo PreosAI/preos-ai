@@ -1246,44 +1246,38 @@
         <div class="subsection">
           <div class="subsection-title">Estilo de vida</div>
           <div class="lifestyle-grid">
-            <div class="lifestyle-card">
+            <div class="lifestyle-card" data-score-type="walkability">
               <div class="lifestyle-icon">🚶</div>
               <div class="lifestyle-score">—</div>
-              <div class="lifestyle-label">Caminabilidad</div>
-              <div class="lifestyle-desc">Walkability</div>
+              <div class="lifestyle-label">—</div>
             </div>
-            <div class="lifestyle-card">
+            <div class="lifestyle-card" data-score-type="bike">
               <div class="lifestyle-icon">🚲</div>
               <div class="lifestyle-score">—</div>
-              <div class="lifestyle-label">Ciclabilidad</div>
-              <div class="lifestyle-desc">Bikeability</div>
+              <div class="lifestyle-label">—</div>
             </div>
-            <div class="lifestyle-card">
+            <div class="lifestyle-card" data-score-type="transit">
               <div class="lifestyle-icon">🚌</div>
               <div class="lifestyle-score">—</div>
-              <div class="lifestyle-label">Transporte</div>
-              <div class="lifestyle-desc">Transit</div>
+              <div class="lifestyle-label">—</div>
             </div>
-            <div class="lifestyle-card">
+            <div class="lifestyle-card" data-score-type="noise">
               <div class="lifestyle-icon">🔇</div>
               <div class="lifestyle-score">—</div>
-              <div class="lifestyle-label">Ruido</div>
-              <div class="lifestyle-desc">Noise</div>
+              <div class="lifestyle-label">—</div>
             </div>
-            <div class="lifestyle-card">
+            <div class="lifestyle-card" data-score-type="wellness">
               <div class="lifestyle-icon">🌿</div>
               <div class="lifestyle-score">—</div>
-              <div class="lifestyle-label">Bienestar</div>
-              <div class="lifestyle-desc">Wellness</div>
+              <div class="lifestyle-label">—</div>
             </div>
-            <div class="lifestyle-card">
+            <div class="lifestyle-card" data-score-type="green">
               <div class="lifestyle-icon">🌳</div>
               <div class="lifestyle-score">—</div>
-              <div class="lifestyle-label">Zona verde</div>
-              <div class="lifestyle-desc">Green area</div>
+              <div class="lifestyle-label">—</div>
             </div>
           </div>
-          <p style="font-size:11px;color:var(--muted);margin-top:10px;">Walk Score y Local Logic · Próximamente</p>
+          <p id="nb-source" style="font-size:11px;color:var(--muted);margin-top:10px;"></p>
         </div>
 
         <!-- Sun exposure -->
@@ -1872,6 +1866,173 @@
   // Initial calculation
   calcMortgage();
 
+  // ── Neighborhood lifestyle scores ────────────────────────────────────────────
+  (function() {
+    var LABEL_KEY = {
+      "Walker's Paradise": 'nb_walkers_paradise', 'Very Walkable': 'nb_very_walkable',
+      'Walkable': 'nb_walkable', 'Some Walkability': 'nb_some_walk', 'Car-Dependent': 'nb_car_dependent',
+      'Excellent Transit': 'nb_excellent_transit', 'Good Transit': 'nb_good_transit',
+      'Some Transit': 'nb_some_transit', 'Minimal Transit': 'nb_minimal_transit', 'No Transit': 'nb_no_transit',
+      "Biker's Paradise": 'nb_bikers_paradise', 'Very Bikeable': 'nb_very_bikeable',
+      'Bikeable': 'nb_bikeable', 'Some Bike Infra': 'nb_some_bike', 'Minimal Bike Infra': 'nb_minimal_bike',
+      'Quiet Area': 'nb_quiet', 'Mostly Quiet': 'nb_mostly_quiet', 'Some Noise': 'nb_some_noise',
+      'Noisy': 'nb_noisy', 'Very Noisy': 'nb_very_noisy',
+      'Wellness Paradise': 'nb_wellness_paradise', 'Healthy Area': 'nb_healthy',
+      'Some Wellness': 'nb_some_wellness', 'Limited Wellness': 'nb_limited_wellness',
+      'Tree-Filled': 'nb_tree_filled', 'Good Green Space': 'nb_good_green',
+      'Some Green Space': 'nb_some_green', 'Limited Green Space': 'nb_limited_green'
+    };
+    var SCORE_TYPES = ['walkability', 'bike', 'transit', 'noise', 'wellness', 'green'];
+    var WALK_TIERS    = [[8,"Walker's Paradise"],[6,'Very Walkable'],   [4,'Walkable'],        [2,'Some Walkability'],[0,'Car-Dependent']];
+    var TRANSIT_TIERS = [[8,'Excellent Transit'],[6,'Good Transit'],    [4,'Some Transit'],    [2,'Minimal Transit'], [0,'No Transit']];
+    var BIKE_TIERS    = [[8,"Biker's Paradise"], [6,'Very Bikeable'],   [4,'Bikeable'],        [2,'Some Bike Infra'], [0,'Minimal Bike Infra']];
+    var NOISE_TIERS   = [[8,'Quiet Area'],       [6,'Mostly Quiet'],   [4,'Some Noise'],      [2,'Noisy'],           [0,'Very Noisy']];
+    var WELL_TIERS    = [[8,'Wellness Paradise'],[6,'Healthy Area'],   [4,'Some Wellness'],   [0,'Limited Wellness']];
+    var GREEN_TIERS   = [[8,'Tree-Filled'],      [6,'Good Green Space'],[4,'Some Green Space'],[0,'Limited Green Space']];
+    var MIRRORS = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter',
+      'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+    ];
+    var TTL = 30 * 24 * 60 * 60 * 1000;
+    window._lastNbScores = null;
+
+    function tr(key) { return (window.PreosLang && PreosLang.t) ? PreosLang.t(key) : key; }
+
+    function applyScores(scores) {
+      window._lastNbScores = scores;
+      SCORE_TYPES.forEach(function(type) {
+        var card = document.querySelector('.lifestyle-card[data-score-type="' + type + '"]');
+        if (!card) return;
+        var scoreEl = card.querySelector('.lifestyle-score');
+        var labelEl = card.querySelector('.lifestyle-label');
+        var data = scores[type];
+        if (!data || data.score === null) {
+          if (scoreEl) scoreEl.textContent = '—';
+          if (labelEl) labelEl.textContent = tr('nb_error');
+          return;
+        }
+        if (scoreEl) scoreEl.textContent = data.score.toFixed(1);
+        if (labelEl) {
+          var key = LABEL_KEY[data.label];
+          labelEl.textContent = key ? tr(key) : (data.label || '—');
+        }
+      });
+      var srcEl = document.getElementById('nb-source');
+      if (srcEl) srcEl.textContent = tr('nb_source');
+    }
+    window._applyNbScores = applyScores;
+
+    function getLbl(score, tiers) {
+      if (score === null) return null;
+      for (var i = 0; i < tiers.length; i++) { if (score >= tiers[i][0]) return tiers[i][1]; }
+      return tiers[tiers.length - 1][1];
+    }
+    function norm(c, m)    { return Math.round(Math.min(c, m) / m * 100) / 10; }
+    function normInv(c, m) { return Math.round((1 - Math.min(c, m) / m) * 100) / 10; }
+
+    function categorise(el) {
+      var t = el.tags || {}, tp = el.type, b = {};
+      if (t.shop) b.walk = 1;
+      if (t.amenity && /^(restaurant|cafe|fast_food|bar|pub|supermarket|convenience|pharmacy|bank|post_office|bakery|butcher|marketplace)$/.test(t.amenity)) b.walk = 1;
+      if (t.highway === 'bus_stop' || t.amenity === 'bus_station') b.transit = 1;
+      if (t.railway && /^(station|tram_stop|halt|subway_entrance)$/.test(t.railway)) b.transit = 1;
+      if (tp === 'way' && (t.highway === 'cycleway' || (t.cycleway && /^(lane|track|opposite_lane|opposite_track)$/.test(t.cycleway)) || (t.bicycle && /^(designated|yes)$/.test(t.bicycle)))) b.bike = 1;
+      if (tp === 'way' && ((t.highway && /^(motorway|trunk|primary|secondary)$/.test(t.highway)) || t.railway === 'rail')) b.noise = 1;
+      if (t.amenity && /^(pharmacy|hospital|clinic|doctors|dentist)$/.test(t.amenity)) b.wellness = 1;
+      if (t.leisure && /^(fitness_centre|sports_centre|swimming_pool|gym)$/.test(t.leisure)) b.wellness = 1;
+      if (tp === 'way' && t.leisure && /^(park|garden|nature_reserve|pitch|playground)$/.test(t.leisure)) b.green = 1;
+      if (tp === 'way' && t.landuse && /^(grass|meadow|forest|recreation_ground|village_green)$/.test(t.landuse)) b.green = 1;
+      if (t.natural && /^(wood|scrub|grassland|beach)$/.test(t.natural)) b.green = 1;
+      return b;
+    }
+
+    function computeScores(elements) {
+      var c = { walk: 0, transit: 0, bike: 0, noise: 0, wellness: 0, green: 0 };
+      elements.forEach(function(el) { var b = categorise(el); Object.keys(b).forEach(function(k) { c[k]++; }); });
+      var ws = norm(c.walk, 25), ts = norm(c.transit, 15), bs = norm(c.bike, 10),
+          ns = normInv(c.noise, 4), wls = norm(c.wellness, 8), gs = norm(c.green, 6);
+      return {
+        walkability: { score: ws,  label: getLbl(ws,  WALK_TIERS),    icon: '🚶' },
+        transit:     { score: ts,  label: getLbl(ts,  TRANSIT_TIERS), icon: '🚌' },
+        bike:        { score: bs,  label: getLbl(bs,  BIKE_TIERS),    icon: '🚲' },
+        noise:       { score: ns,  label: getLbl(ns,  NOISE_TIERS),   icon: '🔇' },
+        wellness:    { score: wls, label: getLbl(wls, WELL_TIERS),    icon: '🌿' },
+        green:       { score: gs,  label: getLbl(gs,  GREEN_TIERS),   icon: '🌳' }
+      };
+    }
+
+    async function fetchOverpass(lat, lng) {
+      var q = '[out:json][timeout:55];\n(\n' +
+        '  node["shop"](around:500,LAT,LNG);\n' +
+        '  node["amenity"~"restaurant|cafe|fast_food|bar|pub|supermarket|convenience|pharmacy|bank|post_office|bakery|butcher|marketplace"](around:500,LAT,LNG);\n' +
+        '  node["highway"="bus_stop"](around:800,LAT,LNG);\n' +
+        '  node["amenity"="bus_station"](around:800,LAT,LNG);\n' +
+        '  node["railway"~"station|tram_stop|halt|subway_entrance"](around:1200,LAT,LNG);\n' +
+        '  way["highway"="cycleway"](around:1000,LAT,LNG);\n' +
+        '  way["cycleway"~"lane|track|opposite_lane|opposite_track"](around:1000,LAT,LNG);\n' +
+        '  way["bicycle"~"designated|yes"]["highway"](around:1000,LAT,LNG);\n' +
+        '  way["highway"~"motorway|trunk|primary|secondary"](around:300,LAT,LNG);\n' +
+        '  way["railway"="rail"](around:300,LAT,LNG);\n' +
+        '  node["amenity"~"pharmacy|hospital|clinic|doctors|dentist"](around:800,LAT,LNG);\n' +
+        '  node["leisure"~"fitness_centre|sports_centre|swimming_pool|gym"](around:800,LAT,LNG);\n' +
+        '  way["leisure"~"park|garden|nature_reserve|pitch|playground"](around:800,LAT,LNG);\n' +
+        '  way["landuse"~"grass|meadow|forest|recreation_ground|village_green"](around:800,LAT,LNG);\n' +
+        '  node["natural"~"wood|scrub|grassland|beach"](around:800,LAT,LNG);\n' +
+        '  way["natural"~"wood|scrub|grassland|beach"](around:800,LAT,LNG);\n' +
+        ');\nout tags;';
+      q = q.split('LAT').join(lat).split('LNG').join(lng);
+      for (var i = 0; i < MIRRORS.length; i++) {
+        try {
+          var res = await fetch(MIRRORS[i], {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'data=' + encodeURIComponent(q),
+            signal: AbortSignal.timeout(30000)
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          var data = await res.json();
+          return computeScores(data.elements || []);
+        } catch(e) { console.warn('Overpass mirror failed:', e.message); }
+      }
+      return null;
+    }
+
+    window.loadNeighborhoodScores = async function(p) {
+      if (!p || p.lat == null || p.lng == null) return;
+      var lat = parseFloat(p.lat), lng = parseFloat(p.lng);
+      if (isNaN(lat) || isNaN(lng)) return;
+      SCORE_TYPES.forEach(function(type) {
+        var el = document.querySelector('.lifestyle-card[data-score-type="' + type + '"] .lifestyle-score');
+        if (el) el.textContent = '…';
+      });
+      if (window.db && p.id) {
+        try {
+          var snap = await db.collection('enrichment').doc(p.id).get();
+          if (snap.exists) {
+            var cached = snap.data();
+            if (cached.nbScores && cached.nbCachedAt && (Date.now() - new Date(cached.nbCachedAt).getTime()) < TTL) {
+              applyScores(cached.nbScores); return;
+            }
+          }
+        } catch(e) { /* ignore */ }
+      }
+      var scores = await fetchOverpass(lat, lng);
+      if (!scores) {
+        SCORE_TYPES.forEach(function(type) {
+          var el = document.querySelector('.lifestyle-card[data-score-type="' + type + '"] .lifestyle-score');
+          if (el) el.textContent = '—';
+        });
+        return;
+      }
+      applyScores(scores);
+      if (window.db && p.id) {
+        try { await db.collection('enrichment').doc(p.id).set({ nbScores: scores, nbCachedAt: new Date().toISOString() }, { merge: true }); }
+        catch(e) { /* ignore */ }
+      }
+    };
+  })();
+
   // ── Load property data from URL param ──────────────────────────
   (async () => {
     const id = new URLSearchParams(window.location.search).get('id') || 'prop-001';
@@ -2020,6 +2181,9 @@
       const _fsvg = document.querySelector('#btn-favorito svg');
       if (_fsvg) { _fsvg.setAttribute('fill', 'var(--red)'); _fsvg.setAttribute('stroke', 'var(--red)'); }
     }
+
+    // Load neighborhood scores
+    if (window.loadNeighborhoodScores) loadNeighborhoodScores(p).catch(function() {});
   })();
 </script>
 
@@ -2055,6 +2219,9 @@
     document.querySelectorAll('.scroll-nav-link[data-i18n]').forEach(function(a) {
       a.textContent = PreosLang.t(a.getAttribute('data-i18n'));
     });
+    if (window._applyNbScores && window._lastNbScores) {
+      window._applyNbScores(window._lastNbScores);
+    }
   });
   updateScrollSpy();
 })();
