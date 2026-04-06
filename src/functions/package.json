@@ -1,0 +1,16 @@
+{
+  "name": "preos-functions",
+  "version": "1.0.0",
+  "description": "Preos.ai Azure Functions — API proxy layer",
+  "main": "resales.js",
+  "scripts": {
+    "start": "func start"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

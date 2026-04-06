@@ -1,1 +1,4 @@
 .claude/
+
+# Azure Functions local settings (contains secrets)
+src/functions/local.settings.json
