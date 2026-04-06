@@ -84,6 +84,7 @@ function normInv(count, max) {
 
 // ── Azure Function handler ────────────────────────────────────────────────────
 
+try {
 app.http('neighborhood', {
   methods:   ['GET', 'OPTIONS'],
   authLevel: 'anonymous',
@@ -208,3 +209,6 @@ out count;`
     };
   }
 });
+} catch (err) {
+  console.error('Failed to register neighborhood function:', err);
+}
