@@ -2,7 +2,7 @@
   "name": "preos-functions",
   "version": "1.0.0",
   "description": "Preos.ai Azure Functions — API proxy layer",
-  "main": "*.js",
+  "main": "index.js",
   "scripts": {
     "start": "func start"
   },
