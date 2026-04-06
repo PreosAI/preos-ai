@@ -439,22 +439,22 @@
     <div class="sidebar-brand">CRM AGENTE</div>
     <nav class="crm-nav">
       <button class="crm-nav-item active" data-section="leads-nuevos">
-        📥 Leads nuevos
+        📥 <span data-i18n="crmNewLeads">Leads nuevos</span>
         <span class="nav-badge hidden" id="badge-nuevos">0</span>
       </button>
       <button class="crm-nav-item" data-section="todos">
-        📋 Todos los leads
+        📋 <span data-i18n="crmAllLeads">Todos los leads</span>
         <span class="nav-badge hidden" id="badge-todos">0</span>
       </button>
       <button class="crm-nav-item" data-section="propiedades">
-        🏠 Propiedades
+        🏠 <span data-i18n="crmProperties">Propiedades</span>
       </button>
       <button class="crm-nav-item" data-section="seller-leads">
-        📝 Leads de venta
+        📝 <span data-i18n="crmSellLeads">Leads de venta</span>
         <span class="nav-badge hidden" id="badge-seller">0</span>
       </button>
       <button class="crm-nav-item" data-section="ofertas">
-        💰 Ofertas
+        💰 <span data-i18n="crmOffers">Ofertas</span>
         <span class="nav-badge hidden" id="badge-ofertas">0</span>
       </button>
     </nav>
@@ -481,15 +481,15 @@
 
       <!-- ── Section: Leads nuevos ─────────────────────── -->
       <div class="crm-section" id="section-leads-nuevos">
-        <div class="section-title">📥 Leads nuevos</div>
-        <div class="section-subtitle" id="subtitle-nuevos">Leads pendientes sin gestionar</div>
+        <div class="section-title">📥 <span data-i18n="crmNewLeads">Leads nuevos</span></div>
+        <div class="section-subtitle" id="subtitle-nuevos" data-i18n="crmLeadsPending">Leads pendientes sin gestionar</div>
         <div class="leads-list" id="list-nuevos"></div>
       </div>
 
       <!-- ── Section: Todos los leads ─────────────────── -->
       <div class="crm-section" id="section-todos">
-        <div class="section-title">📋 Todos los leads</div>
-        <div class="section-subtitle" id="subtitle-todos">Todos los leads</div>
+        <div class="section-title">📋 <span data-i18n="crmAllLeads">Todos los leads</span></div>
+        <div class="section-subtitle" id="subtitle-todos" data-i18n="crmAllLeads">Todos los leads</div>
         <div class="filter-bar" id="filter-bar">
           <button class="filter-btn active" data-filter="all">Todos</button>
           <button class="filter-btn" data-filter="nuevo">Nuevo</button>
@@ -504,22 +504,22 @@
 
       <!-- ── Section: Propiedades ──────────────────────── -->
       <div class="crm-section" id="section-propiedades">
-        <div class="section-title">🏠 Propiedades</div>
-        <div class="section-subtitle">Propiedades con actividad de leads</div>
+        <div class="section-title">🏠 <span data-i18n="crmProperties">Propiedades</span></div>
+        <div class="section-subtitle" data-i18n="crmPropertiesSubtitle">Propiedades con actividad de leads</div>
         <div class="prop-grid" id="prop-grid"></div>
       </div>
 
       <!-- ── Section: Leads de venta ────────────────────── -->
       <div class="crm-section" id="section-seller-leads">
-        <div class="section-title">📝 Leads de venta</div>
-        <div class="section-subtitle" id="subtitle-seller">Solicitudes de valoración recibidas</div>
+        <div class="section-title">📝 <span data-i18n="crmSellLeads">Leads de venta</span></div>
+        <div class="section-subtitle" id="subtitle-seller" data-i18n="crmSellLeadsSubtitle">Solicitudes de valoración recibidas</div>
         <div class="leads-list" id="list-seller"></div>
       </div>
 
       <!-- ── Section: Ofertas ──────────────────────────── -->
       <div class="crm-section" id="section-ofertas">
-        <div class="section-title">💰 Ofertas</div>
-        <div class="section-subtitle" id="subtitle-ofertas">Ofertas recibidas sobre propiedades</div>
+        <div class="section-title">💰 <span data-i18n="crmOffers">Ofertas</span></div>
+        <div class="section-subtitle" id="subtitle-ofertas" data-i18n="crmOffersPending">Ofertas recibidas sobre propiedades</div>
         <div class="leads-list" id="list-ofertas"></div>
       </div>
 
@@ -1227,6 +1227,9 @@
   }
 
   document.addEventListener('preos:langchange', function() {
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      el.textContent = PreosLang.t(el.getAttribute('data-i18n'));
+    });
     renderActiveSection();
   });
 </script>

@@ -777,6 +777,8 @@
     if (_prop) {
       updatePriceDisplay(getOfferPrice());
       updateArrasSlider();
+      var askingEl = document.getElementById('asking-ref');
+      if (askingEl) askingEl.textContent = PreosLang.t('offerAskingRef') + ' ' + formatPrice(_prop.price);
     }
     if (_currentStep === 5) buildSummary();
   });
