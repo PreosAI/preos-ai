@@ -2018,8 +2018,17 @@
           var snap = await firebase.firestore().collection('enrichment').doc(p.id).get();
           if (snap.exists) {
             var cached = snap.data();
-            if (cached.nbScores && cached.nbCachedAt && (Date.now() - new Date(cached.nbCachedAt).getTime()) < 30 * 24 * 60 * 60 * 1000) {
-              applyScores(cached.nbScores); return;
+            if (cached.cachedAt && cached.walkability != null &&
+                (Date.now() - new Date(cached.cachedAt).getTime()) < 30 * 24 * 60 * 60 * 1000) {
+              applyScores({
+                walkability: { score: cached.walkability, label: getLbl(cached.walkability, WALK_TIERS),    icon: '🚶' },
+                transit:     { score: cached.transit,     label: getLbl(cached.transit,     TRANSIT_TIERS), icon: '🚌' },
+                bike:        { score: cached.bike,        label: getLbl(cached.bike,        BIKE_TIERS),    icon: '🚲' },
+                noise:       { score: cached.noise,       label: getLbl(cached.noise,       NOISE_TIERS),   icon: '🔇' },
+                wellness:    { score: cached.wellness,    label: getLbl(cached.wellness,    WELL_TIERS),    icon: '🌿' },
+                green:       { score: cached.green,       label: getLbl(cached.green,       GREEN_TIERS),   icon: '🌳' }
+              });
+              return;
             }
           }
         } catch(e) { /* ignore */ }
@@ -2034,7 +2043,15 @@
       }
       applyScores(scores);
       if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && p.id) {
-        try { await firebase.firestore().collection('enrichment').doc(p.id).set({ nbScores: scores, nbCachedAt: new Date().toISOString() }, { merge: true }); }
+        try { await firebase.firestore().collection('enrichment').doc(p.id).set({
+          walkability: scores.walkability.score,
+          transit:     scores.transit.score,
+          bike:        scores.bike.score,
+          noise:       scores.noise.score,
+          wellness:    scores.wellness.score,
+          green:       scores.green.score,
+          cachedAt:    new Date().toISOString()
+        }, { merge: true }); }
         catch(e) { /* ignore */ }
       }
     };
