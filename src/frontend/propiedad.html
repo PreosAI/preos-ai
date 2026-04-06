@@ -305,39 +305,77 @@
 
     /* ─── SECTIONS ─────────────────────────────────────────── */
     .section { margin-bottom: 36px; }
-    .section-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+    .section-title { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; }
     .section-text { font-size: 14px; line-height: 1.8; color: #374151; }
+    .subsection { padding-top: 28px; margin-top: 28px; border-top: 1px solid #eee; }
+    .subsection-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+    .main-section { padding-top: 48px; margin-top: 48px; border-top: 2px solid #f5f5f5; }
 
-    /* ─── PREOS ACTIVITY ───────────────────────────────────── */
-    .activity-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 36px;
+    /* ─── LISTING BADGE ────────────────────────────────────── */
+    .listing-badge-new {
+      position: absolute; top: 16px; left: 16px;
+      background: #00856A; color: #fff;
+      font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 4px;
+      z-index: 2; letter-spacing: 0.2px;
     }
 
-    .activity-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
+    /* ─── LISTED BY ─────────────────────────────────────────── */
+    .listed-by { font-size: 12px; color: #888; margin-bottom: 6px; }
+    .listed-by .agent-name { font-weight: 500; color: #555; }
 
-    .activity-value {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -1px;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
+    /* ─── ACTIVITY LINE ─────────────────────────────────────── */
+    .activity-line { display: flex; gap: 6px; align-items: center; font-size: 13px; color: #555; margin-top: 6px; flex-wrap: wrap; }
+    .activity-item { display: flex; align-items: center; gap: 3px; }
+    .activity-item strong { color: #1a1a1a; }
+    .activity-sep { color: #ccc; }
 
-    .activity-label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-    }
+    /* ─── POPULARITY BANNER ─────────────────────────────────── */
+    .popularity-banner { display: flex; gap: 14px; align-items: center; background: #FFF8F0; border: 1px solid #FFD8A8; border-radius: 10px; padding: 14px 18px; margin: 12px 0; }
+    .popularity-icon { font-size: 28px; }
+    .popularity-title { font-weight: 600; font-size: 14px; color: #C05000; margin-bottom: 2px; }
+    .popularity-desc { font-size: 13px; color: #7A4000; }
+
+    /* ─── PREOS ESTIMATE CARD ───────────────────────────────── */
+    .preos-estimate-card { background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-top: 24px; display: flex; align-items: center; gap: 14px; }
+    .preos-estimate-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .preos-estimate-value { font-size: 18px; font-weight: 700; color: #9ca3af; margin-top: 2px; }
+
+    /* ─── NEIGHBORHOOD PILL TABS ────────────────────────────── */
+    .place-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .place-tab-btn { background: #f3f4f6; border: 1.5px solid transparent; border-radius: 999px; padding: 7px 18px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif; }
+    .place-tab-btn:hover { background: #e5e7eb; }
+    .place-tab-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+    .place-panel { display: none; }
+    .place-panel.active { display: block; }
+
+    /* ─── LIFESTYLE SCORES ──────────────────────────────────── */
+    .lifestyle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .lifestyle-card { background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+    .lifestyle-icon { font-size: 24px; margin-bottom: 6px; }
+    .lifestyle-score { font-size: 24px; font-weight: 800; color: #ccc; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .lifestyle-label { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .lifestyle-desc { font-size: 11px; color: var(--muted); }
+
+    /* ─── CLIMATE RISKS ─────────────────────────────────────── */
+    .climate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+    .climate-card { background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .climate-icon { font-size: 28px; margin-bottom: 8px; }
+    .climate-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .climate-score-badge { display: inline-block; background: #e5e7eb; color: #9ca3af; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
+    .climate-desc { font-size: 11px; color: var(--muted); }
+
+    /* ─── COMING SOON ───────────────────────────────────────── */
+    .coming-soon-text { font-size: 13px; color: var(--muted); padding: 16px; text-align: center; background: #f9fafb; border-radius: 10px; border: 1px dashed var(--border); }
+
+    /* ─── MARKET INSIGHTS ───────────────────────────────────── */
+    .market-insights-card { background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .market-type-label { font-weight: 700; font-size: 16px; color: #1a1a1a; margin: 4px 0 12px; }
+    .insight-row { display: flex; justify-content: space-between; font-size: 13px; color: #555; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    .insight-row:last-child { border-bottom: none; }
+    .insight-value.coming-soon { color: #bbb; }
+    .insight-note { font-size: 12px; color: #aaa; margin-top: 10px; margin-bottom: 0; }
+
 
     /* ─── HISTORY TABLES ───────────────────────────────────── */
     .history-table {
@@ -1021,10 +1059,11 @@
 <!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
 <div class="tabs-bar">
   <div class="tabs-list">
-    <a class="scroll-nav-link active" href="#section-descripcion" data-i18n="section_descripcion">Descripción</a>
-    <a class="scroll-nav-link" href="#section-detalles" data-i18n="section_detalles">Detalles</a>
-    <a class="scroll-nav-link" href="#section-calculadora" data-i18n="section_calculadora">Calculadora</a>
-    <a class="scroll-nav-link" href="#section-escuelas" data-i18n="section_escuelas">Escuelas</a>
+    <a class="scroll-nav-link active" href="#section-overview" data-i18n="nav_overview">Descripción</a>
+    <a class="scroll-nav-link" href="#section-neighborhood" data-i18n="nav_neighborhood">Barrio</a>
+    <a class="scroll-nav-link" href="#section-details" data-i18n="nav_details">Detalles</a>
+    <a class="scroll-nav-link" href="#section-history" data-i18n="nav_history">Historial</a>
+    <a class="scroll-nav-link" href="#section-climate" data-i18n="nav_climate">Clima</a>
   </div>
   <div class="tabs-actions">
     <button class="icon-btn" id="btn-favorito" aria-label="Guardar">
@@ -1050,6 +1089,7 @@
       <div class="img-placeholder">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       </div>
+      <div class="listing-badge-new" id="listing-badge-new" style="display:none;"></div>
       <button class="gallery-count-btn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         26 fotos
@@ -1088,6 +1128,7 @@
     <div class="main-col">
 
       <!-- Always-visible listing header -->
+      <div class="listed-by" id="listed-by"></div>
       <div class="listing-status">
         <div class="status-dot"></div>
         VENTA ACTIVA
@@ -1134,27 +1175,22 @@
         </div>
       </div>
 
-      <!-- ══ SECTION: Descripción general ══════════════════════ -->
-      <div id="section-descripcion">
+      <!-- ══ SECTION 1: Overview ════════════════════════════════ -->
+      <div id="section-overview">
 
-        <div class="section">
-          <div class="section-title">Actividad en Preos</div>
-          <div class="activity-grid">
-            <div class="activity-card">
-              <div class="activity-value">248</div>
-              <div class="activity-label">Visitas en 30 días</div>
-            </div>
-            <div class="activity-card">
-              <div class="activity-value">18</div>
-              <div class="activity-label">Guardados</div>
-            </div>
-            <div class="activity-card">
-              <div class="activity-value">4</div>
-              <div class="activity-label">Recorridos agendados</div>
-            </div>
+        <!-- Activity line (injected by JS) -->
+        <div class="activity-line" id="activity-line" style="margin-bottom:10px;"></div>
+
+        <!-- Popularity banner (shown by JS when views > 200) -->
+        <div class="popularity-banner" id="popularity-banner" style="display:none;">
+          <div class="popularity-icon">🔥</div>
+          <div class="popularity-content">
+            <div class="popularity-title" data-i18n="popular_title">Esta propiedad es popular</div>
+            <div class="popularity-desc" data-i18n="popular_desc">Está entre el 10% más visto en Preos. No pierdas la oportunidad.</div>
           </div>
         </div>
 
+        <!-- About this home -->
         <div class="section">
           <div class="section-title">Acerca de esta casa</div>
           <div class="section-text">
@@ -1164,62 +1200,16 @@
           </div>
         </div>
 
-        <div class="section">
-          <div class="section-title">Historial de precios</div>
-          <table class="history-table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Evento</th>
-                <th>Precio</th>
-                <th>Variación</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Feb 2024</td>
-                <td><span class="badge-reducido">Precio reducido</span></td>
-                <td>€1.489.000</td>
-                <td class="change-neg">−5,1%</td>
-              </tr>
-              <tr>
-                <td>Ago 2023</td>
-                <td><span class="badge-listado">Listado</span></td>
-                <td>€1.568.000</td>
-                <td class="change-neu">—</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Preos estimate placeholder -->
+        <div class="preos-estimate-card">
+          <div>
+            <div class="preos-estimate-label">Estimación Preos</div>
+            <div class="preos-estimate-value">— Estimación próximamente</div>
+          </div>
         </div>
 
-        <div class="section">
-          <div class="section-title">Historial fiscal (IBI)</div>
-          <table class="history-table">
-            <thead>
-              <tr>
-                <th>Año</th>
-                <th>Importe abonado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>2024</td>
-                <td>€2.847</td>
-              </tr>
-              <tr>
-                <td>2023</td>
-                <td>€2.764</td>
-              </tr>
-              <tr>
-                <td>2022</td>
-                <td>€2.693</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Mapa</div>
+        <!-- Map -->
+        <div class="section" style="margin-top:28px;">
           <div class="map-container">
             <div id="prop-map" style="width:100%; height:350px; border-radius:12px;"></div>
           </div>
@@ -1227,63 +1217,135 @@
 
       </div>
 
-      <!-- ══ SECTION: Detalles de la propiedad ═════════════════ -->
-      <div id="section-detalles" style="border-top:2px solid #f5f5f5;padding-top:40px;margin-top:40px;">
+      <!-- ══ SECTION 2: Neighborhood ══════════════════════════════ -->
+      <div id="section-neighborhood" class="main-section">
 
+        <div class="section-title">El barrio</div>
+
+        <!-- Around this home -->
         <div class="section">
-          <div class="section-title">Detalles de la propiedad</div>
-          <div class="details-grid">
-
-            <div class="details-section">
-              <div class="details-section-header">Interior</div>
-              <div class="details-row"><span class="details-row-label">Dormitorios</span><span class="details-row-value">4</span></div>
-              <div class="details-row"><span class="details-row-label">Baños completos</span><span class="details-row-value">2</span></div>
-              <div class="details-row"><span class="details-row-label">Aseos</span><span class="details-row-value">1</span></div>
-              <div class="details-row"><span class="details-row-label">Superficie construida</span><span class="details-row-value">210 m²</span></div>
-              <div class="details-row"><span class="details-row-label">Superficie útil</span><span class="details-row-value">192 m²</span></div>
-              <div class="details-row"><span class="details-row-label">Cocina</span><span class="details-row-value">Equipada</span></div>
-              <div class="details-row"><span class="details-row-label">Suelos</span><span class="details-row-value">Parquet</span></div>
-              <div class="details-row"><span class="details-row-label">Calefacción</span><span class="details-row-value">Radiadores</span></div>
-              <div class="details-row"><span class="details-row-label">Aire acondicionado</span><span class="details-row-value">Sí</span></div>
-              <div class="details-row"><span class="details-row-label">Orientación</span><span class="details-row-value">Sur-Este</span></div>
-            </div>
-
-            <div class="details-section">
-              <div class="details-section-header">Exterior y comunidad</div>
-              <div class="details-row"><span class="details-row-label">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
-              <div class="details-row"><span class="details-row-label">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
-              <div class="details-row"><span class="details-row-label">Trastero</span><span class="details-row-value">No</span></div>
-              <div class="details-row"><span class="details-row-label">Piscina</span><span class="details-row-value">Comunitaria</span></div>
-              <div class="details-row"><span class="details-row-label">Jardín</span><span class="details-row-value">Comunitario</span></div>
-              <div class="details-row"><span class="details-row-label">Ascensor</span><span class="details-row-value">Sí</span></div>
-              <div class="details-row"><span class="details-row-label">Portero</span><span class="details-row-value">24 horas</span></div>
-              <div class="details-row"><span class="details-row-label">Seguridad</span><span class="details-row-value">Sistema 24h</span></div>
-              <div class="details-row"><span class="details-row-label">Planta</span><span class="details-row-value">3ª de 6</span></div>
-              <div class="details-row"><span class="details-row-label">Año construcción</span><span class="details-row-value">2018</span></div>
-            </div>
-
-            <div class="details-section" style="grid-column: span 2;">
-              <div class="details-section-header">Información legal y energética</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr;">
-                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Referencia catastral</span><span class="details-row-value">9872023VK4897S</span></div>
-                <div class="details-row"><span class="details-row-label">Tipo de inmueble</span><span class="details-row-value">Piso</span></div>
-                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Régimen</span><span class="details-row-value">Libre</span></div>
-                <div class="details-row"><span class="details-row-label">Estado</span><span class="details-row-value">Bueno</span></div>
-                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Eficiencia energética</span><span class="details-row-value"><span class="energy-badge">C</span></span></div>
-                <div class="details-row"><span class="details-row-label">Consumo energético</span><span class="details-row-value">145 kWh/m²·año</span></div>
-              </div>
-            </div>
-
+          <div class="subsection-title">Alrededor de esta propiedad</div>
+          <div class="place-tabs">
+            <button class="place-tab-btn active" data-place="colegios">🏫 Colegios</button>
+            <button class="place-tab-btn" data-place="lugares">🛒 Lugares</button>
+            <button class="place-tab-btn" data-place="transporte">🚇 Transporte</button>
           </div>
+
+          <div class="place-panel active" id="place-colegios">
+            <div class="coming-soon-text">🔜 Datos de colegios próximamente · GreatSchools</div>
+          </div>
+          <div class="place-panel" id="place-lugares">
+            <div class="coming-soon-text">🔜 Supermercados, restaurantes, servicios · Próximamente</div>
+          </div>
+          <div class="place-panel" id="place-transporte">
+            <div class="coming-soon-text">🔜 Paradas cercanas · Próximamente</div>
+          </div>
+        </div>
+
+        <!-- Lifestyle scores -->
+        <div class="subsection">
+          <div class="subsection-title">Estilo de vida</div>
+          <div class="lifestyle-grid">
+            <div class="lifestyle-card">
+              <div class="lifestyle-icon">🚶</div>
+              <div class="lifestyle-score">—</div>
+              <div class="lifestyle-label">Caminabilidad</div>
+              <div class="lifestyle-desc">Walkability</div>
+            </div>
+            <div class="lifestyle-card">
+              <div class="lifestyle-icon">🚲</div>
+              <div class="lifestyle-score">—</div>
+              <div class="lifestyle-label">Ciclabilidad</div>
+              <div class="lifestyle-desc">Bikeability</div>
+            </div>
+            <div class="lifestyle-card">
+              <div class="lifestyle-icon">🚌</div>
+              <div class="lifestyle-score">—</div>
+              <div class="lifestyle-label">Transporte</div>
+              <div class="lifestyle-desc">Transit</div>
+            </div>
+            <div class="lifestyle-card">
+              <div class="lifestyle-icon">🔇</div>
+              <div class="lifestyle-score">—</div>
+              <div class="lifestyle-label">Ruido</div>
+              <div class="lifestyle-desc">Noise</div>
+            </div>
+            <div class="lifestyle-card">
+              <div class="lifestyle-icon">🌿</div>
+              <div class="lifestyle-score">—</div>
+              <div class="lifestyle-label">Bienestar</div>
+              <div class="lifestyle-desc">Wellness</div>
+            </div>
+            <div class="lifestyle-card">
+              <div class="lifestyle-icon">🌳</div>
+              <div class="lifestyle-score">—</div>
+              <div class="lifestyle-label">Zona verde</div>
+              <div class="lifestyle-desc">Green area</div>
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;">Walk Score y Local Logic · Próximamente</p>
+        </div>
+
+        <!-- Sun exposure -->
+        <div class="subsection">
+          <div class="subsection-title">Exposición solar</div>
+          <div class="coming-soon-text">☀️ Análisis de orientación e horas de sol disponible próximamente · Shadowmap</div>
         </div>
 
       </div>
 
-      <!-- ══ SECTION: Calculadora de pagos ══════════════════════ -->
-      <div id="section-calculadora" style="border-top:2px solid #f5f5f5;padding-top:40px;margin-top:40px;">
+      <!-- ══ SECTION 3: Details ═══════════════════════════════════ -->
+      <div id="section-details" class="main-section">
 
-        <div class="section">
-          <div class="section-title">Calculadora de hipoteca</div>
+        <div class="section-title">Detalles de la propiedad</div>
+
+        <div class="details-grid">
+
+          <div class="details-section">
+            <div class="details-section-header">Interior</div>
+            <div class="details-row"><span class="details-row-label">Dormitorios</span><span class="details-row-value">4</span></div>
+            <div class="details-row"><span class="details-row-label">Baños completos</span><span class="details-row-value">2</span></div>
+            <div class="details-row"><span class="details-row-label">Aseos</span><span class="details-row-value">1</span></div>
+            <div class="details-row"><span class="details-row-label">Superficie construida</span><span class="details-row-value">210 m²</span></div>
+            <div class="details-row"><span class="details-row-label">Superficie útil</span><span class="details-row-value">192 m²</span></div>
+            <div class="details-row"><span class="details-row-label">Cocina</span><span class="details-row-value">Equipada</span></div>
+            <div class="details-row"><span class="details-row-label">Suelos</span><span class="details-row-value">Parquet</span></div>
+            <div class="details-row"><span class="details-row-label">Calefacción</span><span class="details-row-value">Radiadores</span></div>
+            <div class="details-row"><span class="details-row-label">Aire acondicionado</span><span class="details-row-value">Sí</span></div>
+            <div class="details-row"><span class="details-row-label">Orientación</span><span class="details-row-value">Sur-Este</span></div>
+          </div>
+
+          <div class="details-section">
+            <div class="details-section-header">Exterior y comunidad</div>
+            <div class="details-row"><span class="details-row-label">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
+            <div class="details-row"><span class="details-row-label">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
+            <div class="details-row"><span class="details-row-label">Trastero</span><span class="details-row-value">No</span></div>
+            <div class="details-row"><span class="details-row-label">Piscina</span><span class="details-row-value">Comunitaria</span></div>
+            <div class="details-row"><span class="details-row-label">Jardín</span><span class="details-row-value">Comunitario</span></div>
+            <div class="details-row"><span class="details-row-label">Ascensor</span><span class="details-row-value">Sí</span></div>
+            <div class="details-row"><span class="details-row-label">Portero</span><span class="details-row-value">24 horas</span></div>
+            <div class="details-row"><span class="details-row-label">Seguridad</span><span class="details-row-value">Sistema 24h</span></div>
+            <div class="details-row"><span class="details-row-label">Planta</span><span class="details-row-value">3ª de 6</span></div>
+            <div class="details-row"><span class="details-row-label">Año construcción</span><span class="details-row-value">2018</span></div>
+          </div>
+
+          <div class="details-section" style="grid-column: span 2;">
+            <div class="details-section-header">Información legal y energética</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr;">
+              <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Referencia catastral</span><span class="details-row-value">9872023VK4897S</span></div>
+              <div class="details-row"><span class="details-row-label">Tipo de inmueble</span><span class="details-row-value">Piso</span></div>
+              <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Régimen</span><span class="details-row-value">Libre</span></div>
+              <div class="details-row"><span class="details-row-label">Estado</span><span class="details-row-value">Bueno</span></div>
+              <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Eficiencia energética</span><span class="details-row-value"><span class="energy-badge">C</span></span></div>
+              <div class="details-row"><span class="details-row-label">Consumo energético</span><span class="details-row-value">145 kWh/m²·año</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Payment calculator (subsection) -->
+        <div class="subsection">
+          <div class="subsection-title">Calculadora de pagos</div>
 
           <div class="calc-result">
             <div>
@@ -1297,12 +1359,10 @@
           </div>
 
           <div class="calc-fields">
-
             <div class="calc-field">
               <label>Precio de la vivienda</label>
               <input type="text" id="calc-precio" value="€1.489.000" readonly style="background:#f9fafb; color:var(--muted); cursor:default;">
             </div>
-
             <div class="calc-field">
               <label>Plazo</label>
               <select id="calc-plazo">
@@ -1313,7 +1373,6 @@
                 <option value="30" selected>30 años</option>
               </select>
             </div>
-
             <div class="calc-field" style="grid-column: span 2;">
               <label>
                 Entrada
@@ -1325,12 +1384,10 @@
               </label>
               <input type="range" id="calc-entrada" min="5" max="50" value="20" step="1">
             </div>
-
             <div class="calc-field">
               <label>Tipo de interés anual (%)</label>
               <input type="number" id="calc-interes" value="3.5" min="0.1" max="15" step="0.1">
             </div>
-
             <div class="calc-field">
               <label>Tipo de interés</label>
               <select id="calc-tipo-interes">
@@ -1339,7 +1396,6 @@
                 <option value="mixto">Mixto</option>
               </select>
             </div>
-
           </div>
 
           <div class="calc-breakdown">
@@ -1369,99 +1425,90 @@
 
       </div>
 
-      <!-- ══ SECTION: Escuelas ═══════════════════════════════════ -->
-      <div id="section-escuelas" style="border-top:2px solid #f5f5f5;padding-top:40px;margin-top:40px;">
+      <!-- ══ SECTION 4: History ═══════════════════════════════════ -->
+      <div id="section-history" class="main-section">
 
-        <div class="section">
-          <div class="section-title">Colegios cercanos</div>
-          <div class="schools-list">
+        <div class="section-title">Historial</div>
 
-            <div class="school-card">
-              <div class="school-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              </div>
-              <div class="school-info">
-                <div class="school-name">Colegio Internacional de Madrid</div>
-                <div class="school-meta">
-                  <span class="school-type school-type-pub">Público</span>
-                  <span class="school-dist">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    0,3 km
-                  </span>
-                </div>
-              </div>
-              <div class="school-rating">
-                <div class="school-rating-value">9.2</div>
-                <div class="school-rating-stars">★★★★★</div>
-                <div class="school-rating-label">Valoración</div>
-              </div>
-            </div>
+        <!-- Sale history -->
+        <div class="subsection-title">Historial de ventas</div>
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Evento</th>
+              <th>Precio</th>
+              <th>Variación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Feb 2024</td>
+              <td><span class="badge-reducido">Precio reducido</span></td>
+              <td>€1.489.000</td>
+              <td class="change-neg">−5,1%</td>
+            </tr>
+            <tr>
+              <td>Ago 2023</td>
+              <td><span class="badge-listado">Listado</span></td>
+              <td>€1.568.000</td>
+              <td class="change-neu">—</td>
+            </tr>
+          </tbody>
+        </table>
 
-            <div class="school-card">
-              <div class="school-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              </div>
-              <div class="school-info">
-                <div class="school-name">Colegio San Isidro</div>
-                <div class="school-meta">
-                  <span class="school-type school-type-conc">Concertado</span>
-                  <span class="school-dist">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    0,5 km
-                  </span>
-                </div>
-              </div>
-              <div class="school-rating">
-                <div class="school-rating-value">8.8</div>
-                <div class="school-rating-stars">★★★★☆</div>
-                <div class="school-rating-label">Valoración</div>
-              </div>
-            </div>
+        <!-- Tax history placeholder -->
+        <div class="subsection">
+          <div class="subsection-title">Historial fiscal (IBI)</div>
+          <div class="coming-soon-text">🔜 Disponible tras integración con Catastro</div>
+        </div>
 
-            <div class="school-card">
-              <div class="school-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              </div>
-              <div class="school-info">
-                <div class="school-name">Instituto Gran Vía</div>
-                <div class="school-meta">
-                  <span class="school-type school-type-pub">Público</span>
-                  <span class="school-dist">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    0,8 km
-                  </span>
-                </div>
-              </div>
-              <div class="school-rating">
-                <div class="school-rating-value">8.1</div>
-                <div class="school-rating-stars">★★★★☆</div>
-                <div class="school-rating-label">Valoración</div>
-              </div>
-            </div>
+        <!-- Permit history placeholder -->
+        <div class="subsection">
+          <div class="subsection-title">Licencias de obras</div>
+          <div class="coming-soon-text">🔜 Disponible tras integración con ayuntamientos</div>
+        </div>
 
-            <div class="school-card">
-              <div class="school-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              </div>
-              <div class="school-info">
-                <div class="school-name">American School of Madrid</div>
-                <div class="school-meta">
-                  <span class="school-type school-type-priv">Privado</span>
-                  <span class="school-dist">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    1,2 km
-                  </span>
-                </div>
-              </div>
-              <div class="school-rating">
-                <div class="school-rating-value">9.5</div>
-                <div class="school-rating-stars">★★★★★</div>
-                <div class="school-rating-label">Valoración</div>
-              </div>
-            </div>
+      </div>
 
+      <!-- ══ SECTION 5: Climate ═══════════════════════════════════ -->
+      <div id="section-climate" class="main-section">
+
+        <div class="section-title">Riesgos climáticos</div>
+
+        <div class="climate-grid">
+          <div class="climate-card">
+            <div class="climate-icon">💧</div>
+            <div class="climate-name">Inundación</div>
+            <div class="climate-score-badge">—/10</div>
+            <div class="climate-desc">Próximamente</div>
+          </div>
+          <div class="climate-card">
+            <div class="climate-icon">🔥</div>
+            <div class="climate-name">Incendio</div>
+            <div class="climate-score-badge">—/10</div>
+            <div class="climate-desc">Próximamente</div>
+          </div>
+          <div class="climate-card">
+            <div class="climate-icon">🌡️</div>
+            <div class="climate-name">Calor</div>
+            <div class="climate-score-badge">—/10</div>
+            <div class="climate-desc">Próximamente</div>
+          </div>
+          <div class="climate-card">
+            <div class="climate-icon">💨</div>
+            <div class="climate-name">Viento</div>
+            <div class="climate-score-badge">—/10</div>
+            <div class="climate-desc">Próximamente</div>
+          </div>
+          <div class="climate-card">
+            <div class="climate-icon">🌫️</div>
+            <div class="climate-name">Calidad del aire</div>
+            <div class="climate-score-badge">—/10</div>
+            <div class="climate-desc">Próximamente</div>
           </div>
         </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:14px;">AEMET, COPERNICUS · Próximamente</p>
 
       </div>
 
@@ -1475,6 +1522,26 @@
         <div class="sidebar-card-sub">Precio estimado de venta para propiedades similares en esta zona:</div>
         <div class="price-range">€1.350.000 – €1.620.000</div>
         <a href="#" class="btn-red" id="btn-agente-sidebar">Habla con un agente</a>
+      </div>
+
+      <div class="market-insights-card">
+        <div class="sidebar-card-title" data-i18n="market_insights_title">Insights del mercado</div>
+        <div class="market-type-label" data-i18n="market_type_balanced">Mercado equilibrado</div>
+        <div class="market-insights-rows">
+          <div class="insight-row">
+            <span data-i18n="insight_list_sale">Precio venta / lista</span>
+            <span class="insight-value coming-soon">—</span>
+          </div>
+          <div class="insight-row">
+            <span data-i18n="insight_days_market">Días en mercado (media)</span>
+            <span class="insight-value coming-soon">—</span>
+          </div>
+          <div class="insight-row">
+            <span data-i18n="insight_competing">Ofertas competidoras</span>
+            <span class="insight-value coming-soon">—</span>
+          </div>
+        </div>
+        <p class="insight-note">🔜 <span data-i18n="market_insights_coming">Datos de mercado próximamente</span></p>
       </div>
 
       <div class="sidebar-card">
@@ -1663,6 +1730,17 @@
 
   // Marker added dynamically after property data loads
 
+  // ── Neighborhood place tabs ────────────────────────────────────
+  document.querySelectorAll('.place-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.place-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      document.querySelectorAll('.place-panel').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var panel = document.getElementById('place-' + btn.dataset.place);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
   // ── Map tab toggle ─────────────────────────────────────────────
   document.querySelectorAll('.map-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -1835,13 +1913,83 @@
       const propDesc  = propLang === 'en' ? (p.description_en || p.description) : p.description;
       document.querySelector('.listing-price').textContent   = formatPrice(p.price);
       document.querySelector('.listing-address').textContent = propTitle + ' · ' + p.location;
-      const descEl = document.querySelector('#section-descripcion .section-text');
+      const descEl = document.querySelector('#section-overview .section-text');
       if (descEl) descEl.textContent = propDesc;
       document.title = propTitle + ' — Preos';
     }
     renderPropDetails();
     document.addEventListener('preos:langchange', renderPropDetails);
     if (window.PreosAnalytics) PreosAnalytics.trackPropertyView(p);
+
+    // ── Stable mock seed from property id ─────────────────────
+    var _seed = (function(s) {
+      var h = 0;
+      for (var i = 0; i < s.length; i++) { h = (Math.imul(31, h) + s.charCodeAt(i)) | 0; }
+      return Math.abs(h);
+    })(p.id || 'prop');
+    var _mockDays   = (_seed % 25) + 1;          // 1–25 days listed
+    var _mockViews  = 200 + (_seed % 100);        // 200–299
+    var _mockSaves  = 15 + (_seed % 20);          // 15–34
+    var _mockTours  = 3 + (_seed % 6);            // 3–8
+
+    // ── Gallery "NEW X DAYS AGO" badge ────────────────────────
+    (function() {
+      var badge = document.getElementById('listing-badge-new');
+      if (!badge) return;
+      var lang = localStorage.getItem('preos-lang') || 'es';
+      var text = '';
+      if (_mockDays < 1) {
+        text = lang === 'en' ? 'NEW TODAY' : 'NUEVO HOY';
+      } else if (_mockDays < 2) {
+        text = lang === 'en' ? 'NEW 1 DAY AGO' : 'NUEVO HACE 1 DÍA';
+      } else if (_mockDays < 7) {
+        text = lang === 'en' ? 'NEW ' + _mockDays + ' DAYS AGO' : 'NUEVO HACE ' + _mockDays + ' DÍAS';
+      } else if (_mockDays < 30) {
+        text = lang === 'en' ? _mockDays + ' DAYS AGO' : 'HACE ' + _mockDays + ' DÍAS';
+      }
+      if (text) { badge.textContent = text; badge.style.display = ''; }
+    })();
+
+    // ── Activity compact line ─────────────────────────────────
+    function renderActivityLine() {
+      var el = document.getElementById('activity-line');
+      if (!el) return;
+      var lang = localStorage.getItem('preos-lang') || 'es';
+      el.innerHTML =
+        '<span class="activity-item">📅 <strong>' + _mockDays + '</strong> <span data-i18n="activity_days_on_preos">' + (lang === 'en' ? 'days on Preos' : 'días en Preos') + '</span></span>' +
+        '<span class="activity-sep">·</span>' +
+        '<span class="activity-item">👁 <strong>' + _mockViews + '</strong> <span data-i18n="activity_views">' + (lang === 'en' ? 'views' : 'visitas') + '</span></span>' +
+        '<span class="activity-sep">·</span>' +
+        '<span class="activity-item">🤍 <strong>' + _mockSaves + '</strong> <span data-i18n="activity_saves">' + (lang === 'en' ? 'saves' : 'guardados') + '</span></span>' +
+        '<span class="activity-sep">·</span>' +
+        '<span class="activity-item">📅 <strong>' + _mockTours + '</strong> <span data-i18n="activity_tours">' + (lang === 'en' ? 'tours scheduled' : 'recorridos agendados') + '</span></span>';
+    }
+    renderActivityLine();
+    document.addEventListener('preos:langchange', renderActivityLine);
+
+    // ── Popularity banner ─────────────────────────────────────
+    if (_mockViews > 200) {
+      var _banner = document.getElementById('popularity-banner');
+      if (_banner) _banner.style.display = 'flex';
+    }
+
+    // ── Listed-by attribution ──────────────────────────────────
+    (function() {
+      var el = document.getElementById('listed-by');
+      if (!el) return;
+      var agentName = p.agent || '';
+      var ref = p.agency_ref || '';
+      if (!agentName && !ref) return;
+      function renderListedBy() {
+        var lang = localStorage.getItem('preos-lang') || 'es';
+        var label = lang === 'en' ? 'Listed by' : 'Publicado por';
+        el.innerHTML = '<span>' + label + '</span>' +
+          (agentName ? ' <span class="agent-name">' + agentName + '</span>' : '') +
+          (ref ? ' · <span class="agency-ref">' + ref + '</span>' : '');
+      }
+      renderListedBy();
+      document.addEventListener('preos:langchange', renderListedBy);
+    })();
 
     // Specs
     const vals = document.querySelectorAll('.spec-value');
@@ -1877,7 +2025,7 @@
 
 <script>
 (function() {
-  var sections = ['descripcion','detalles','calculadora','escuelas'];
+  var sections = ['overview','neighborhood','details','history','climate'];
   var _ticking = false;
   function updateScrollSpy() {
     var offset = 120;
