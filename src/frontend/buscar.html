@@ -1559,7 +1559,13 @@
     const sorted = [...props].sort((a, b) => {
       if (sortVal === 'asc')  return a.price - b.price;
       if (sortVal === 'desc') return b.price - a.price;
-      return 0;
+      // default / sort_recommended: quality-aware sort
+      var qa = window.ListingQuality && window.ListingQuality.cache[a.id];
+      var qb = window.ListingQuality && window.ListingQuality.cache[b.id];
+      if (qa && qb) return qb.score - qa.score;
+      if (qa) return -1;
+      if (qb) return 1;
+      return new Date(b.listed_date || 0) - new Date(a.listed_date || 0);
     });
 
     const list    = document.querySelector('.listings-list');
@@ -2086,6 +2092,7 @@
     }
   </script>
   <script src="js/lang.js"></script>
+  <script src="js/listing-quality.js"></script>
 
   <!-- Mobile map toggle button -->
   <button class="mobile-map-toggle" id="mobileMapToggle" style="display:none;" onclick="toggleMobileMap()">
