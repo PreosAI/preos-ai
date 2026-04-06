@@ -123,20 +123,20 @@
       flex: 1;
     }
 
-    .tab {
+    .scroll-nav-link {
       padding: 0 20px;
       font-size: 13px;
       font-weight: 500;
       color: var(--muted);
-      cursor: pointer;
+      text-decoration: none;
       border-bottom: 2px solid transparent;
       display: flex;
       align-items: center;
       white-space: nowrap;
-      transition: color .15s, border-color .15s;
+      transition: color .2s, border-color .2s;
     }
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+    .scroll-nav-link:hover { color: var(--text); }
+    .scroll-nav-link.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
 
     .tabs-actions {
       display: flex;
@@ -302,10 +302,6 @@
     .spec-icon svg { width: 20px; height: 20px; display: block; color: var(--muted); }
     .spec-value { font-size: 16px; font-weight: 700; color: var(--text); }
     .spec-label { font-size: 12px; color: var(--muted); }
-
-    /* ─── TAB PANELS ───────────────────────────────────────── */
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
 
     /* ─── SECTIONS ─────────────────────────────────────────── */
     .section { margin-bottom: 36px; }
@@ -969,7 +965,7 @@
       .tabs-bar { padding: 0 12px; overflow-x: auto; }
       .tabs-bar::-webkit-scrollbar { display: none; }
       .tabs-list { gap: 0; }
-      .tab { font-size: 13px; padding: 0 12px; white-space: nowrap; }
+      .scroll-nav-link { font-size: 13px; padding: 0 12px; white-space: nowrap; }
       .tabs-actions { display: none; }
 
       .gallery { height: 260px; }
@@ -1025,10 +1021,10 @@
 <!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
 <div class="tabs-bar">
   <div class="tabs-list">
-    <div class="tab active" data-tab="1">Descripción general</div>
-    <div class="tab" data-tab="2">Calculadora de pagos</div>
-    <div class="tab" data-tab="3">Detalles de la propiedad</div>
-    <div class="tab" data-tab="4">Escuelas</div>
+    <a class="scroll-nav-link active" href="#section-descripcion" data-i18n="section_descripcion">Descripción</a>
+    <a class="scroll-nav-link" href="#section-detalles" data-i18n="section_detalles">Detalles</a>
+    <a class="scroll-nav-link" href="#section-calculadora" data-i18n="section_calculadora">Calculadora</a>
+    <a class="scroll-nav-link" href="#section-escuelas" data-i18n="section_escuelas">Escuelas</a>
   </div>
   <div class="tabs-actions">
     <button class="icon-btn" id="btn-favorito" aria-label="Guardar">
@@ -1138,8 +1134,8 @@
         </div>
       </div>
 
-      <!-- ══ TAB PANEL 1: Descripción general ══════════════════ -->
-      <div class="tab-panel active" id="panel-1">
+      <!-- ══ SECTION: Descripción general ══════════════════════ -->
+      <div id="section-descripcion">
 
         <div class="section">
           <div class="section-title">Actividad en Preos</div>
@@ -1231,8 +1227,60 @@
 
       </div>
 
-      <!-- ══ TAB PANEL 2: Calculadora de pagos ═════════════════ -->
-      <div class="tab-panel" id="panel-2">
+      <!-- ══ SECTION: Detalles de la propiedad ═════════════════ -->
+      <div id="section-detalles" style="border-top:2px solid #f5f5f5;padding-top:40px;margin-top:40px;">
+
+        <div class="section">
+          <div class="section-title">Detalles de la propiedad</div>
+          <div class="details-grid">
+
+            <div class="details-section">
+              <div class="details-section-header">Interior</div>
+              <div class="details-row"><span class="details-row-label">Dormitorios</span><span class="details-row-value">4</span></div>
+              <div class="details-row"><span class="details-row-label">Baños completos</span><span class="details-row-value">2</span></div>
+              <div class="details-row"><span class="details-row-label">Aseos</span><span class="details-row-value">1</span></div>
+              <div class="details-row"><span class="details-row-label">Superficie construida</span><span class="details-row-value">210 m²</span></div>
+              <div class="details-row"><span class="details-row-label">Superficie útil</span><span class="details-row-value">192 m²</span></div>
+              <div class="details-row"><span class="details-row-label">Cocina</span><span class="details-row-value">Equipada</span></div>
+              <div class="details-row"><span class="details-row-label">Suelos</span><span class="details-row-value">Parquet</span></div>
+              <div class="details-row"><span class="details-row-label">Calefacción</span><span class="details-row-value">Radiadores</span></div>
+              <div class="details-row"><span class="details-row-label">Aire acondicionado</span><span class="details-row-value">Sí</span></div>
+              <div class="details-row"><span class="details-row-label">Orientación</span><span class="details-row-value">Sur-Este</span></div>
+            </div>
+
+            <div class="details-section">
+              <div class="details-section-header">Exterior y comunidad</div>
+              <div class="details-row"><span class="details-row-label">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
+              <div class="details-row"><span class="details-row-label">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
+              <div class="details-row"><span class="details-row-label">Trastero</span><span class="details-row-value">No</span></div>
+              <div class="details-row"><span class="details-row-label">Piscina</span><span class="details-row-value">Comunitaria</span></div>
+              <div class="details-row"><span class="details-row-label">Jardín</span><span class="details-row-value">Comunitario</span></div>
+              <div class="details-row"><span class="details-row-label">Ascensor</span><span class="details-row-value">Sí</span></div>
+              <div class="details-row"><span class="details-row-label">Portero</span><span class="details-row-value">24 horas</span></div>
+              <div class="details-row"><span class="details-row-label">Seguridad</span><span class="details-row-value">Sistema 24h</span></div>
+              <div class="details-row"><span class="details-row-label">Planta</span><span class="details-row-value">3ª de 6</span></div>
+              <div class="details-row"><span class="details-row-label">Año construcción</span><span class="details-row-value">2018</span></div>
+            </div>
+
+            <div class="details-section" style="grid-column: span 2;">
+              <div class="details-section-header">Información legal y energética</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Referencia catastral</span><span class="details-row-value">9872023VK4897S</span></div>
+                <div class="details-row"><span class="details-row-label">Tipo de inmueble</span><span class="details-row-value">Piso</span></div>
+                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Régimen</span><span class="details-row-value">Libre</span></div>
+                <div class="details-row"><span class="details-row-label">Estado</span><span class="details-row-value">Bueno</span></div>
+                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Eficiencia energética</span><span class="details-row-value"><span class="energy-badge">C</span></span></div>
+                <div class="details-row"><span class="details-row-label">Consumo energético</span><span class="details-row-value">145 kWh/m²·año</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ SECTION: Calculadora de pagos ══════════════════════ -->
+      <div id="section-calculadora" style="border-top:2px solid #f5f5f5;padding-top:40px;margin-top:40px;">
 
         <div class="section">
           <div class="section-title">Calculadora de hipoteca</div>
@@ -1321,60 +1369,8 @@
 
       </div>
 
-      <!-- ══ TAB PANEL 3: Detalles de la propiedad ═════════════ -->
-      <div class="tab-panel" id="panel-3">
-
-        <div class="section">
-          <div class="section-title">Detalles de la propiedad</div>
-          <div class="details-grid">
-
-            <div class="details-section">
-              <div class="details-section-header">Interior</div>
-              <div class="details-row"><span class="details-row-label">Dormitorios</span><span class="details-row-value">4</span></div>
-              <div class="details-row"><span class="details-row-label">Baños completos</span><span class="details-row-value">2</span></div>
-              <div class="details-row"><span class="details-row-label">Aseos</span><span class="details-row-value">1</span></div>
-              <div class="details-row"><span class="details-row-label">Superficie construida</span><span class="details-row-value">210 m²</span></div>
-              <div class="details-row"><span class="details-row-label">Superficie útil</span><span class="details-row-value">192 m²</span></div>
-              <div class="details-row"><span class="details-row-label">Cocina</span><span class="details-row-value">Equipada</span></div>
-              <div class="details-row"><span class="details-row-label">Suelos</span><span class="details-row-value">Parquet</span></div>
-              <div class="details-row"><span class="details-row-label">Calefacción</span><span class="details-row-value">Radiadores</span></div>
-              <div class="details-row"><span class="details-row-label">Aire acondicionado</span><span class="details-row-value">Sí</span></div>
-              <div class="details-row"><span class="details-row-label">Orientación</span><span class="details-row-value">Sur-Este</span></div>
-            </div>
-
-            <div class="details-section">
-              <div class="details-section-header">Exterior y comunidad</div>
-              <div class="details-row"><span class="details-row-label">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
-              <div class="details-row"><span class="details-row-label">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
-              <div class="details-row"><span class="details-row-label">Trastero</span><span class="details-row-value">No</span></div>
-              <div class="details-row"><span class="details-row-label">Piscina</span><span class="details-row-value">Comunitaria</span></div>
-              <div class="details-row"><span class="details-row-label">Jardín</span><span class="details-row-value">Comunitario</span></div>
-              <div class="details-row"><span class="details-row-label">Ascensor</span><span class="details-row-value">Sí</span></div>
-              <div class="details-row"><span class="details-row-label">Portero</span><span class="details-row-value">24 horas</span></div>
-              <div class="details-row"><span class="details-row-label">Seguridad</span><span class="details-row-value">Sistema 24h</span></div>
-              <div class="details-row"><span class="details-row-label">Planta</span><span class="details-row-value">3ª de 6</span></div>
-              <div class="details-row"><span class="details-row-label">Año construcción</span><span class="details-row-value">2018</span></div>
-            </div>
-
-            <div class="details-section" style="grid-column: span 2;">
-              <div class="details-section-header">Información legal y energética</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr;">
-                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Referencia catastral</span><span class="details-row-value">9872023VK4897S</span></div>
-                <div class="details-row"><span class="details-row-label">Tipo de inmueble</span><span class="details-row-value">Piso</span></div>
-                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Régimen</span><span class="details-row-value">Libre</span></div>
-                <div class="details-row"><span class="details-row-label">Estado</span><span class="details-row-value">Bueno</span></div>
-                <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Eficiencia energética</span><span class="details-row-value"><span class="energy-badge">C</span></span></div>
-                <div class="details-row"><span class="details-row-label">Consumo energético</span><span class="details-row-value">145 kWh/m²·año</span></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ══ TAB PANEL 4: Escuelas ══════════════════════════════ -->
-      <div class="tab-panel" id="panel-4">
+      <!-- ══ SECTION: Escuelas ═══════════════════════════════════ -->
+      <div id="section-escuelas" style="border-top:2px solid #f5f5f5;padding-top:40px;margin-top:40px;">
 
         <div class="section">
           <div class="section-title">Colegios cercanos</div>
@@ -1667,17 +1663,6 @@
 
   // Marker added dynamically after property data loads
 
-  // ── Tab switching ──────────────────────────────────────────────
-  document.querySelectorAll('.tab[data-tab]').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const n = tab.dataset.tab;
-      document.querySelectorAll('.tab[data-tab]').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('panel-' + n).classList.add('active');
-    });
-  });
-
   // ── Map tab toggle ─────────────────────────────────────────────
   document.querySelectorAll('.map-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -1850,7 +1835,7 @@
       const propDesc  = propLang === 'en' ? (p.description_en || p.description) : p.description;
       document.querySelector('.listing-price').textContent   = formatPrice(p.price);
       document.querySelector('.listing-address').textContent = propTitle + ' · ' + p.location;
-      const descEl = document.querySelector('#panel-1 .section-text');
+      const descEl = document.querySelector('#section-descripcion .section-text');
       if (descEl) descEl.textContent = propDesc;
       document.title = propTitle + ' — Preos';
     }
@@ -1888,6 +1873,43 @@
       if (_fsvg) { _fsvg.setAttribute('fill', 'var(--red)'); _fsvg.setAttribute('stroke', 'var(--red)'); }
     }
   })();
+</script>
+
+<script>
+(function() {
+  var sections = ['descripcion','detalles','calculadora','escuelas'];
+  var _ticking = false;
+  function updateScrollSpy() {
+    var offset = 120;
+    var active = sections[0];
+    for (var i = sections.length - 1; i >= 0; i--) {
+      var el = document.getElementById('section-' + sections[i]);
+      if (el && el.getBoundingClientRect().top <= offset) { active = sections[i]; break; }
+    }
+    document.querySelectorAll('.scroll-nav-link').forEach(function(a) {
+      a.classList.toggle('active', a.getAttribute('href') === '#section-' + active);
+    });
+  }
+  window.addEventListener('scroll', function() {
+    if (!_ticking) { setTimeout(function() { updateScrollSpy(); _ticking = false; }, 100); _ticking = true; }
+  }, { passive: true });
+  document.querySelectorAll('.scroll-nav-link').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (!el) return;
+      var top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    });
+  });
+  document.addEventListener('preos:langchange', function() {
+    document.querySelectorAll('.scroll-nav-link[data-i18n]').forEach(function(a) {
+      a.textContent = PreosLang.t(a.getAttribute('data-i18n'));
+    });
+  });
+  updateScrollSpy();
+})();
 </script>
 
   <script src="js/logo-path.js"></script>
