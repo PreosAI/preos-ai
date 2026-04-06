@@ -35,20 +35,24 @@ const CORS = {
 
 // ── Overpass query helper ─────────────────────────────────────────────────────
 
-async function overpassCount(query) {
-  const res = await fetch('https://overpass-api.de/api/interpreter', {
+async function overpassCount(query, attempt) {
+  const mirrors = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+  ];
+  const url = mirrors[(attempt || 0) % mirrors.length];
+  const res = await fetch(url, {
     method:  'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body:    `data=${encodeURIComponent(query)}`,
     timeout: 20000
   });
-  if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`Overpass HTTP ${res.status} from ${url}`);
   const data = await res.json();
-  // out count; returns a single element with tags.total
   if (data.elements && data.elements[0] && data.elements[0].tags) {
     return parseInt(data.elements[0].tags.total || 0);
   }
-  // fallback: count elements array length
   return data.elements ? data.elements.length : 0;
 }
 
@@ -113,14 +117,14 @@ app.http('neighborhood', {
     // All use "out count;" for efficiency — returns just the total count
 
     const queries = {
-      walk: `[out:json][timeout:25];
+      walk: `[out:json][timeout:15];
 (
   node["shop"](around:500,${lat},${lng});
   node["amenity"~"restaurant|cafe|fast_food|bar|pub|supermarket|convenience|pharmacy|bank|post_office"](around:500,${lat},${lng});
 );
 out count;`,
 
-      transit: `[out:json][timeout:25];
+      transit: `[out:json][timeout:15];
 (
   node["highway"="bus_stop"](around:800,${lat},${lng});
   node["amenity"="bus_station"](around:800,${lat},${lng});
@@ -128,7 +132,7 @@ out count;`,
 );
 out count;`,
 
-      bike: `[out:json][timeout:25];
+      bike: `[out:json][timeout:15];
 (
   way["highway"="cycleway"](around:1000,${lat},${lng});
   way["cycleway"~"lane|track|opposite_lane|opposite_track"](around:1000,${lat},${lng});
@@ -137,7 +141,7 @@ out count;`,
 );
 out count;`,
 
-      noise: `[out:json][timeout:25];
+      noise: `[out:json][timeout:15];
 (
   way["highway"~"motorway|trunk|primary|secondary"](around:300,${lat},${lng});
   way["railway"="rail"](around:300,${lat},${lng});
@@ -145,7 +149,7 @@ out count;`,
 );
 out count;`,
 
-      wellness: `[out:json][timeout:25];
+      wellness: `[out:json][timeout:15];
 (
   node["amenity"~"pharmacy|hospital|clinic|doctors|dentist"](around:800,${lat},${lng});
   node["leisure"~"fitness_centre|sports_centre|swimming_pool|gym"](around:800,${lat},${lng});
@@ -153,7 +157,7 @@ out count;`,
 );
 out count;`,
 
-      green: `[out:json][timeout:25];
+      green: `[out:json][timeout:15];
 (
   way["leisure"~"park|garden|nature_reserve|pitch|playground"](around:800,${lat},${lng});
   way["landuse"~"grass|meadow|forest|recreation_ground|village_green"](around:800,${lat},${lng});
@@ -166,9 +170,10 @@ out count;`
     // Run queries sequentially to avoid Overpass rate limiting
     const counts = {};
     const queryEntries = Object.entries(queries);
+    let attempt = 0;
     for (const [key, q] of queryEntries) {
       try {
-        counts[key] = await overpassCount(q);
+        counts[key] = await overpassCount(q, attempt++);
         context.log(`  ${key}: ${counts[key]}`);
       } catch (e) {
         context.log(`  ${key} error: ${e.message}`);
