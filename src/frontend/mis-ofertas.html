@@ -188,11 +188,11 @@
 <div id="withdraw-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:14px;padding:28px 24px;max-width:380px;width:90%;text-align:center;">
     <div style="font-size:24px;margin-bottom:12px;">⚠️</div>
-    <div style="font-size:17px;font-weight:700;margin-bottom:8px;">¿Retirar oferta?</div>
-    <div style="font-size:14px;color:var(--muted);margin-bottom:24px;">Esta acción no se puede deshacer.</div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:8px;" data-i18n="withdrawModalTitle">¿Retirar oferta?</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:24px;" data-i18n="withdrawModalSub">Esta acción no se puede deshacer.</div>
     <div style="display:flex;gap:10px;justify-content:center;">
-      <button id="modal-cancel" style="flex:1;border:1px solid var(--border);background:#fff;border-radius:999px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;">Cancelar</button>
-      <button id="modal-confirm" style="flex:1;background:var(--red-b);color:#fff;border:none;border-radius:999px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;">Retirar</button>
+      <button id="modal-cancel" style="flex:1;border:1px solid var(--border);background:#fff;border-radius:999px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btnCancel">Cancelar</button>
+      <button id="modal-confirm" style="flex:1;background:var(--red-b);color:#fff;border:none;border-radius:999px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btnWithdrawConfirm">Retirar</button>
     </div>
   </div>
 </div>
@@ -268,9 +268,9 @@
       list.innerHTML =
         '<div class="empty-wrap">' +
           '<div class="empty-icon">🏠</div>' +
-          '<div class="empty-title">No tienes ofertas activas</div>' +
-          '<div class="empty-sub">Cuando envíes una oferta sobre una propiedad, aparecerá aquí.</div>' +
-          '<a href="buscar.html" class="btn-new-offer">Buscar propiedades</a>' +
+          '<div class="empty-title">' + PreosLang.t('offerEmptyTitle') + '</div>' +
+          '<div class="empty-sub">' + PreosLang.t('offerEmptySub') + '</div>' +
+          '<a href="buscar.html" class="btn-new-offer">' + PreosLang.t('offerBrowseProps') + '</a>' +
         '</div>';
       return;
     }
@@ -295,15 +295,15 @@
       : '—';
 
     var statusMap = {
-      pending:   { label: 'Pendiente',    cls: 'badge-pending' },
-      nuevo:     { label: 'Enviada',      cls: 'badge-pending' },
-      accepted:  { label: 'Aceptada ✓',  cls: 'badge-accepted' },
-      countered: { label: 'Contraoferta', cls: 'badge-countered' },
-      rejected:  { label: 'Rechazada',    cls: 'badge-rejected' },
-      withdrawn: { label: 'Retirada',     cls: 'badge-withdrawn' },
-      aceptada:  { label: 'Aceptada ✓',  cls: 'badge-accepted' },
-      contraoferta: { label: 'Contraoferta', cls: 'badge-countered' },
-      rechazada: { label: 'Rechazada',    cls: 'badge-rejected' }
+      pending:      { label: PreosLang.t('offerPending'),                  cls: 'badge-pending' },
+      nuevo:        { label: PreosLang.t('offerStatusSent'),               cls: 'badge-pending' },
+      accepted:     { label: PreosLang.t('offerAccepted') + ' ✓',         cls: 'badge-accepted' },
+      countered:    { label: PreosLang.t('offerCountered'),                cls: 'badge-countered' },
+      rejected:     { label: PreosLang.t('offerRejected'),                 cls: 'badge-rejected' },
+      withdrawn:    { label: PreosLang.t('offerWithdrawn'),                cls: 'badge-withdrawn' },
+      aceptada:     { label: PreosLang.t('offerAccepted') + ' ✓',         cls: 'badge-accepted' },
+      contraoferta: { label: PreosLang.t('offerCountered'),                cls: 'badge-countered' },
+      rechazada:    { label: PreosLang.t('offerRejected'),                 cls: 'badge-rejected' }
     };
     var agentSt = o.agentStatus || o.status || 'pending';
     var stInfo  = statusMap[agentSt] || statusMap['pending'];
@@ -313,41 +313,41 @@
       : '—';
 
     var details = [];
-    if (o.isCashBuyer) details.push('<strong>Contado</strong>');
-    if (o.hasMortgageApproval) details.push('Hipoteca aprobada');
-    if (o.arrasAmount) details.push('Arras: ' + Number(o.arrasAmount).toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }));
-    if (o.arrasDate) details.push('Fecha arras: ' + o.arrasDate);
-    if (o.closingDate) details.push('Cierre: ' + o.closingDate);
+    if (o.isCashBuyer) details.push('<strong>' + PreosLang.t('offerDetailCash') + '</strong>');
+    if (o.hasMortgageApproval) details.push(PreosLang.t('offerDetailMortgage'));
+    if (o.arrasAmount) details.push(PreosLang.t('offerDetailArras') + ' ' + Number(o.arrasAmount).toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }));
+    if (o.arrasDate) details.push(PreosLang.t('offerDetailArrasDate') + ' ' + o.arrasDate);
+    if (o.closingDate) details.push(PreosLang.t('offerDetailClosing') + ' ' + o.closingDate);
 
     var counteredBanner = '';
     if (agentSt === 'countered' || agentSt === 'contraoferta') {
-      counteredBanner = '<div class="countered-banner"><strong>El agente ha enviado una contraoferta.</strong> Contacta con Preos para continuar la negociación.</div>';
+      counteredBanner = '<div class="countered-banner">' + PreosLang.t('offerCounteredMsg') + '</div>';
     }
     var acceptedBanner = '';
     if (agentSt === 'accepted' || agentSt === 'aceptada') {
-      acceptedBanner = '<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:14px;"><strong style="color:#065f46;">¡Tu oferta ha sido aceptada!</strong> El agente se pondrá en contacto contigo pronto.</div>';
+      acceptedBanner = '<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:14px;">' + PreosLang.t('offerAcceptedMsg') + '</div>';
     }
 
     var canWithdraw = (agentSt === 'pending' || agentSt === 'nuevo');
     var withdrawBtn = canWithdraw
-      ? '<button class="btn-withdraw" data-id="' + escHtml(o.id) + '">Retirar oferta</button>'
+      ? '<button class="btn-withdraw" data-id="' + escHtml(o.id) + '">' + PreosLang.t('withdrawOffer') + '</button>'
       : '';
 
     card.innerHTML =
       '<div class="offer-card-header">' +
         '<div>' +
           '<div class="offer-prop-title"><a href="propiedad.html?id=' + escHtml(o.propertyId) + '">' + escHtml(propTitle) + '</a></div>' +
-          '<div class="offer-date">Enviada el ' + dateStr + '</div>' +
+          '<div class="offer-date">' + PreosLang.t('offerSentOn') + ' ' + dateStr + '</div>' +
         '</div>' +
         '<span class="status-badge ' + stInfo.cls + '">' + stInfo.label + '</span>' +
       '</div>' +
       (counteredBanner || acceptedBanner) +
       '<div class="offer-price">' + price + '</div>' +
       (details.length ? '<div class="offer-details">' + details.join('<span style="color:var(--border);">·</span>') + '</div>' : '') +
-      (o.conditions ? '<div style="font-size:13px;color:#374151;margin-bottom:8px;padding:8px 12px;background:#f9fafb;border-radius:6px;"><span style="font-weight:600;color:#6b7280;">Condiciones: </span>' + escHtml(o.conditions) + '</div>' : '') +
+      (o.conditions ? '<div style="font-size:13px;color:#374151;margin-bottom:8px;padding:8px 12px;background:#f9fafb;border-radius:6px;"><span style="font-weight:600;color:#6b7280;">' + PreosLang.t('offerCondLabel') + ' </span>' + escHtml(o.conditions) + '</div>' : '') +
       (o.coverLetter ? '<div class="offer-letter">"' + escHtml(o.coverLetter.substring(0, 200)) + (o.coverLetter.length > 200 ? '…' : '') + '"</div>' : '') +
       '<div class="offer-actions">' +
-        '<a href="propiedad.html?id=' + escHtml(o.propertyId) + '" class="btn-view-prop">Ver propiedad →</a>' +
+        '<a href="propiedad.html?id=' + escHtml(o.propertyId) + '" class="btn-view-prop">' + PreosLang.t('offerViewProp') + '</a>' +
         withdrawBtn +
       '</div>';
 
@@ -409,6 +409,10 @@
   function escHtml(s) {
     return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+
+  document.addEventListener('preos:langchange', function() {
+    render();
+  });
 
   /* ─── Hamburger ─────────────────────────────────────── */
   var _ham = document.getElementById('hamburger');

@@ -193,8 +193,8 @@
     <!-- Auth gate -->
     <div class="auth-gate" id="auth-gate">
       <div class="auth-gate-icon">🔒</div>
-      <div class="auth-gate-title">Inicia sesión para continuar</div>
-      <div class="auth-gate-sub">Necesitas una cuenta Preos para enviar una oferta.</div>
+      <div class="auth-gate-title" data-i18n="offerAuthTitle">Inicia sesión para continuar</div>
+      <div class="auth-gate-sub" data-i18n="offerAuthSub">Necesitas una cuenta Preos para enviar una oferta.</div>
       <a href="ingresar.html" class="btn-success">Ingresar / Crear cuenta</a>
     </div>
 
@@ -207,7 +207,7 @@
         <span>›</span>
         <a href="#" id="bc-prop-link">Propiedad</a>
         <span>›</span>
-        Iniciar oferta
+        <span data-i18n="offerBreadcrumb">Iniciar oferta</span>
       </div>
 
       <!-- Property strip -->
@@ -247,8 +247,8 @@
 
         <!-- ── Step 1: Price ── -->
         <div class="wizard-step active" id="step-1">
-          <div class="step-title">Precio de oferta</div>
-          <div class="step-subtitle">¿Cuánto quieres ofrecer por esta propiedad?</div>
+          <div class="step-title" data-i18n="offerStep1Title">Precio de oferta</div>
+          <div class="step-subtitle" data-i18n="offerStep1Sub">¿Cuánto quieres ofrecer por esta propiedad?</div>
           <div class="price-display" id="offer-price-display">—</div>
           <div class="asking-ref" id="asking-ref">Precio de venta: —</div>
           <input type="range" id="price-slider" min="0" max="1000000" step="5000" value="0">
@@ -259,24 +259,24 @@
           <div id="price-diff-helper" style="font-size:14px;font-weight:600;margin:8px 0 4px;min-height:20px;text-align:center;"></div>
           <div id="market-price-line" style="font-size:13px;color:#6b7280;text-align:center;margin-bottom:8px;"></div>
           <div class="form-group" style="margin-top:16px;">
-            <label class="form-label" for="price-input">O escribe el importe exacto</label>
+            <label class="form-label" for="price-input" data-i18n="offerExactLabel">O escribe el importe exacto</label>
             <input type="number" id="price-input" class="form-input" placeholder="ej. 280000" min="0" step="1000">
-            <div class="form-error" id="err-price">Por favor introduce un precio válido.</div>
+            <div class="form-error" id="err-price" data-i18n="offerPriceError">Por favor introduce un precio válido.</div>
           </div>
           <div class="btn-row">
-            <button class="btn-back" onclick="window.history.back()">← Volver</button>
-            <button class="btn-next" id="btn-step1-next" onclick="goStep(2)">Siguiente →</button>
+            <button class="btn-back" onclick="window.history.back()" data-i18n="btnGoBack">← Volver</button>
+            <button class="btn-next" id="btn-step1-next" onclick="goStep(2)" data-i18n="btnNext">Siguiente →</button>
           </div>
         </div>
 
         <!-- ── Step 2: Buyer status ── -->
         <div class="wizard-step" id="step-2">
-          <div class="step-title">Tu situación como comprador</div>
-          <div class="step-subtitle">Ayuda al vendedor a entender tu posición.</div>
+          <div class="step-title" data-i18n="offerStep2Title">Tu situación como comprador</div>
+          <div class="step-subtitle" data-i18n="offerStep2Sub">Ayuda al vendedor a entender tu posición.</div>
           <div class="toggle-row">
             <div>
-              <div class="toggle-label">Comprador al contado</div>
-              <div class="toggle-sublabel">No necesito financiación hipotecaria</div>
+              <div class="toggle-label" data-i18n="offerCashLabel">Comprador al contado</div>
+              <div class="toggle-sublabel" data-i18n="offerCashSub">No necesito financiación hipotecaria</div>
             </div>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-cash">
@@ -285,8 +285,8 @@
           </div>
           <div class="toggle-row">
             <div>
-              <div class="toggle-label">Aprobación hipotecaria</div>
-              <div class="toggle-sublabel">Tengo una hipoteca pre-aprobada por el banco</div>
+              <div class="toggle-label" data-i18n="offerMortgLabel">Aprobación hipotecaria</div>
+              <div class="toggle-sublabel" data-i18n="offerMortgSub">Tengo una hipoteca pre-aprobada por el banco</div>
             </div>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-mortgage">
@@ -294,72 +294,73 @@
             </label>
           </div>
           <div class="btn-row">
-            <button class="btn-back" onclick="goStep(1)">← Atrás</button>
-            <button class="btn-next" onclick="goStep(3)">Siguiente →</button>
+            <button class="btn-back" onclick="goStep(1)" data-i18n="btnBack">← Atrás</button>
+            <button class="btn-next" onclick="goStep(3)" data-i18n="btnNext">Siguiente →</button>
           </div>
         </div>
 
         <!-- ── Step 3: Arras + dates ── -->
         <div class="wizard-step" id="step-3">
-          <div class="step-title">Arras y plazos</div>
-          <div class="step-subtitle">Define los términos económicos y temporales de tu oferta.</div>
+          <div class="step-title" data-i18n="offerStep3Title">Arras y plazos</div>
+          <div class="step-subtitle" data-i18n="offerStep3Sub">Define los términos económicos y temporales de tu oferta.</div>
           <div class="form-group">
             <div class="price-display" id="arras-pct-display">10%</div>
-            <div class="asking-ref" id="arras-amount-display">Calculando…</div>
+            <div class="asking-ref" id="arras-amount-display" data-i18n="arrasCalculating">Calculando…</div>
             <input type="range" id="arras-pct-slider" min="5" max="20" step="1" value="10">
             <div class="range-labels">
               <span>5%</span>
               <span>20%</span>
             </div>
             <div id="arras-diff-helper" style="font-size:14px;font-weight:600;margin:8px 0 4px;min-height:20px;text-align:center;"></div>
-            <div style="font-size:13px;color:#6b7280;text-align:center;margin-bottom:8px;">
+            <div style="font-size:13px;color:#6b7280;text-align:center;margin-bottom:8px;" data-i18n="arrasHint">
               💡 Lo habitual en España es el 10% del precio de oferta
             </div>
             <input type="hidden" id="arras-amount" value="0">
           </div>
           <div class="form-group">
-            <label class="form-label" for="arras-date">Fecha de firma de arras</label>
+            <label class="form-label" for="arras-date" data-i18n="arrasDateLabel">Fecha de firma de arras</label>
             <input type="date" id="arras-date" class="form-input">
-            <div class="date-helper">💡 Mínimo 7 días — recomendamos al menos 2 semanas para preparar la documentación</div>
+            <div class="date-helper" data-i18n="arrasDateHint">💡 Mínimo 7 días — recomendamos al menos 2 semanas para preparar la documentación</div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="closing-date">Fecha estimada de cierre (escritura)</label>
+            <label class="form-label" for="closing-date" data-i18n="closingDateLabel">Fecha estimada de cierre (escritura)</label>
             <input type="date" id="closing-date" class="form-input">
-            <div class="date-helper">💡 Mínimo 30 días desde las arras — recomendamos 45–60 días para tramitar hipoteca y notaría</div>
+            <div class="date-helper" data-i18n="closingDateHint">💡 Mínimo 30 días desde las arras — recomendamos 45–60 días para tramitar hipoteca y notaría</div>
           </div>
           <div class="btn-row">
-            <button class="btn-back" onclick="goStep(2)">← Atrás</button>
-            <button class="btn-next" onclick="goStep(4)">Siguiente →</button>
+            <button class="btn-back" onclick="goStep(2)" data-i18n="btnBack">← Atrás</button>
+            <button class="btn-next" onclick="goStep(4)" data-i18n="btnNext">Siguiente →</button>
           </div>
         </div>
 
         <!-- ── Step 4: Cover letter ── -->
         <div class="wizard-step" id="step-4">
-          <div class="step-title">Carta de presentación</div>
-          <div class="step-subtitle">Opcional — explica al vendedor por qué eres el comprador ideal.</div>
+          <div class="step-title" data-i18n="offerStep4Title">Carta de presentación</div>
+          <div class="step-subtitle" data-i18n="offerStep4Sub">Opcional — explica al vendedor por qué eres el comprador ideal.</div>
           <div class="form-group">
-            <label class="form-label" for="cover-letter">Tu mensaje para el vendedor</label>
-            <textarea id="cover-letter" class="form-input" rows="6" maxlength="600" placeholder="Hola, somos una familia con dos hijos buscando nuestra primera vivienda en Marbella…" style="resize:vertical;"></textarea>
+            <label class="form-label" for="cover-letter" data-i18n="coverLetterLabel">Tu mensaje para el vendedor</label>
+            <textarea id="cover-letter" class="form-input" rows="6" maxlength="600" placeholder="Hola, somos una familia con dos hijos buscando nuestra primera vivienda en Marbella…" data-i18n-placeholder="coverLetterPh" style="resize:vertical;"></textarea>
             <div style="text-align:right;font-size:12px;color:var(--muted);margin-top:4px;"><span id="char-count">0</span>/600</div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="conditions">Condiciones adicionales (opcional)</label>
-            <textarea id="conditions" class="form-input" rows="3" maxlength="300" placeholder="Sujeto a inspección técnica del edificio…" style="resize:vertical;"></textarea>
+            <label class="form-label" for="conditions" data-i18n="conditionsLabel">Condiciones adicionales (opcional)</label>
+            <textarea id="conditions" class="form-input" rows="3" maxlength="300" placeholder="Sujeto a inspección técnica del edificio…" data-i18n-placeholder="conditionsPh" style="resize:vertical;"></textarea>
           </div>
           <div class="btn-row">
-            <button class="btn-back" onclick="goStep(3)">← Atrás</button>
-            <button class="btn-next" onclick="goStep(5)">Revisar oferta →</button>
+            <button class="btn-back" onclick="goStep(3)" data-i18n="btnBack">← Atrás</button>
+            <button class="btn-next" onclick="goStep(5)" data-i18n="btnReviewOffer">Revisar oferta →</button>
           </div>
         </div>
 
         <!-- ── Step 5: Confirm ── -->
         <div class="wizard-step" id="step-5">
-          <div class="step-title">Confirma tu oferta</div>
-          <div class="step-subtitle">Revisa los detalles antes de enviar. Podrás retirar la oferta desde <a href="mis-ofertas.html" style="color:var(--red);">Mis ofertas</a>.</div>
+          <div class="step-title" data-i18n="offerStep5Title">Confirma tu oferta</div>
+          <div class="step-subtitle" data-i18n="offerStep5Sub">Revisa los detalles antes de enviar. Podrás retirar la oferta desde</div>
+          <div style="font-size:14px;color:var(--muted);margin-top:-20px;margin-bottom:28px;"><a href="mis-ofertas.html" style="color:var(--red);">Mis ofertas</a>.</div>
           <div id="summary-rows"></div>
           <div class="btn-row">
-            <button class="btn-back" onclick="goStep(4)">← Editar</button>
-            <button class="btn-next" id="btn-submit" onclick="submitOffer()">Enviar oferta</button>
+            <button class="btn-back" onclick="goStep(4)" data-i18n="btnEditOffer">← Editar</button>
+            <button class="btn-next" id="btn-submit" onclick="submitOffer()" data-i18n="btnSubmitOffer">Enviar oferta</button>
           </div>
           <div class="form-error" id="err-submit" style="margin-top:12px;"></div>
         </div>
@@ -369,10 +370,10 @@
       <!-- Success screen -->
       <div class="success-wrap" id="success-wrap">
         <div class="success-icon">🎉</div>
-        <div class="success-title">¡Oferta enviada!</div>
-        <div class="success-subtitle">Tu oferta ha sido enviada al agente. Te notificaremos cuando haya novedades.</div>
-        <a href="mis-ofertas.html" class="btn-success">Ver mis ofertas</a>
-        <a href="buscar.html" class="btn-success-outline">Seguir buscando</a>
+        <div class="success-title" data-i18n="offerSuccessTitle">¡Oferta enviada!</div>
+        <div class="success-subtitle" data-i18n="offerSuccessSub">Tu oferta ha sido enviada al agente. Te notificaremos cuando haya novedades.</div>
+        <a href="mis-ofertas.html" class="btn-success" data-i18n="btnViewMyOffers">Ver mis ofertas</a>
+        <a href="buscar.html" class="btn-success-outline" data-i18n="btnKeepBrowsing">Seguir buscando</a>
       </div>
 
     </div><!-- #wizard-content -->
@@ -425,7 +426,7 @@
       if (!p) {
         document.getElementById('wizard-content').style.display = 'block';
         document.querySelector('.breadcrumb').innerHTML = '<a href="buscar.html">← Volver a buscar</a>';
-        document.querySelector('.wizard-card').innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);">Propiedad no encontrada.</div>';
+        document.querySelector('.wizard-card').innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);">' + PreosLang.t('propNotFound') + '</div>';
         return;
       }
       _prop = p;
@@ -444,9 +445,9 @@
             var latest = cityData.pricePerM2[cityData.pricePerM2.length - 1];
             var el = document.getElementById('market-price-line');
             if (el && latest) {
-              el.textContent = 'Precio medio en ' + (_prop.city || _prop.location)
+              el.textContent = PreosLang.t('offerMarketPrice') + ' ' + (_prop.city || _prop.location)
                 + ': €' + latest.price.toLocaleString('es-ES') + '/m²'
-                + ' (Fuente: Notariado)';
+                + ' (' + PreosLang.t('offerMarketSrc') + ')';
             }
           }
         })
@@ -486,7 +487,7 @@
 
     document.getElementById('slider-min').textContent = formatPrice(min);
     document.getElementById('slider-max').textContent = formatPrice(max);
-    document.getElementById('asking-ref').textContent = 'Precio de venta: ' + formatPrice(price);
+    document.getElementById('asking-ref').textContent = PreosLang.t('offerAskingRef') + ' ' + formatPrice(price);
 
     updatePriceDisplay(def);
 
@@ -515,16 +516,16 @@
     document.getElementById('arras-amount').value = arrasAmount;
     document.getElementById('arras-pct-display').textContent = pct + '%';
     document.getElementById('arras-amount-display').textContent =
-      '€' + arrasAmount.toLocaleString('es-ES') + ' de arras';
+      '€' + arrasAmount.toLocaleString('es-ES') + ' ' + PreosLang.t('arrasOf');
     var diff = pct - 10;
     var helperEl = document.getElementById('arras-diff-helper');
     if (helperEl) {
       if (diff === 0) {
-        helperEl.textContent = 'Igual al 10% recomendado';
+        helperEl.textContent = PreosLang.t('arrasEqualRec');
         helperEl.style.color = '#6b7280';
       } else {
-        helperEl.textContent = (diff > 0 ? '+' : '') + diff + ' puntos '
-          + (diff > 0 ? 'por encima' : 'por debajo') + ' del 10% recomendado';
+        helperEl.textContent = (diff > 0 ? '+' : '') + diff + ' '
+          + (diff > 0 ? PreosLang.t('arrasAboveRec') : PreosLang.t('arrasBelowRec'));
         helperEl.style.color = diff > 0 ? '#E51B27' : '#16a34a';
       }
     }
@@ -539,8 +540,8 @@
     var sign = diff >= 0 ? '+' : '';
     var color = diff > 0 ? '#E51B27' : diff < 0 ? '#16a34a' : '#6b7280';
     var msg = diff === 0
-      ? 'Igual al precio de salida'
-      : sign + pct + '% ' + (diff > 0 ? 'por encima' : 'por debajo') + ' del precio de salida';
+      ? PreosLang.t('offerEqualAsking')
+      : sign + pct + '% ' + (diff > 0 ? PreosLang.t('offerAboveAsking') : PreosLang.t('offerBelowAsking'));
     var helperEl = document.getElementById('price-diff-helper');
     if (helperEl) { helperEl.textContent = msg; helperEl.style.color = color; }
     updateArrasSlider();
@@ -674,35 +675,35 @@
     var letter       = letterEl ? letterEl.value.trim() : '';
 
     var rows = [
-      ['Propiedad',        propTitle],
-      ['Precio de oferta', formatPrice(price)],
-      ['Situación',        isCash ? 'Comprador al contado' : hasMortg ? 'Hipoteca aprobada' : 'Pendiente de financiación'],
-      ['Arras',            arrasAmt ? (document.getElementById('arras-pct-slider').value + '% — ' + formatPrice(parseInt(arrasAmt))) : 'No especificado'],
-      ['Fecha arras',      arrasDate || 'No especificada'],
-      ['Fecha cierre',     closeDate || 'No especificada']
+      [PreosLang.t('summaryProperty'),    propTitle],
+      [PreosLang.t('offerPrice'),         formatPrice(price)],
+      [PreosLang.t('summaryBuyerStatus'), isCash ? PreosLang.t('summaryCash') : hasMortg ? PreosLang.t('summaryMortgApproved') : PreosLang.t('summaryFinancingTBD')],
+      [PreosLang.t('summaryArras'),       arrasAmt ? (document.getElementById('arras-pct-slider').value + '% — ' + formatPrice(parseInt(arrasAmt))) : PreosLang.t('notSpecified')],
+      [PreosLang.t('summaryArrasDate'),   arrasDate || PreosLang.t('notSpecified')],
+      [PreosLang.t('summaryClosingDate'), closeDate || PreosLang.t('notSpecified')]
     ];
 
     var html = '';
     rows.forEach(function(r) {
-      var valClass = r[0] === 'Precio de oferta' ? 'summary-val summary-price' : 'summary-val';
+      var valClass = r[0] === PreosLang.t('offerPrice') ? 'summary-val summary-price' : 'summary-val';
       html += '<div class="summary-row"><span class="summary-key">' + r[0] + '</span><span class="' + valClass + '">' + escHtml(r[1]) + '</span></div>';
     });
     if (conditions) {
       html += '<div class="summary-row summary-row-full">'
-        + '<span class="summary-key">Condiciones adicionales</span>'
+        + '<span class="summary-key">' + PreosLang.t('summaryConditions') + '</span>'
         + '<span class="summary-val"><em>' + escHtml(conditions) + '</em></span>'
         + '</div>';
     }
     if (letter) {
       html += '<div class="summary-row summary-row-full">'
-        + '<span class="summary-key">Carta al vendedor</span>'
+        + '<span class="summary-key">' + PreosLang.t('summaryCoverLetter') + '</span>'
         + '<span class="summary-val" style="font-style:italic;color:#374151;">'
         + '&ldquo;' + escHtml(letter) + '&rdquo;'
         + '</span>'
         + '</div>';
     } else {
-      html += '<div class="summary-row"><span class="summary-key">Carta al vendedor</span>'
-        + '<span class="summary-val" style="color:#9ca3af;">Sin carta</span></div>';
+      html += '<div class="summary-row"><span class="summary-key">' + PreosLang.t('summaryCoverLetter') + '</span>'
+        + '<span class="summary-val" style="color:#9ca3af;">' + PreosLang.t('summaryNoLetter') + '</span></div>';
     }
     document.getElementById('summary-rows').innerHTML = html;
   }
@@ -712,7 +713,7 @@
     if (!_user) { window.location.href = 'ingresar.html'; return; }
     var btn = document.getElementById('btn-submit');
     btn.disabled = true;
-    btn.textContent = 'Enviando…';
+    btn.textContent = PreosLang.t('btnSubmitting');
 
     var offerData = {
       propertyId:          _propId,
@@ -754,9 +755,9 @@
       })
       .catch(function(err) {
         btn.disabled = false;
-        btn.textContent = 'Enviar oferta';
+        btn.textContent = PreosLang.t('btnSubmitOffer');
         var errEl = document.getElementById('err-submit');
-        errEl.textContent = 'Error al enviar la oferta. Por favor inténtalo de nuevo.';
+        errEl.textContent = PreosLang.t('offerSubmitError');
         errEl.classList.add('show');
         console.error('Offer submit error:', err);
       });
@@ -771,6 +772,14 @@
       _menu.classList.toggle('open');
     });
   }
+
+  document.addEventListener('preos:langchange', function() {
+    if (_prop) {
+      updatePriceDisplay(getOfferPrice());
+      updateArrasSlider();
+    }
+    if (_currentStep === 5) buildSummary();
+  });
 </script>
 </body>
 </html>

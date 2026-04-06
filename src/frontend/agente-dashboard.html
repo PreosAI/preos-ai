@@ -769,8 +769,8 @@
 
   /* ─── Build lead card ────────────────────────────────────── */
   var PIPELINE_LABELS = {
-    nuevo: 'Nuevo', contactado: 'Contactado', visita: 'Visita programada',
-    oferta: 'Oferta enviada', cerrado: 'Cerrado ✓'
+    nuevo: PreosLang.t('crmPipelineNew'), contactado: PreosLang.t('crmPipelineContacted'), visita: PreosLang.t('crmPipelineVisit'),
+    oferta: PreosLang.t('crmPipelineOffer'), cerrado: PreosLang.t('crmPipelineClosed') + ' ✓'
   };
 
   function buildLeadCard(booking, inNuevosSection) {
@@ -848,7 +848,7 @@
           '<div>' +
             '<div class="lead-meta-label">Notas</div>' +
             '<div class="notes-wrap">' +
-              '<textarea class="notes-textarea" placeholder="Notas sobre este lead...">' + (booking.agentNotes || '') + '</textarea>' +
+              '<textarea class="notes-textarea" placeholder="' + PreosLang.t('crmNotesPh') + '">' + (booking.agentNotes || '') + '</textarea>' +
               '<span class="notes-saved" style="display:none;">Guardado ✓</span>' +
             '</div>' +
           '</div>' +
@@ -921,7 +921,7 @@
     var phoneDigits = (lead.phone || '').replace(/\D/g,'');
     var waMsg = encodeURIComponent('Hola ' + (lead.name || '') + ', soy agente de Preos. He recibido tu solicitud de valoración y me gustaría hablar contigo.');
 
-    var PIPELINE_LABELS = { nuevo:'Nuevo', contactado:'Contactado', visita:'Visita programada', oferta:'Oferta enviada', cerrado:'Cerrado ✓' };
+    var PIPELINE_LABELS = { nuevo: PreosLang.t('crmPipelineNew'), contactado: PreosLang.t('crmPipelineContacted'), visita: PreosLang.t('crmPipelineVisit'), oferta: PreosLang.t('crmPipelineOffer'), cerrado: PreosLang.t('crmPipelineClosed') + ' ✓' };
 
     card.innerHTML =
       '<div class="lead-card-top">' +
@@ -1016,11 +1016,11 @@
       ? new Date(oferta.createdAt.seconds * 1000).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
       : '—';
     var statusBadge = {
-      nuevo: '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Nueva</span>',
-      revisando: '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Revisando</span>',
-      aceptada: '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Aceptada</span>',
-      contraoferta: '<span style="background:#ede9fe;color:#5b21b6;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Contraoferta</span>',
-      rechazada: '<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">Rechazada</span>'
+      nuevo: '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' + PreosLang.t('crmOfferStatusNew') + '</span>',
+      revisando: '<span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' + PreosLang.t('crmOfferStatusReviewed') + '</span>',
+      aceptada: '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' + PreosLang.t('crmOfferStatusAccepted') + '</span>',
+      contraoferta: '<span style="background:#ede9fe;color:#5b21b6;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' + PreosLang.t('offerCountered') + '</span>',
+      rechazada: '<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' + PreosLang.t('crmOfferStatusRejected') + '</span>'
     }[oferta.agentStatus || 'nuevo'] || '';
 
     var price = oferta.offerPrice ? Number(oferta.offerPrice).toLocaleString('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }) : '—';
@@ -1051,10 +1051,10 @@
           '<a href="propiedad.html?id=' + oferta.propertyId + '" target="_blank" style="font-weight:600;color:var(--red);text-decoration:none;max-width:60%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (oferta.propertyTitle || propTitle) + '</a>' +
         '</div>' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
-          '<span style="color:#6b7280;">Precio salida</span><strong>' + askingFmt + '</strong>' +
+          '<span style="color:#6b7280;">' + PreosLang.t('crmLabelAskingPrice') + '</span><strong>' + askingFmt + '</strong>' +
         '</div>' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
-          '<span style="color:#6b7280;">Oferta</span>' +
+          '<span style="color:#6b7280;">' + PreosLang.t('crmLabelOffer') + '</span>' +
           '<strong style="color:var(--red);">' + price + (offerPct ? ' <span style="font-weight:400;color:#6b7280;">(' + offerPct + '%)</span>' : '') + '</strong>' +
         '</div>' +
         (oferta.listingAgencyName && oferta.listingAgencyName !== 'Preos'
@@ -1068,17 +1068,17 @@
       '<div style="background:#f9fafb;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;">' +
         '<div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.06em;margin-bottom:6px;">TÉRMINOS DE OFERTA</div>' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
-          '<span style="color:#6b7280;">Arras</span>' +
+          '<span style="color:#6b7280;">' + PreosLang.t('crmLabelArras') + '</span>' +
           '<strong>' + (oferta.arrasAmount ? '€' + Number(oferta.arrasAmount).toLocaleString('es-ES') : '—') + '</strong>' +
         '</div>' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
-          '<span style="color:#6b7280;">Fecha arras</span><span>' + (oferta.arrasDate || '—') + '</span>' +
+          '<span style="color:#6b7280;">' + PreosLang.t('crmLabelArrasDate') + '</span><span>' + (oferta.arrasDate || '—') + '</span>' +
         '</div>' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
-          '<span style="color:#6b7280;">Fecha cierre</span><span>' + (oferta.closingDate || '—') + '</span>' +
+          '<span style="color:#6b7280;">' + PreosLang.t('crmLabelClosing') + '</span><span>' + (oferta.closingDate || '—') + '</span>' +
         '</div>' +
         '<div style="display:flex;justify-content:space-between;">' +
-          '<span style="color:#6b7280;">Condiciones</span><span>' + buyerStatus + '</span>' +
+          '<span style="color:#6b7280;">' + PreosLang.t('crmLabelConditions') + '</span><span>' + buyerStatus + '</span>' +
         '</div>' +
         (oferta.conditions
           ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;">' +
@@ -1131,42 +1131,42 @@
               '</div>';
           }
         } else {
-          html += '<div style="color:#6b7280;font-size:12px;margin-bottom:8px;">Agente vendedor no identificado aún — disponible cuando se integre el MLS (Resales Online)</div>';
+          html += '<div style="color:#6b7280;font-size:12px;margin-bottom:8px;">' + PreosLang.t('crmOfferNoAgent') + '</div>';
         }
 
         html +=
           '<div style="margin-top:8px;">' +
-            '<label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Nota adicional para el agente vendedor (opcional):</label>' +
-            '<textarea class="notes-textarea" id="seller-note-' + oferta.id + '" placeholder="Añade cualquier nota adicional antes de enviar..." style="min-height:60px;"></textarea>' +
+            '<label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">' + PreosLang.t('crmOfferAgentNote') + '</label>' +
+            '<textarea class="notes-textarea" id="seller-note-' + oferta.id + '" placeholder="' + PreosLang.t('crmOfferAgentNotePh') + '" style="min-height:60px;"></textarea>' +
           '</div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">';
 
         if (oferta.listingAgentPhone) {
           var phoneDigits = (oferta.listingAgentPhone || '').replace(/\D/g, '');
           html += '<a href="https://wa.me/' + phoneDigits + '?text=' + encodeURIComponent(offerSummary) + '" '
-            + 'target="_blank" style="font-size:13px;font-weight:600;background:#25d366;color:#fff;border:none;border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap;">💬 WhatsApp</a>';
+            + 'target="_blank" style="font-size:13px;font-weight:600;background:#25d366;color:#fff;border:none;border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap;">💬 ' + PreosLang.t('crmBtnWhatsAppOffer') + '</a>';
         }
         if (oferta.listingAgentEmail) {
           html += '<a href="mailto:' + oferta.listingAgentEmail + '?subject=' + emailSubj + '&body=' + emailBody + '" '
             + 'style="font-size:13px;font-weight:600;background:var(--red-b);color:#fff;border:none;border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;white-space:nowrap;">✉️ Enviar email</a>';
         }
         html += '<button style="font-size:13px;font-weight:600;background:#fff;color:#374151;border:1px solid #e5e7eb;border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;font-family:inherit;" '
-          + 'id="copy-offer-' + oferta.id + '">📋 Copiar oferta</button>';
+          + 'id="copy-offer-' + oferta.id + '">📋 ' + PreosLang.t('crmBtnCopyOffer') + '</button>';
         html += '</div></div>';
         return html;
       })() +
       '<div class="lead-actions">' +
         '<select id="sel-of-' + oferta.id + '" class="pipeline-select">' +
-          '<option value="nuevo"' + ((!oferta.agentStatus || oferta.agentStatus === 'nuevo') ? ' selected' : '') + '>Nueva</option>' +
-          '<option value="revisando"' + (oferta.agentStatus === 'revisando' ? ' selected' : '') + '>Revisando</option>' +
-          '<option value="aceptada"' + (oferta.agentStatus === 'aceptada' ? ' selected' : '') + '>Aceptada</option>' +
-          '<option value="contraoferta"' + (oferta.agentStatus === 'contraoferta' ? ' selected' : '') + '>Contraoferta</option>' +
-          '<option value="rechazada"' + (oferta.agentStatus === 'rechazada' ? ' selected' : '') + '>Rechazada</option>' +
+          '<option value="nuevo"' + ((!oferta.agentStatus || oferta.agentStatus === 'nuevo') ? ' selected' : '') + '>' + PreosLang.t('crmOfferStatusNew') + '</option>' +
+          '<option value="revisando"' + (oferta.agentStatus === 'revisando' ? ' selected' : '') + '>' + PreosLang.t('crmOfferStatusReviewed') + '</option>' +
+          '<option value="aceptada"' + (oferta.agentStatus === 'aceptada' ? ' selected' : '') + '>' + PreosLang.t('crmOfferStatusAccepted') + '</option>' +
+          '<option value="contraoferta"' + (oferta.agentStatus === 'contraoferta' ? ' selected' : '') + '>' + PreosLang.t('offerCountered') + '</option>' +
+          '<option value="rechazada"' + (oferta.agentStatus === 'rechazada' ? ' selected' : '') + '>' + PreosLang.t('crmOfferStatusRejected') + '</option>' +
         '</select>' +
         '<span id="of-saved-' + oferta.id + '" style="display:none;font-size:12px;color:green;margin-left:8px;">✓ Guardado</span>' +
       '</div>' +
       '<div style="margin-top:10px;">' +
-        '<textarea id="of-notes-' + oferta.id + '" class="notes-textarea" placeholder="Notas internas…">' + (oferta.agentNotes || '') + '</textarea>' +
+        '<textarea id="of-notes-' + oferta.id + '" class="notes-textarea" placeholder="' + PreosLang.t('crmInternalNotesPh') + '">' + (oferta.agentNotes || '') + '</textarea>' +
       '</div>';
 
     var select = card.querySelector('#sel-of-' + oferta.id);
@@ -1225,6 +1225,10 @@
 
     return card;
   }
+
+  document.addEventListener('preos:langchange', function() {
+    renderActiveSection();
+  });
 </script>
 <script src="js/analytics.js"></script>
 </body>
