@@ -2013,12 +2013,12 @@
         var el = document.querySelector('.lifestyle-card[data-score-type="' + type + '"] .lifestyle-score');
         if (el) el.textContent = '…';
       });
-      if (window.db && p.id) {
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && p.id) {
         try {
-          var snap = await db.collection('enrichment').doc(p.id).get();
+          var snap = await firebase.firestore().collection('enrichment').doc(p.id).get();
           if (snap.exists) {
             var cached = snap.data();
-            if (cached.nbScores && cached.nbCachedAt && (Date.now() - new Date(cached.nbCachedAt).getTime()) < 0) {
+            if (cached.nbScores && cached.nbCachedAt && (Date.now() - new Date(cached.nbCachedAt).getTime()) < 30 * 24 * 60 * 60 * 1000) {
               applyScores(cached.nbScores); return;
             }
           }
@@ -2033,8 +2033,8 @@
         return;
       }
       applyScores(scores);
-      if (window.db && p.id) {
-        try { await db.collection('enrichment').doc(p.id).set({ nbScores: scores, nbCachedAt: new Date().toISOString() }, { merge: true }); }
+      if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && p.id) {
+        try { await firebase.firestore().collection('enrichment').doc(p.id).set({ nbScores: scores, nbCachedAt: new Date().toISOString() }, { merge: true }); }
         catch(e) { /* ignore */ }
       }
     };
