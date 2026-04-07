@@ -373,8 +373,10 @@
     .climate-card { background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
     .climate-icon { font-size: 28px; margin-bottom: 8px; }
     .climate-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-    .climate-score-badge { display: inline-block; background: #e5e7eb; color: #9ca3af; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
-    .climate-desc { font-size: 11px; color: var(--muted); }
+    .climate-score-badge { display: inline-block; background: #e5e7eb; color: #9ca3af; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; transition: background .3s, color .3s; }
+    .climate-level { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+    .climate-desc { font-size: 11px; color: var(--muted); line-height: 1.45; margin-bottom: 4px; }
+    .climate-source { font-size: 10px; color: #b0b7c3; margin-top: 4px; }
 
     /* ─── COMING SOON ───────────────────────────────────────── */
     .coming-soon-text { font-size: 13px; color: var(--muted); padding: 16px; text-align: center; background: #f9fafb; border-radius: 10px; border: 1px dashed var(--border); }
@@ -1521,38 +1523,47 @@
         <div class="section-title">Riesgos climáticos</div>
 
         <div class="climate-grid">
-          <div class="climate-card">
+          <div class="climate-card" data-risk="flood">
             <div class="climate-icon">💧</div>
-            <div class="climate-name">Inundación</div>
+            <div class="climate-name" data-i18n="climate_flood">Inundación</div>
             <div class="climate-score-badge">—/10</div>
-            <div class="climate-desc">Próximamente</div>
+            <div class="climate-level"></div>
+            <div class="climate-desc"></div>
+            <div class="climate-source"></div>
           </div>
-          <div class="climate-card">
+          <div class="climate-card" data-risk="wildfire">
             <div class="climate-icon">🔥</div>
-            <div class="climate-name">Incendio</div>
+            <div class="climate-name" data-i18n="climate_wildfire">Incendio</div>
             <div class="climate-score-badge">—/10</div>
-            <div class="climate-desc">Próximamente</div>
+            <div class="climate-level"></div>
+            <div class="climate-desc"></div>
+            <div class="climate-source"></div>
           </div>
-          <div class="climate-card">
+          <div class="climate-card" data-risk="heat">
             <div class="climate-icon">🌡️</div>
-            <div class="climate-name">Calor</div>
+            <div class="climate-name" data-i18n="climate_heat">Calor</div>
             <div class="climate-score-badge">—/10</div>
-            <div class="climate-desc">Próximamente</div>
+            <div class="climate-level"></div>
+            <div class="climate-desc"></div>
+            <div class="climate-source"></div>
           </div>
-          <div class="climate-card">
+          <div class="climate-card" data-risk="wind">
             <div class="climate-icon">💨</div>
-            <div class="climate-name">Viento</div>
+            <div class="climate-name" data-i18n="climate_wind">Viento</div>
             <div class="climate-score-badge">—/10</div>
-            <div class="climate-desc">Próximamente</div>
+            <div class="climate-level"></div>
+            <div class="climate-desc"></div>
+            <div class="climate-source"></div>
           </div>
-          <div class="climate-card">
+          <div class="climate-card" data-risk="air">
             <div class="climate-icon">🌫️</div>
-            <div class="climate-name">Calidad del aire</div>
+            <div class="climate-name" data-i18n="climate_air">Calidad del aire</div>
             <div class="climate-score-badge">—/10</div>
-            <div class="climate-desc">Próximamente</div>
+            <div class="climate-level"></div>
+            <div class="climate-desc"></div>
+            <div class="climate-source"></div>
           </div>
         </div>
-        <p style="font-size:11px;color:var(--muted);margin-top:14px;">AEMET, COPERNICUS · Próximamente</p>
 
       </div>
 
@@ -2222,6 +2233,78 @@ out tags;`;
     }
   }
 
+  // ── Climate risks panel ──────────────────────────────────────────────────────
+
+  async function loadClimateRisks(property) {
+    try {
+      const snap = await firebase.firestore()
+        .collection('enrichment').doc(property.id).get();
+      const climate = snap.exists && snap.data().climate
+                      ? snap.data().climate : null;
+      if (climate) {
+        renderClimateRisks(climate);
+      }
+    } catch(e) {
+      console.warn('[climate] Firestore read failed:', e);
+    }
+  }
+
+  function renderClimateRisks(climate) {
+    // Score → label key map
+    function scoreLabelKey(score) {
+      if (score === null || score === undefined) return 'climate_not_available';
+      if (score <= 2) return 'climate_very_low';
+      if (score <= 3) return 'climate_low';
+      if (score <= 5) return 'climate_medium';
+      if (score <= 7) return 'climate_medium_high';
+      if (score <= 8) return 'climate_high';
+      return 'climate_very_high';
+    }
+
+    // Score → badge colour
+    function scoreColor(score) {
+      if (score === null || score === undefined) return { bg: '#e5e7eb', fg: '#9ca3af' };
+      if (score <= 2) return { bg: '#dcfce7', fg: '#166534' };
+      if (score <= 3) return { bg: '#d1fae5', fg: '#065f46' };
+      if (score <= 5) return { bg: '#fef9c3', fg: '#854d0e' };
+      if (score <= 7) return { bg: '#ffedd5', fg: '#9a3412' };
+      return { bg: '#fee2e2', fg: '#991b1b' };
+    }
+
+    const riskKeys = ['flood', 'wildfire', 'heat', 'wind', 'air'];
+    riskKeys.forEach(function(key) {
+      const card = document.querySelector('[data-risk="' + key + '"]');
+      if (!card) return;
+      const data = climate[key];
+      if (!data) return;
+
+      const badge = card.querySelector('.climate-score-badge');
+      const desc  = card.querySelector('.climate-desc');
+      const detailEl = card.querySelector('.climate-detail');
+      const sourceEl = card.querySelector('.climate-source');
+      const levelEl  = card.querySelector('.climate-level');
+
+      const score = data.score;
+      const col   = scoreColor(score);
+
+      if (badge) {
+        badge.textContent = (score !== null && score !== undefined) ? score + '/10' : '—';
+        badge.style.background = col.bg;
+        badge.style.color      = col.fg;
+      }
+      if (levelEl) {
+        levelEl.textContent = PreosLang.t(scoreLabelKey(score));
+        levelEl.style.color = col.fg;
+      }
+      if (desc) {
+        desc.textContent = data.detail || '';
+      }
+      if (sourceEl) {
+        sourceEl.textContent = data.source ? PreosLang.t('climate_source') + data.source : '';
+      }
+    });
+  }
+
   // ── Load property data from URL param ──────────────────────────
   (async () => {
     const id = new URLSearchParams(window.location.search).get('id') || 'prop-001';
@@ -2384,6 +2467,11 @@ out tags;`;
         if (typeof loadCatastroPanel === 'function') {
           loadCatastroPanel(prop).catch(function(e) {
             console.warn('[catastro] failed:', e);
+          });
+        }
+        if (typeof loadClimateRisks === 'function') {
+          loadClimateRisks(prop).catch(function(e) {
+            console.warn('[climate] failed:', e);
           });
         }
       });
