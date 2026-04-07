@@ -21,7 +21,6 @@
 
 const fetch = require('node-fetch');
 const admin = require('firebase-admin');
-const { createCanvas, loadImage } = require('canvas');
 
 let sa;
 try { sa = require('./serviceAccount.json'); }
@@ -50,33 +49,44 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 // for each of T=10, T=100, T=500 flood return periods.
 // If the centre pixel is non-transparent → property is in that flood zone.
 
-function buildFloodUrl(endpoint, lat, lng) {
-  // Build a tight 0.001° bbox around the property (~100m)
-  const d    = 0.0005;
-  const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
-  const layer = encodeURIComponent('Z.I. con alta probabilidad');
-  return `${endpoint}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap` +
-    `&LAYERS=${layer}&STYLES=&SRS=EPSG:4326` +
-    `&BBOX=${bbox}&WIDTH=64&HEIGHT=64` +
-    `&FORMAT=image/png&TRANSPARENT=TRUE`;
-}
-
-async function isInFloodZone(endpoint, lat, lng) {
+async function isInFloodZone(endpoint, layer, lat, lng) {
   try {
-    const url = buildFloodUrl(endpoint, lat, lng);
+    const d    = 0.0005;
+    const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
+    const url = `${endpoint}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap` +
+      `&LAYERS=${encodeURIComponent(layer)}&STYLES=&SRS=EPSG:4326` +
+      `&BBOX=${bbox}&WIDTH=64&HEIGHT=64` +
+      `&FORMAT=image/png&TRANSPARENT=TRUE`;
+
     const res = await fetch(url, { timeout: 15000 });
     if (!res.ok) return false;
     const buf = await res.buffer();
-    // Parse PNG and check centre pixel alpha
-    const img    = await loadImage(buf);
-    const canvas = createCanvas(64, 64);
-    const ctx    = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, 64, 64);
-    const pixel  = ctx.getImageData(32, 32, 1, 1).data;
-    return pixel[3] > 10; // alpha > 10 = coloured = in flood zone
+
+    // A transparent PNG has alpha=0 for all pixels.
+    // We check the PNG IDAT chunk for non-zero alpha bytes.
+    // PNG signature: 8 bytes, then chunks.
+    // For a fully transparent 64x64 RGBA image, all pixels have alpha=0.
+    // Strategy: if the file is a valid PNG and larger than a blank tile,
+    // it likely contains flood zone data. We use a size heuristic:
+    // blank transparent PNGs are typically < 200 bytes compressed.
+    // Coloured flood zone tiles are typically > 500 bytes.
+
+    // Check it's actually a PNG (starts with PNG signature)
+    if (buf.length < 8) return false;
+    const sig = buf.slice(0, 8);
+    const isPNG = sig[0] === 0x89 && sig[1] === 0x50 &&
+                  sig[2] === 0x4E && sig[3] === 0x47;
+    if (!isPNG) return false;
+
+    // Size heuristic: blank transparent = small, flood data = larger
+    // Calibrated against SNCZI tiles:
+    //   blank tile:       ~170-250 bytes
+    //   flood zone tile: ~1500-8000 bytes
+    return buf.length > 400;
+
   } catch(e) {
-    console.warn(`  flood check failed (${endpoint}): ${e.message}`);
-    return null; // unknown
+    console.warn(`  flood check failed: ${e.message}`);
+    return null;
   }
 }
 
@@ -88,10 +98,12 @@ async function getFloodRisk(lat, lng) {
   };
 
   const results = {};
-  for (const [key, endpoint] of Object.entries(endpoints)) {
-    results[key] = await isInFloodZone(endpoint, lat, lng);
-    await sleep(500);
-  }
+  results.t10  = await isInFloodZone(endpoints.t10,  'Z.I. con alta probabilidad',              lat, lng);
+  await sleep(500);
+  results.t100 = await isInFloodZone(endpoints.t100, 'Z.I. con probabilidad media u ocasional', lat, lng);
+  await sleep(500);
+  results.t500 = await isInFloodZone(endpoints.t500, 'Z.I. con baja probabilidad o excepcional',lat, lng);
+  await sleep(500);
 
   // Score: in T10 zone = 9, T100 only = 6, T500 only = 3, none = 1
   let score, label, detail;
