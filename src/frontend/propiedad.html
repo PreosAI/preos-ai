@@ -2240,71 +2240,72 @@ out tags;`;
       const snap = await firebase.firestore()
         .collection('enrichment').doc(property.id).get();
       const climate = snap.exists && snap.data().climate
-                      ? snap.data().climate : null;
-      if (climate) {
-        renderClimateRisks(climate);
-      }
+        ? snap.data().climate : null;
+      if (!climate) return;
+      renderClimateRisks(climate);
     } catch(e) {
-      console.warn('[climate] Firestore read failed:', e);
+      console.warn('[climate]', e.message);
     }
   }
 
   function renderClimateRisks(climate) {
-    // Score → label key map
-    function scoreLabelKey(score) {
-      if (score === null || score === undefined) return 'climate_not_available';
-      if (score <= 2) return 'climate_very_low';
-      if (score <= 3) return 'climate_low';
-      if (score <= 5) return 'climate_medium';
-      if (score <= 7) return 'climate_medium_high';
-      if (score <= 8) return 'climate_high';
-      return 'climate_very_high';
-    }
-
-    // Score → badge colour
-    function scoreColor(score) {
-      if (score === null || score === undefined) return { bg: '#e5e7eb', fg: '#9ca3af' };
-      if (score <= 2) return { bg: '#dcfce7', fg: '#166534' };
-      if (score <= 3) return { bg: '#d1fae5', fg: '#065f46' };
-      if (score <= 5) return { bg: '#fef9c3', fg: '#854d0e' };
-      if (score <= 7) return { bg: '#ffedd5', fg: '#9a3412' };
-      return { bg: '#fee2e2', fg: '#991b1b' };
-    }
-
-    const risks = [
-      { key: 'flood' }, { key: 'wildfire' }, { key: 'heat' },
-      { key: 'wind'  }, { key: 'air'      }
-    ];
     const cardEls = document.querySelectorAll('.climate-card');
+    const risks = [
+      { key: 'flood',    nameKey: 'climate_flood',    data: climate.flood    },
+      { key: 'wildfire', nameKey: 'climate_wildfire',  data: climate.wildfire },
+      { key: 'heat',     nameKey: 'climate_heat',      data: climate.heat     },
+      { key: 'wind',     nameKey: 'climate_wind',      data: climate.wind     },
+      { key: 'air',      nameKey: 'climate_air',       data: climate.air      }
+    ];
+
+    function riskColour(score) {
+      if (!score) return '#9E9E9E';
+      if (score >= 8) return '#B71C1C';
+      if (score >= 6) return '#E64A19';
+      if (score >= 4) return '#F57F17';
+      if (score >= 2) return '#388E3C';
+      return '#1565C0';
+    }
+
+    function riskLevelKey(score) {
+      if (!score) return 'climate_not_available';
+      if (score >= 8) return 'climate_very_high';
+      if (score >= 6) return 'climate_high';
+      if (score >= 5) return 'climate_medium_high';
+      if (score >= 3) return 'climate_medium';
+      if (score >= 2) return 'climate_low';
+      return 'climate_very_low';
+    }
+
     risks.forEach(function(risk, i) {
       const card = cardEls[i];
-      if (!card) return;
-      const data = climate[risk.key];
-      if (!data) return;
+      if (!card || !risk.data) return;
 
-      const badge    = card.querySelector('.climate-score-badge');
-      const desc     = card.querySelector('.climate-desc');
-      const sourceEl = card.querySelector('.climate-source');
-      const levelEl  = card.querySelector('.climate-level');
+      const score  = risk.data.score;
+      const colour = riskColour(score);
+      const level  = PreosLang.t(riskLevelKey(score));
 
-      const score = data.score;
-      const col   = scoreColor(score);
-
+      const badge = card.querySelector('.climate-score-badge');
       if (badge) {
-        badge.textContent = (score !== null && score !== undefined) ? score + '/10' : '—';
-        badge.style.background = col.bg;
-        badge.style.color      = col.fg;
+        badge.textContent = score !== null ? score + '/10' : '—';
+        badge.style.background = colour;
+        badge.style.color = '#fff';
       }
-      if (levelEl) {
-        levelEl.textContent = PreosLang.t(scoreLabelKey(score));
-        levelEl.style.color = col.fg;
-      }
+
+      const desc = card.querySelector('.climate-desc');
       if (desc) {
-        desc.textContent = data.detail || '';
+        desc.innerHTML =
+          '<span class="climate-level" style="font-weight:600;color:' +
+          colour + '">' + level + '</span>' +
+          '<br><span class="climate-detail">' +
+          (risk.data.detail || '') + '</span>' +
+          '<br><small class="climate-source" style="color:#aaa;">' +
+          PreosLang.t('climate_source') +
+          (risk.data.source || '') + '</small>';
       }
-      if (sourceEl) {
-        sourceEl.textContent = data.source ? PreosLang.t('climate_source') + data.source : '';
-      }
+
+      const name = card.querySelector('.climate-name');
+      if (name) name.textContent = PreosLang.t(risk.nameKey);
     });
   }
 
