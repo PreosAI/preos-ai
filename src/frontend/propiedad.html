@@ -1366,7 +1366,6 @@
           <div class="details-section" style="grid-column: span 2;">
             <div class="details-section-header">Información legal y energética</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr;">
-              <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Referencia catastral</span><span class="details-row-value">9872023VK4897S</span></div>
               <div class="details-row"><span class="details-row-label">Tipo de inmueble</span><span class="details-row-value">Piso</span></div>
               <div class="details-row" style="border-right: 1px solid var(--border);"><span class="details-row-label">Régimen</span><span class="details-row-value">Libre</span></div>
               <div class="details-row"><span class="details-row-label">Estado</span><span class="details-row-value">Bueno</span></div>
@@ -2099,55 +2098,56 @@ out tags;`;
       const cat = snap.exists && snap.data().catastro
                   ? snap.data().catastro : null;
 
-      if (!cat || !cat.refcat) {
+      if (!cat || !cat.best_refcat) {
         body.innerHTML = `<p class="catastro-not-found">
           ${PreosLang.t('catastro_not_found')}</p>`;
         return;
       }
 
-      // Address match check
-      const catAddr  = (cat.address  || '').toUpperCase();
-      const propAddr = (property.address || property.location || '').toUpperCase();
-      const hasMatch = catAddr.length > 0;
-      const matchLabel = hasMatch
-        ? PreosLang.t('catastro_address_match')
-        : '';
+      const confidenceConfig = {
+        verified:   { icon: '✅', label: PreosLang.t('cat_verified'),   color: '#2E7D32' },
+        high:       { icon: '🟢', label: PreosLang.t('cat_high'),       color: '#388E3C' },
+        medium:     { icon: '🟡', label: PreosLang.t('cat_medium'),     color: '#F57F17' },
+        low:        { icon: '🔴', label: PreosLang.t('cat_low'),        color: '#C62828' },
+        unverified: { icon: '⚠️', label: PreosLang.t('cat_unverified'), color: '#E65100' },
+        gps_only:   { icon: '📍', label: PreosLang.t('cat_gps_only'),   color: '#1565C0' }
+      };
+      const conf = confidenceConfig[cat.confidence] || confidenceConfig.gps_only;
 
       body.innerHTML = `
         <div class="catastro-grid">
           <div class="catastro-row">
             <span class="catastro-label"
-                  data-i18n="catastro_refcat">
-              Referencia
-            </span>
+                  data-i18n="catastro_refcat">Referencia</span>
             <span class="catastro-value catastro-refcat-value">
-              <code>${cat.refcat}</code>
+              <code>${cat.best_refcat}</code>
               <button class="catastro-copy-btn"
-                      onclick="navigator.clipboard.writeText('${cat.refcat}')
-                        .then(() => this.textContent = '✅')
-                        .catch(() => {}); this.textContent = '📋';"
-                      title="Copiar referencia">
+                title="Copiar"
+                onclick="navigator.clipboard.writeText('${cat.best_refcat}')
+                  .then(()=>this.textContent='✅')
+                  .catch(()=>{});
+                  setTimeout(()=>this.textContent='📋',2000);">
                 📋
               </button>
             </span>
           </div>
+          ${cat.address_catastro ? `
           <div class="catastro-row">
             <span class="catastro-label"
-                  data-i18n="catastro_address">
-              Dirección oficial
-            </span>
-            <span class="catastro-value">
-              ${cat.address || PreosLang.t('catastro_not_found')}
+                  data-i18n="catastro_address">Dirección oficial</span>
+            <span class="catastro-value">${cat.address_catastro}</span>
+          </div>` : ''}
+          <div class="catastro-row">
+            <span class="catastro-label"
+                  data-i18n="catastro_confidence">Verificación</span>
+            <span class="catastro-confidence-badge"
+                  style="color:${conf.color};font-size:13px;font-weight:500;">
+              ${conf.icon} ${conf.label}
             </span>
           </div>
-          ${matchLabel ? `
-          <div class="catastro-row catastro-match-row">
-            <span class="catastro-match-label">${matchLabel}</span>
-          </div>` : ''}
           <div class="catastro-row catastro-link-row">
-            <a href="${cat.url}"
-               target="_blank"
-               rel="noopener noreferrer"
+            <a href="${cat.best_refcat_url}"
+               target="_blank" rel="noopener noreferrer"
                class="catastro-link"
                data-i18n="catastro_link">
               Ver ficha en Catastro →
