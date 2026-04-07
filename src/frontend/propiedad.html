@@ -2271,16 +2271,19 @@ out tags;`;
       return { bg: '#fee2e2', fg: '#991b1b' };
     }
 
-    const riskKeys = ['flood', 'wildfire', 'heat', 'wind', 'air'];
-    riskKeys.forEach(function(key) {
-      const card = document.querySelector('[data-risk="' + key + '"]');
+    const risks = [
+      { key: 'flood' }, { key: 'wildfire' }, { key: 'heat' },
+      { key: 'wind'  }, { key: 'air'      }
+    ];
+    const cardEls = document.querySelectorAll('.climate-card');
+    risks.forEach(function(risk, i) {
+      const card = cardEls[i];
       if (!card) return;
-      const data = climate[key];
+      const data = climate[risk.key];
       if (!data) return;
 
-      const badge = card.querySelector('.climate-score-badge');
-      const desc  = card.querySelector('.climate-desc');
-      const detailEl = card.querySelector('.climate-detail');
+      const badge    = card.querySelector('.climate-score-badge');
+      const desc     = card.querySelector('.climate-desc');
       const sourceEl = card.querySelector('.climate-source');
       const levelEl  = card.querySelector('.climate-level');
 
