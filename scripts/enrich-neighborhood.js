@@ -131,12 +131,12 @@ out tags;`;
   console.log(`  counts: walk=${c.walk} transit=${c.transit} bike=${c.bike} noise=${c.noise} wellness=${c.wellness} green=${c.green}`);
 
   return {
-    walkability: norm(c.walk,     25),
-    transit:     norm(c.transit,  15),
-    bike:        norm(c.bike,     10),
-    noise:       normInv(c.noise,  4),
-    wellness:    norm(c.wellness,  8),
-    green:       norm(c.green,     6),
+    walkability: norm(c.walk,     250),
+    transit:     norm(c.transit,   35),
+    bike:        norm(c.bike,      25),
+    noise:       normInv(c.noise,  30),
+    wellness:    norm(c.wellness, 260),
+    green:       norm(c.green,    125),
     cachedAt:    new Date().toISOString()
   };
 }
