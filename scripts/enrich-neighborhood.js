@@ -145,17 +145,22 @@ out tags;`;
 async function main() {
   console.log(`\nPreos neighborhood enrichment — ${PROPERTIES.length} properties\n`);
 
+  const force = process.argv.includes('--force');
+  console.log(force ? '⚡ Force mode — re-enriching all properties' : '📦 Normal mode — skipping fresh cache');
+
   for (const prop of PROPERTIES) {
     console.log(`\n[${prop.id}] ${prop.location} (${prop.lat}, ${prop.lng})`);
 
-    // Check if already cached
+    // Skip if already cached and not forcing
     const doc = await db.collection('enrichment').doc(prop.id).get();
-    const existing = doc.exists && doc.data().neighborhood;
-    if (existing && existing.cachedAt) {
-      const ageDays = (Date.now() - new Date(existing.cachedAt).getTime()) / 86400000;
-      if (ageDays < 30) {
-        console.log(`  ⏭  already cached (${ageDays.toFixed(1)} days old) — skipping`);
-        continue;
+    if (doc.exists && doc.data().neighborhood) {
+      const existing = doc.data().neighborhood;
+      if (existing.cachedAt) {
+        const ageDays = (Date.now() - new Date(existing.cachedAt).getTime()) / 86400000;
+        if (!force && ageDays < 30) {
+          console.log(`  ⏭  already cached (${ageDays.toFixed(1)} days old) — skipping`);
+          continue;
+        }
       }
     }
 
