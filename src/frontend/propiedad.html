@@ -2319,19 +2319,23 @@ out tags;`;
       if (_fsvg) { _fsvg.setAttribute('fill', 'var(--red)'); _fsvg.setAttribute('stroke', 'var(--red)'); }
     }
 
-    // Wait for Firebase auth to be ready before loading
-    // neighborhood scores — ensures Firestore reads work
-    if (typeof firebase !== 'undefined') {
-      const unsubNb = firebase.auth().onAuthStateChanged(function() {
-        unsubNb(); // unsubscribe immediately after first call
-        loadNeighborhoodScores(p).catch(function(e) {
-          console.warn('[neighborhood] failed:', e);
-        });
-        loadCatastroPanel(p).catch(function(e) {
-          console.warn('[catastro] failed:', e);
-        });
+    // Load enrichment data after auth is confirmed
+    (function(prop) {
+      if (typeof firebase === 'undefined') return;
+      const unsub = firebase.auth().onAuthStateChanged(function() {
+        unsub();
+        if (typeof loadNeighborhoodScores === 'function') {
+          loadNeighborhoodScores(prop).catch(function(e) {
+            console.warn('[nb] failed:', e);
+          });
+        }
+        if (typeof loadCatastroPanel === 'function') {
+          loadCatastroPanel(prop).catch(function(e) {
+            console.warn('[catastro] failed:', e);
+          });
+        }
       });
-    }
+    })(p);
   })();
 </script>
 
