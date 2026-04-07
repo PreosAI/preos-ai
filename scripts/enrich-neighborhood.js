@@ -141,6 +141,118 @@ out tags;`;
   };
 }
 
+// ── Haversine distance in metres ─────────────────────────
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI/180) *
+            Math.cos(lat2 * Math.PI/180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+// ── Fetch nearby POIs with names for tab panels ───────────
+async function fetchPOIs(prop) {
+  const { lat, lng } = prop;
+
+  const query = `[out:json][timeout:30];
+(
+  node["amenity"~"school|kindergarten|college|university"](around:2000,${lat},${lng});
+  node["amenity"~"restaurant|cafe|fast_food|bar|pub"](around:600,${lat},${lng});
+  node["shop"~"supermarket|convenience|bakery|butcher|greengrocer"](around:600,${lat},${lng});
+  node["amenity"~"pharmacy|hospital|clinic|doctors|dentist|bank|post_office"](around:600,${lat},${lng});
+  node["leisure"~"park|playground|sports_centre|swimming_pool"](around:800,${lat},${lng});
+  node["highway"="bus_stop"](around:800,${lat},${lng});
+  node["railway"~"station|tram_stop|halt"](around:1500,${lat},${lng});
+);
+out body qt;`;
+
+  for (const mirror of [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter'
+  ]) {
+    try {
+      const res = await fetch(mirror, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(query),
+        timeout: 35000
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const elements = data.elements || [];
+
+      // Categorise and calculate distances
+      const schools   = [];
+      const places    = [];
+      const transport = [];
+
+      for (const el of elements) {
+        if (!el.lat || !el.lon || !el.tags) continue;
+        const t    = el.tags;
+        const name = t.name || t['name:es'] || t['name:en'] || null;
+        if (!name) continue; // skip unnamed POIs
+
+        const dist = haversine(lat, lng, el.lat, el.lon);
+
+        // Schools
+        if (t.amenity === 'school')       schools.push({ name, type: 'Colegio',      dist });
+        if (t.amenity === 'kindergarten') schools.push({ name, type: 'Guardería',    dist });
+        if (t.amenity === 'college')      schools.push({ name, type: 'Instituto',    dist });
+        if (t.amenity === 'university')   schools.push({ name, type: 'Universidad',  dist });
+
+        // Transport
+        if (t.highway === 'bus_stop')              transport.push({ name, type: 'Autobús',  dist });
+        if (t.railway === 'station')               transport.push({ name, type: 'Tren',     dist });
+        if (t.railway === 'tram_stop')             transport.push({ name, type: 'Tranvía',  dist });
+        if (t.railway === 'halt')                  transport.push({ name, type: 'Tren',     dist });
+
+        // Places (restaurants, shops, services, leisure)
+        if (t.amenity === 'restaurant')   places.push({ name, type: 'Restaurante', dist });
+        if (t.amenity === 'cafe')         places.push({ name, type: 'Café',        dist });
+        if (t.amenity === 'fast_food')    places.push({ name, type: 'Comida rápida', dist });
+        if (t.amenity === 'bar' || t.amenity === 'pub') places.push({ name, type: 'Bar', dist });
+        if (t.shop    === 'supermarket')  places.push({ name, type: 'Supermercado', dist });
+        if (t.shop    === 'convenience')  places.push({ name, type: 'Tienda',       dist });
+        if (t.shop    === 'bakery')       places.push({ name, type: 'Panadería',    dist });
+        if (t.shop    === 'butcher')      places.push({ name, type: 'Carnicería',   dist });
+        if (t.shop    === 'greengrocer')  places.push({ name, type: 'Frutería',     dist });
+        if (t.amenity === 'pharmacy')     places.push({ name, type: 'Farmacia',     dist });
+        if (t.amenity === 'bank')         places.push({ name, type: 'Banco',        dist });
+        if (t.amenity === 'hospital' ||
+            t.amenity === 'clinic' ||
+            t.amenity === 'doctors' ||
+            t.amenity === 'dentist')      places.push({ name, type: 'Salud',        dist });
+        if (t.leisure === 'park')         places.push({ name, type: 'Parque',       dist });
+        if (t.leisure === 'playground')   places.push({ name, type: 'Parque infantil', dist });
+        if (t.leisure === 'sports_centre' ||
+            t.leisure === 'swimming_pool') places.push({ name, type: 'Deporte',     dist });
+      }
+
+      // Sort by distance, deduplicate by name, take top N
+      function topN(arr, n) {
+        const seen = new Set();
+        return arr
+          .sort((a, b) => a.dist - b.dist)
+          .filter(item => { if (seen.has(item.name)) return false; seen.add(item.name); return true; })
+          .slice(0, n);
+      }
+
+      return {
+        schools:   topN(schools,   6),
+        places:    topN(places,    8),
+        transport: topN(transport, 6)
+      };
+
+    } catch(e) {
+      console.warn(`  POI mirror failed: ${e.message}`);
+    }
+  }
+  return null;
+}
+
 // ── Main ──────────────────────────────────────────────────
 async function main() {
   console.log(`\nPreos neighborhood enrichment — ${PROPERTIES.length} properties\n`);
@@ -176,6 +288,20 @@ async function main() {
     await db.collection('enrichment').doc(prop.id)
       .set({ neighborhood: scores }, { merge: true });
     console.log(`  💾 saved to Firestore: walk=${scores.walkability} transit=${scores.transit} bike=${scores.bike} noise=${scores.noise} wellness=${scores.wellness} green=${scores.green}`);
+
+    // Fetch and store POI names for tab panels
+    console.log('  🏪 fetching nearby POIs...');
+    await sleep(3000); // polite delay after score query
+    const pois = await fetchPOIs(prop);
+    if (pois) {
+      const totals = `schools:${pois.schools.length} places:${pois.places.length} transport:${pois.transport.length}`;
+      console.log(`  📍 POIs found — ${totals}`);
+      await db.collection('enrichment').doc(prop.id)
+        .set({ neighborhood: { pois } }, { merge: true });
+      console.log('  💾 POIs saved to Firestore');
+    } else {
+      console.log('  ⚠️  POI fetch failed');
+    }
 
     // Polite delay between requests
     console.log('  ⏳ waiting 6s before next property...');
