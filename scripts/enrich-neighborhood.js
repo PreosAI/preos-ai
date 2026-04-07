@@ -142,7 +142,10 @@ out body qt;`;
         if (t.natural && /^(wood|scrub|grassland|beach)$/.test(t.natural)) c.green++;
 
         // --- Named POI collection for tabs ---
-        const name = t.name || t['name:es'] || t['name:en'] || null;
+        const name = t['name:es'] || t['name:en'] || t.name || null;
+        // Skip clearly non-Spanish names or generic placeholders
+        if (!name) continue;
+        if (/^(name|unbekannt|unknown|sin nombre|noname)$/i.test(name)) continue;
         const elLat = el.lat || (el.center && el.center.lat);
         const elLon = el.lon || (el.center && el.center.lon);
         if (!name || !elLat || !elLon) continue;
