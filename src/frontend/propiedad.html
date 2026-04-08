@@ -2233,6 +2233,143 @@ out tags;`;
     }
   }
 
+  // ── Browser-side SNCZI flood zone check ─────────────────────────────────────
+
+  async function checkFloodZone(property) {
+    if (!property || !property.lat || !property.lng) return;
+
+    // Check if we already have a real flood score
+    try {
+      const snap = await firebase.firestore()
+        .collection('enrichment').doc(property.id).get();
+      const existing = snap.exists && snap.data().climate?.flood;
+      if (existing && existing.score !== null && existing.score !== undefined) {
+        console.log('[flood] already scored:', existing.score);
+        return;
+      }
+    } catch(e) {}
+
+    console.log('[flood] checking SNCZI WMS via canvas...');
+
+    const lat = property.lat;
+    const lng = property.lng;
+    // Use 0.005 degree bbox (~500m) — large enough to capture
+    // the flood zone polygon if property is within it
+    const d = 0.005;
+    const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
+    const W = 256, H = 256;
+
+    const periods = {
+      t10:  { url: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ10/wms.aspx',
+               layer: 'Z.I. con alta probabilidad' },
+      t100: { url: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ100/wms.aspx',
+               layer: 'Z.I. con probabilidad media u ocasional' },
+      t500: { url: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ500/wms.aspx',
+               layer: 'Z.I. con baja probabilidad o excepcional' }
+    };
+
+    // Check if a pixel in a canvas image is the SNCZI flood colour
+    // Flood colour: R=255, G=191, B=0 (golden orange) or similar warm tone
+    // White background: R=255, G=255, B=255
+    function hasFloodPixel(ctx, w, h) {
+      // Sample a grid of 25 points across the centre of the image
+      const pts = [];
+      for (let x = w*0.2; x <= w*0.8; x += w*0.15) {
+        for (let y = h*0.2; y <= h*0.8; y += h*0.15) {
+          pts.push([Math.round(x), Math.round(y)]);
+        }
+      }
+      for (const [x, y] of pts) {
+        const px = ctx.getImageData(x, y, 1, 1).data;
+        // Flood zone is warm orange/yellow: R high, G medium, B low
+        if (px[0] > 200 && px[1] > 100 && px[1] < 230 && px[2] < 50) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    async function checkPeriod(period) {
+      try {
+        const { url, layer } = periods[period];
+        const tileUrl = `${url}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap` +
+          `&LAYERS=${encodeURIComponent(layer)}&STYLES=&SRS=EPSG:4326` +
+          `&BBOX=${bbox}&WIDTH=${W}&HEIGHT=${H}` +
+          `&FORMAT=image/png&TRANSPARENT=FALSE`;
+
+        return await new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = W; canvas.height = H;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, W, H);
+            resolve(hasFloodPixel(ctx, W, H));
+          };
+          img.onerror = function() { resolve(null); };
+          img.src = tileUrl;
+          setTimeout(() => resolve(null), 15000);
+        });
+      } catch(e) {
+        console.warn('[flood] period check failed:', e.message);
+        return null;
+      }
+    }
+
+    // Check all 3 periods sequentially
+    const t10  = await checkPeriod('t10');
+    const t100 = await checkPeriod('t100');
+    const t500 = await checkPeriod('t500');
+    console.log('[flood] results:', { t10, t100, t500 });
+
+    let score, label, detail;
+    if (t10) {
+      score = 9; label = 'High';
+      detail = 'In high-probability flood zone (T=10 years). Check SNCZI for details.';
+    } else if (t100) {
+      score = 6; label = 'Medium';
+      detail = 'In medium-probability flood zone (T=100 years). Check SNCZI for details.';
+    } else if (t500) {
+      score = 3; label = 'Low';
+      detail = 'In low-probability flood zone (T=500 years).';
+    } else if (t10 === false && t100 === false && t500 === false) {
+      score = 1; label = 'Very Low';
+      detail = 'Not in any SNCZI mapped flood zone.';
+    } else {
+      score = null; label = null;
+      detail = 'Flood zone data check inconclusive.';
+    }
+
+    const floodResult = {
+      score, label, detail,
+      zones: { t10, t100, t500 },
+      source: 'SNCZI — Ministerio para la Transición Ecológica'
+    };
+
+    // Save to Firestore
+    try {
+      await firebase.firestore()
+        .collection('enrichment').doc(property.id)
+        .set({ climate: { flood: floodResult } }, { merge: true });
+      console.log('[flood] saved to Firestore:', score);
+    } catch(e) {
+      console.warn('[flood] Firestore save failed:', e.message);
+    }
+
+    // Update the flood card on screen
+    const cards = document.querySelectorAll('.climate-card');
+    const floodCard = cards[0]; // flood is first card
+    if (floodCard && score !== null) {
+      const badge = floodCard.querySelector('.climate-score-badge');
+      const desc  = floodCard.querySelector('.climate-desc');
+      const colours = { 9:'#B71C1C', 6:'#E64A19', 3:'#F57F17', 1:'#1565C0' };
+      const col = colours[score] || '#9E9E9E';
+      if (badge) { badge.textContent = score+'/10'; badge.style.background=col; badge.style.color='#fff'; }
+      if (desc) desc.innerHTML = '<span style="font-weight:600;color:'+col+'">'+label+'</span><br><span style="color:#666;font-size:12px">'+detail+'</span><br><small style="color:#aaa;font-size:11px">SNCZI — Ministerio para la Transición Ecológica</small>';
+    }
+  }
+
   // ── Climate risks panel ──────────────────────────────────────────────────────
 
   async function loadClimateRisks(property) {
@@ -2476,6 +2613,11 @@ out tags;`;
         if (typeof loadClimateRisks === 'function') {
           loadClimateRisks(prop).catch(function(e) {
             console.warn('[climate] failed:', e);
+          });
+        }
+        if (typeof checkFloodZone === 'function') {
+          checkFloodZone(prop).catch(function(e) {
+            console.warn('[flood] failed:', e);
           });
         }
       });

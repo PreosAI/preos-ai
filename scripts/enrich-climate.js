@@ -6,7 +6,8 @@
  *   enrichment/{id}.climate
  *
  * Risk sources:
- *   💧 Flood    — SNCZI WMS pixel check (Spanish gov, official)
+ *   💧 Flood    — Checked browser-side via SNCZI canvas pixel check
+ *                 (score stored as null here; browser fills it in)
  *   🔥 Wildfire — Static scoring by municipality/inland distance
  *   🌡️ Heat     — Static scoring by coastal proximity + altitude
  *   💨 Wind     — Static scoring by altitude + coastal exposure
@@ -19,7 +20,6 @@
  *   node scripts/enrich-climate.js --force
  */
 
-const fetch = require('node-fetch');
 const admin = require('firebase-admin');
 
 let sa;
@@ -44,91 +44,6 @@ const PROPERTIES = [
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ── SNCZI Flood risk via WMS pixel check ─────────────────────────────────────
-// Strategy: request a small PNG tile centred on the property coordinate
-// for each of T=10, T=100, T=500 flood return periods.
-// If the centre pixel is non-transparent → property is in that flood zone.
-
-async function isInFloodZone(endpoint, layer, lat, lng) {
-  try {
-    const d    = 0.0005;
-    const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
-    const url = `${endpoint}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap` +
-      `&LAYERS=${encodeURIComponent(layer)}&STYLES=&SRS=EPSG:4326` +
-      `&BBOX=${bbox}&WIDTH=64&HEIGHT=64` +
-      `&FORMAT=image/png&TRANSPARENT=TRUE`;
-
-    const res = await fetch(url, { timeout: 15000 });
-    if (!res.ok) return false;
-    const buf = await res.buffer();
-
-    // A transparent PNG has alpha=0 for all pixels.
-    // We check the PNG IDAT chunk for non-zero alpha bytes.
-    // PNG signature: 8 bytes, then chunks.
-    // For a fully transparent 64x64 RGBA image, all pixels have alpha=0.
-    // Strategy: if the file is a valid PNG and larger than a blank tile,
-    // it likely contains flood zone data. We use a size heuristic:
-    // blank transparent PNGs are typically < 200 bytes compressed.
-    // Coloured flood zone tiles are typically > 500 bytes.
-
-    // Check it's actually a PNG (starts with PNG signature)
-    if (buf.length < 8) return false;
-    const sig = buf.slice(0, 8);
-    const isPNG = sig[0] === 0x89 && sig[1] === 0x50 &&
-                  sig[2] === 0x4E && sig[3] === 0x47;
-    if (!isPNG) return false;
-
-    // Size heuristic: blank transparent = small, flood data = larger
-    // Calibrated against SNCZI tiles:
-    //   blank tile:       ~170-250 bytes
-    //   flood zone tile: ~1500-8000 bytes
-    return buf.length > 400;
-
-  } catch(e) {
-    console.warn(`  flood check failed: ${e.message}`);
-    return null;
-  }
-}
-
-async function getFloodRisk(lat, lng) {
-  const endpoints = {
-    t10:  'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ10/wms.aspx',
-    t100: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ100/wms.aspx',
-    t500: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ500/wms.aspx'
-  };
-
-  const results = {};
-  results.t10  = await isInFloodZone(endpoints.t10,  'Z.I. con alta probabilidad',              lat, lng);
-  await sleep(500);
-  results.t100 = await isInFloodZone(endpoints.t100, 'Z.I. con probabilidad media u ocasional', lat, lng);
-  await sleep(500);
-  results.t500 = await isInFloodZone(endpoints.t500, 'Z.I. con baja probabilidad o excepcional',lat, lng);
-  await sleep(500);
-
-  // Score: in T10 zone = 9, T100 only = 6, T500 only = 3, none = 1
-  let score, label, detail;
-  if (results.t10) {
-    score = 9; label = 'High';
-    detail = 'Located in high-probability flood zone (T=10 years)';
-  } else if (results.t100) {
-    score = 6; label = 'Medium';
-    detail = 'Located in medium-probability flood zone (T=100 years)';
-  } else if (results.t500) {
-    score = 3; label = 'Low';
-    detail = 'Located in low-probability flood zone (T=500 years)';
-  } else if (results.t10 === null && results.t100 === null) {
-    score = null; label = null;
-    detail = 'Flood data unavailable — check SNCZI viewer manually';
-  } else {
-    score = 1; label = 'Very Low';
-    detail = 'Not in any mapped flood zone';
-  }
-
-  return { score, label, detail,
-    zones: { t10: results.t10, t100: results.t100, t500: results.t500 },
-    source: 'SNCZI — Ministerio para la Transición Ecológica' };
-}
-
 // ── Static risk scoring ──────────────────────────────────────────────────────
 // Based on well-documented risk profiles for the Costa del Sol / Málaga province
 
@@ -136,7 +51,6 @@ async function getFloodRisk(lat, lng) {
 // Coastal strip (within ~5km of coast, lat > 36.55): low-medium
 // Inland municipalities: higher risk (Coín, Mijas inland etc.)
 function getWildfireRisk(lat, lng, city) {
-  const inlandCities  = ['COIN', 'ALHAURIN', 'CASARES', 'ESTEPONA_INLAND'];
   const highRiskCities = ['COIN'];
   const isInland = lat > 36.58 && lng < -4.55 && lat < 36.72;
   const isHighRisk = highRiskCities.includes(city);
@@ -159,8 +73,6 @@ function getWildfireRisk(lat, lng, city) {
 // Heat risk — coastal areas cooler, inland hotter
 // Average summer max Torremolinos: 29°C, Coín: 38°C
 function getHeatRisk(lat, lng) {
-  // Distance from coast approximated by latitude + longitude
-  // Málaga coast runs roughly at lat ~36.50-36.65
   const isCoastal = lat < 36.62 && lng > -4.65;
   const isInland  = lat > 36.63 || lng < -4.65;
 
@@ -181,9 +93,6 @@ function getHeatRisk(lat, lng) {
 
 // Wind risk — coastal properties more exposed, especially west-facing
 function getWindRisk(lat, lng) {
-  // Costa del Sol is relatively sheltered by the Sierra Nevada to the north
-  // Main risk: Levante (easterly) and occasional Poniente (westerly) winds
-  // Western Costa del Sol (Estepona, Marbella) more exposed to Poniente
   const isWesternCosta = lng < -4.90;
   const isCoastal      = lat < 36.60;
 
@@ -203,9 +112,7 @@ function getWindRisk(lat, lng) {
 }
 
 // Air quality — Costa del Sol generally good
-// Slightly worse near Málaga city, industrial areas
 function getAirRisk(lat, lng) {
-  // Málaga city centre and port area have moderate pollution
   const nearMalagaCity = lat > 36.69 && lat < 36.73 && lng > -4.45 && lng < -4.40;
   const isCoastal      = lat < 36.65;
 
@@ -245,10 +152,14 @@ async function main() {
     }
 
     try {
-      // Flood — real data from SNCZI
-      console.log('  💧 checking flood zones (SNCZI)...');
-      const flood = await getFloodRisk(prop.lat, prop.lng);
-      console.log(`  💧 flood: ${flood.score ?? '?'}/10 (${flood.label ?? 'unknown'}) T10:${flood.zones.t10} T100:${flood.zones.t100} T500:${flood.zones.t500}`);
+      // Flood — checked browser-side via SNCZI canvas pixel check
+      const flood = {
+        score: null,
+        label: null,
+        detail: 'Flood zone data loaded directly from SNCZI on page load',
+        source: 'SNCZI — Ministerio para la Transición Ecológica',
+        zones: { t10: null, t100: null, t500: null }
+      };
 
       // Static risks
       const wildfire = getWildfireRisk(prop.lat, prop.lng, prop.city);
@@ -256,6 +167,7 @@ async function main() {
       const wind     = getWindRisk(prop.lat, prop.lng);
       const air      = getAirRisk(prop.lat, prop.lng);
 
+      console.log(`  💧 flood:    (browser-side check)`);
       console.log(`  🔥 wildfire: ${wildfire.score}/10 (${wildfire.label})`);
       console.log(`  🌡️  heat:     ${heat.score}/10 (${heat.label})`);
       console.log(`  💨 wind:     ${wind.score}/10 (${wind.label})`);
