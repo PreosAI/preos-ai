@@ -341,24 +341,61 @@
     .preos-estimate-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
     .preos-estimate-value { font-size: 18px; font-weight: 700; color: #9ca3af; margin-top: 2px; }
 
-    /* ─── NEIGHBORHOOD PILL TABS ────────────────────────────── */
-    .place-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .place-tab-btn { background: #f3f4f6; border: 1.5px solid transparent; border-radius: 999px; padding: 7px 18px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif; }
-    .place-tab-btn:hover { background: #e5e7eb; }
-    .place-tab-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+    /* ── El Barrio tabs ── */
+    .place-tabs { display:flex; gap:0; margin-bottom:0;
+      border-bottom:1px solid #e0e0e0; }
+    .place-tab-btn { padding:12px 20px; border:none;
+      background:none; font-size:14px; font-weight:500;
+      color:#666; cursor:pointer;
+      border-bottom:3px solid transparent;
+      margin-bottom:-1px; transition:all 0.15s; }
+    .place-tab-btn.active { color:#1a1a1a;
+      border-bottom:3px solid #CC0000; }
+    .place-tab-btn:hover:not(.active) { color:#1a1a1a; }
     .place-panel { display: none; }
     .place-panel.active { display: block; }
-    .place-row { display: flex; justify-content: space-between;
-      align-items: center; padding: 10px 0;
-      border-bottom: 1px solid #f5f5f5; }
-    .place-row:last-child { border-bottom: none; }
-    .place-row-info { display: flex; flex-direction: column; gap: 2px; }
-    .place-row-name { font-size: 14px; font-weight: 500; color: #1a1a1a; }
-    .place-row-type { font-size: 12px; color: #888; }
-    .place-row-dist { font-size: 13px; color: #CC0000;
-      font-weight: 500; white-space: nowrap; margin-left: 12px; }
-    .place-empty { font-size: 13px; color: #aaa;
-      font-style: italic; padding: 12px 0; }
+
+    /* School rows — Redfin style */
+    .school-row { display:flex; align-items:flex-start;
+      justify-content:space-between; padding:16px 0;
+      border-bottom:1px solid #efefef; }
+    .school-row:last-child { border-bottom:none; }
+    .school-left { flex:1; min-width:0; padding-right:16px; }
+    .school-title { font-size:15px; font-weight:600;
+      color:#1a1a1a; text-decoration:none; display:block;
+      margin-bottom:3px; }
+    .school-title:hover { color:#CC0000; }
+    .school-subtitle { font-size:13px; color:#777;
+      line-height:1.4; }
+    .school-right { flex-shrink:0; text-align:right; }
+    .school-score-text { font-size:14px; font-weight:600;
+      color:#1a1a1a; white-space:nowrap; }
+    .school-score-text.score-high { color:#2E7D32; }
+    .school-score-text.score-mid  { color:#F57F17; }
+    .school-score-text.score-low  { color:#C62828; }
+    .school-score-text.score-none { color:#999;
+      font-weight:400; }
+    .school-score-arrow { color:#aaa; margin-left:2px; }
+    .school-attribution { font-size:12px; color:#999;
+      margin-top:12px; padding-top:8px;
+      border-top:1px solid #f0f0f0; }
+    .school-attribution a { color:#CC0000;
+      text-decoration:none; }
+
+    /* Place/transport rows */
+    .place-row { display:flex; align-items:center;
+      justify-content:space-between; padding:13px 0;
+      border-bottom:1px solid #efefef; gap:12px; }
+    .place-row:last-child { border-bottom:none; }
+    .place-row-left { flex:1; min-width:0; }
+    .place-row-name { font-size:14px; font-weight:500;
+      color:#1a1a1a; display:block; }
+    .place-row-type { font-size:12px; color:#888; }
+    .place-row-dist { flex-shrink:0; font-size:13px;
+      color:#777; }
+    .place-empty { font-size:13px; color:#aaa;
+      font-style:italic; padding:16px 0; }
+    .place-panel { padding-top:8px; }
 
     /* ─── LIFESTYLE SCORES ──────────────────────────────────── */
     .lifestyle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -1266,9 +1303,9 @@
         <div class="section">
           <div class="subsection-title">Alrededor de esta propiedad</div>
           <div class="place-tabs">
-            <button class="place-tab-btn active" data-place="colegios">🏫 Colegios</button>
+            <button class="place-tab-btn active" data-place="colegios">🎓 Colegios</button>
             <button class="place-tab-btn" data-place="lugares">🛒 Lugares</button>
-            <button class="place-tab-btn" data-place="transporte">🚇 Transporte</button>
+            <button class="place-tab-btn" data-place="transporte">🚌 Transporte</button>
           </div>
 
           <div class="place-panel active" id="place-colegios">
@@ -2126,72 +2163,79 @@ out tags;`;
   function renderPlaceTabs(pois) {
     if (!pois) return;
 
-    function distLabel(m) {
-      return m < 1000 ? m + ' m' : (m/1000).toFixed(1) + ' km';
+    function schoolRow(item) {
+      // Score display — right side like Redfin "9/10 ›"
+      let scoreHtml = '';
+      if (item.rating) {
+        const cls = item.rating >= 4.0 ? 'score-high' :
+                    item.rating >= 3.0 ? 'score-mid' : 'score-low';
+        // Convert 5-point micole scale to 10-point display
+        const outOf10 = Math.round(item.rating * 2);
+        scoreHtml = '<div class="school-right">' +
+          '<span class="school-score-text ' + cls + '">' +
+          outOf10 + '/10' +
+          '<span class="school-score-arrow"> ›</span>' +
+          '</span></div>';
+      } else {
+        scoreHtml = '<div class="school-right">' +
+          '<span class="school-score-text score-none">—</span>' +
+          '</div>';
+      }
+
+      // Subtitle: tipo · metodologia · distance
+      const parts = [];
+      if (item.tipo) parts.push(item.tipo);
+      if (item.metodologia) parts.push(item.metodologia);
+      const dist = item.dist < 1000
+        ? item.dist + ' m' : (item.dist/1000).toFixed(1) + ' km';
+      parts.push(dist);
+
+      const titleEl = item.micoleUrl
+        ? '<a href="' + item.micoleUrl + '" target="_blank" rel="noopener" class="school-title">' + item.name + '</a>'
+        : '<span class="school-title" style="cursor:default">' + item.name + '</span>';
+
+      return '<div class="school-row">' +
+        '<div class="school-left">' + titleEl +
+        '<span class="school-subtitle">' + parts.join(' · ') + '</span>' +
+        '</div>' + scoreHtml + '</div>';
     }
 
-    function poiRow(item, isSchool) {
+    function poiRow(item) {
       const dist = item.dist < 1000
-        ? item.dist + ' m'
-        : (item.dist/1000).toFixed(1) + ' km';
-
-      // School rating badge
-      let ratingBadge = '';
-      if (isSchool && item.rating) {
-        const col = item.rating >= 4.5 ? '#2E7D32' :
-                    item.rating >= 4.0 ? '#388E3C' :
-                    item.rating >= 3.5 ? '#F57F17' : '#C62828';
-        const stars = item.rating >= 4.5 ? '⭐' :
-                      item.rating >= 4.0 ? '🟢' : '🟡';
-        ratingBadge = `<span style="font-size:11px;color:${col};font-weight:600;margin-left:6px">${stars} ${item.rating}</span>`;
-        if (item.reviews) ratingBadge += `<span style="font-size:10px;color:#aaa"> (${item.reviews})</span>`;
-      }
-
-      // Type badges for schools
-      let typeBadge = '';
-      if (isSchool) {
-        if (item.metodologia === 'Internacional') typeBadge += '<span style="font-size:10px;background:#E3F2FD;color:#1565C0;padding:1px 5px;border-radius:4px;margin-left:4px">🌍 Int\'l</span>';
-        else if (item.metodologia === 'Bilingüe') typeBadge += '<span style="font-size:10px;background:#E8F5E9;color:#2E7D32;padding:1px 5px;border-radius:4px;margin-left:4px">🌐 Bil</span>';
-        if (item.tipo === 'Privado') typeBadge += '<span style="font-size:10px;background:#FFF3E0;color:#E65100;padding:1px 5px;border-radius:4px;margin-left:4px">Privado</span>';
-        else if (item.tipo === 'Concertado') typeBadge += '<span style="font-size:10px;background:#F3E5F5;color:#6A1B9A;padding:1px 5px;border-radius:4px;margin-left:4px">Concertado</span>';
-      }
-
-      const nameLink = (isSchool && item.micoleUrl)
-        ? `<a href="${item.micoleUrl}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${item.name}</a>`
-        : item.name;
-
-      return `<div class="place-row">
-        <div class="place-row-info">
-          <span class="place-row-name">${nameLink}${ratingBadge}${typeBadge}</span>
-          <span class="place-row-type">${item.type}</span>
-        </div>
-        <span class="place-row-dist">${dist}</span>
-      </div>`;
+        ? item.dist + ' m' : (item.dist/1000).toFixed(1) + ' km';
+      return '<div class="place-row">' +
+        '<div class="place-row-left">' +
+        '<span class="place-row-name">' + item.name + '</span>' +
+        '<span class="place-row-type">' + item.type + '</span>' +
+        '</div>' +
+        '<span class="place-row-dist">' + dist + '</span></div>';
     }
 
     const schoolPanel = document.getElementById('place-colegios');
     if (schoolPanel && pois.schools && pois.schools.length) {
-      // Show loading state while enriching
-      schoolPanel.innerHTML = '<div class="place-empty" style="color:#aaa">Cargando datos de colegios...</div>';
+      schoolPanel.innerHTML = '<div class="place-empty" style="color:#ccc;font-style:normal">Cargando...</div>';
       enrichSchoolsWithRatings(pois.schools).then(function(enriched) {
-        schoolPanel.innerHTML = enriched.map(function(s) {
-          return poiRow(s, true);
-        }).join('');
+        schoolPanel.innerHTML =
+          enriched.map(schoolRow).join('') +
+          '<div class="school-attribution">Valoraciones: ' +
+          '<a href="https://www.micole.net" target="_blank" rel="noopener">micole.net</a>' +
+          '</div>';
       });
-    } else if (schoolPanel && (!pois.schools || !pois.schools.length)) {
-      schoolPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
+    } else if (schoolPanel) {
+      schoolPanel.innerHTML = '<div class="place-empty">' +
+        PreosLang.t('places_none_nearby') + '</div>';
     }
 
     const placesPanel = document.getElementById('place-lugares');
     if (placesPanel && pois.places && pois.places.length) {
-      placesPanel.innerHTML = pois.places.map(function(p) { return poiRow(p, false); }).join('');
+      placesPanel.innerHTML = pois.places.map(poiRow).join('');
     } else if (placesPanel && (!pois.places || !pois.places.length)) {
       placesPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
     }
 
     const transportPanel = document.getElementById('place-transporte');
     if (transportPanel && pois.transport && pois.transport.length) {
-      transportPanel.innerHTML = pois.transport.map(function(t) { return poiRow(t, false); }).join('');
+      transportPanel.innerHTML = pois.transport.map(poiRow).join('');
     } else if (transportPanel && (!pois.transport || !pois.transport.length)) {
       transportPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
     }
