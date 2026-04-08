@@ -42,10 +42,26 @@ async function checkPeriod(key, bbox, W, H, context) {
       `&BBOX=${bbox}&WIDTH=${W}&HEIGHT=${H}` +
       `&FORMAT=image/png&TRANSPARENT=FALSE`;
 
+    context.log(`[flood:${key}] fetching ${tileUrl.substring(0,80)}...`);
     const res = await fetch(tileUrl, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
     const img = await Jimp.read(buf);
+
+    // Debug: log first few non-white pixel values found
+    const debugPixels = [];
+    for (let px = 0; px < 64; px += 4) {
+      for (let py = 0; py < 64; py += 4) {
+        const hex = img.getPixelColor(px, py);
+        const rgba = Jimp.intToRGBA(hex);
+        if (rgba.r < 250 || rgba.g < 250 || rgba.b < 250) {
+          debugPixels.push(`(${px},${py}):R${rgba.r}G${rgba.g}B${rgba.b}A${rgba.a}`);
+          if (debugPixels.length >= 3) break;
+        }
+      }
+      if (debugPixels.length >= 3) break;
+    }
+    context.log(`[flood:${key}] buf=${buf.length}b img=${img.getWidth()}x${img.getHeight()} nonWhite:${debugPixels.join(' ')}`);
 
     // Scan full tile at 4px intervals
     for (let px = 0; px < W; px += 4) {
