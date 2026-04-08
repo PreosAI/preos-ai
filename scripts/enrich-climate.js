@@ -161,16 +161,14 @@ async function getFloodRisk(lat, lng) {
       const buf = await res.buffer();
       const img = await Jimp.read(buf);
 
-      // Scan all pixels for flood orange (R>200, G 80-220, B<50)
-      let found = false;
-      img.scan(0, 0, W, H, function(x, y, idx) {
-        if (found) return;
-        const r = this.bitmap.data[idx];
-        const g = this.bitmap.data[idx+1];
-        const b = this.bitmap.data[idx+2];
-        if (r > 200 && g > 80 && g < 220 && b < 50) found = true;
-      });
-      return found;
+      const { width, height, data } = img.bitmap;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i+1], b = data[i+2];
+        if (r > 200 && g > 80 && g < 220 && b < 50) {
+          return true;
+        }
+      }
+      return false;
     } catch(e) {
       console.warn(`  flood ${key} error: ${e.message}`);
       return null;
