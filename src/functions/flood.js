@@ -2,7 +2,7 @@
  * flood.js — SNCZI flood zone check (Azure Functions v4)
  *
  * Fetches WMS tiles for T10, T100, T500 return periods from
- * the Spanish SNCZI service, reads pixel colours with jimp,
+ * the Spanish SNCZI service, reads pixel colours with pngjs,
  * and returns whether the coordinate falls in each flood zone.
  *
  * GET /api/flood?lat={lat}&lng={lng}
@@ -10,7 +10,7 @@
  */
 
 const { app } = require('@azure/functions');
-const Jimp    = require('jimp');
+const { PNG } = require('pngjs');
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -28,12 +28,6 @@ const periods = {
            layer: 'Z.I. con baja probabilidad o excepcional' }
 };
 
-// Flood zone colour: R=255 G=191 B=0 (golden orange)
-// White = R=255 G=255 B=255 = not in flood zone
-function isFloodPixel(r, g, b) {
-  return r > 200 && g > 80 && g < 220 && b < 50;
-}
-
 async function checkPeriod(key, bbox, W, H, context) {
   try {
     const { url, layer } = periods[key];
@@ -46,34 +40,28 @@ async function checkPeriod(key, bbox, W, H, context) {
     const res = await fetch(tileUrl, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    const img = await Jimp.read(buf);
 
-    // Debug: log first few non-white pixel values found
-    const debugPixels = [];
-    for (let px = 0; px < 64; px += 4) {
-      for (let py = 0; py < 64; py += 4) {
-        const hex = img.getPixelColor(px, py);
-        const rgba = Jimp.intToRGBA(hex);
-        if (rgba.r < 250 || rgba.g < 250 || rgba.b < 250) {
-          debugPixels.push(`(${px},${py}):R${rgba.r}G${rgba.g}B${rgba.b}A${rgba.a}`);
-          if (debugPixels.length >= 3) break;
+    // Parse PNG synchronously using pngjs
+    const png = PNG.sync.read(buf);
+    const { width, height, data } = png;
+
+    // Scan all pixels for flood zone colour
+    // Flood: R>200, G>80 && G<220, B<50
+    // White: R=255, G=255, B=255
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const idx = (y * width + x) * 4;
+        const r = data[idx], g = data[idx+1], b = data[idx+2];
+        if (r > 200 && g > 80 && g < 220 && b < 50) {
+          context.log(`[flood:${key}] flood pixel at (${x},${y}) R=${r}G=${g}B=${b}`);
+          return true;
         }
       }
-      if (debugPixels.length >= 3) break;
     }
-    context.log(`[flood:${key}] buf=${buf.length}b img=${img.getWidth()}x${img.getHeight()} nonWhite:${debugPixels.join(' ')}`);
-
-    // Scan full tile at 4px intervals
-    for (let px = 0; px < W; px += 4) {
-      for (let py = 0; py < H; py += 4) {
-        const hex = img.getPixelColor(px, py);
-        const { r, g, b } = Jimp.intToRGBA(hex);
-        if (isFloodPixel(r, g, b)) return true;
-      }
-    }
+    context.log(`[flood:${key}] no flood pixels in ${width}x${height} tile`);
     return false;
   } catch(e) {
-    context.log(`flood check ${key} error:`, e.message);
+    context.log(`[flood:${key}] error: ${e.message}`);
     return null;
   }
 }

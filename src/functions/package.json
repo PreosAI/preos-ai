@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "@azure/functions": "^4.5.0",
-    "jimp": "0.16.13",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "pngjs": "^6.0.0"
   },
   "engines": {
     "node": ">=22"
