@@ -1406,6 +1406,32 @@
 
       </div>
 
+      <div class="section-sun" id="section-sun" style="display:none">
+        <div class="sun-section">
+          <h3 data-i18n="sun_exposure_title">Radiación solar</h3>
+          <div class="sun-card">
+            <div class="sun-text">
+              <p class="sun-description" id="sun-description"></p>
+              <a href="https://re.jrc.ec.europa.eu/pvg_tools/es/"
+                 target="_blank" rel="noopener"
+                 class="sun-link"
+                 data-i18n="sun_view_tool">
+                Ver herramienta solar →
+              </a>
+              <div class="sun-attribution">
+                <span data-i18n="sun_provided_by">Datos: </span>
+                <a href="https://joint-research-centre.ec.europa.eu/pvgis-photovoltaic-geographical-information-system_en"
+                   target="_blank" rel="noopener">
+                  PVGIS · Comisión Europea</a>
+              </div>
+            </div>
+            <div class="sun-bars">
+              <div class="sun-chart" id="sun-chart"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ══ SECTION 3: Details ═══════════════════════════════════ -->
       <div id="section-details" class="main-section">
 
@@ -1643,32 +1669,6 @@
           </div>
         </div>
 
-      </div>
-
-      <div class="section-sun" id="section-sun" style="display:none">
-        <div class="sun-section">
-          <h3 data-i18n="sun_exposure_title">Exposición solar</h3>
-          <div class="sun-card">
-            <div class="sun-text">
-              <p class="sun-description" id="sun-description"></p>
-              <a href="https://re.jrc.ec.europa.eu/pvg_tools/es/"
-                 target="_blank" rel="noopener"
-                 class="sun-link"
-                 data-i18n="sun_view_tool">
-                Ver herramienta solar →
-              </a>
-              <div class="sun-attribution">
-                <span data-i18n="sun_provided_by">Datos: </span>
-                <a href="https://joint-research-centre.ec.europa.eu/pvgis-photovoltaic-geographical-information-system_en"
-                   target="_blank" rel="noopener">
-                  PVGIS · Comisión Europea</a>
-              </div>
-            </div>
-            <div class="sun-bars">
-              <div class="sun-chart" id="sun-chart"></div>
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -2509,15 +2509,17 @@ out tags;`;
       const lang = window.PreosLang?.currentLang?.() || 'es';
       let desc;
       if (lang === 'en') {
-        desc = `In this area, properties receive around ` +
-          `<strong>${june} hours</strong> of sunlight per day in June ` +
-          `and <strong>${dec} hours</strong> in December — ` +
-          `among the highest in Europe for solar exposure.`;
+        desc = `Solar irradiance in this area reaches ` +
+          `<strong>${june} kWh/m² per day</strong> in June and ` +
+          `<strong>${dec} kWh/m²</strong> in December — among ` +
+          `the highest in Europe for natural light and solar ` +
+          `energy potential.`;
       } else {
-        desc = `En esta zona, las propiedades reciben alrededor de ` +
-          `<strong>${june} horas</strong> de sol al día en junio ` +
-          `y <strong>${dec} horas</strong> en diciembre — ` +
-          `de las más altas de Europa en exposición solar.`;
+        desc = `La radiación solar en esta zona alcanza ` +
+          `<strong>${june} kWh/m² al día</strong> en junio y ` +
+          `<strong>${dec} kWh/m²</strong> en diciembre — entre ` +
+          `las más altas de Europa, ideal para luz natural y ` +
+          `aprovechamiento solar.`;
       }
       document.getElementById('sun-description').innerHTML = desc;
 
@@ -2544,7 +2546,7 @@ out tags;`;
 
     function barHtml(hours, heightPx, label) {
       return '<div class="sun-bar-wrap">' +
-        '<span class="sun-bar-label-top">' + hours + ' hrs</span>' +
+        '<span class="sun-bar-label-top">' + hours + ' kWh/m²</span>' +
         '<div class="sun-bar" style="height:' + heightPx + 'px"></div>' +
         '<span class="sun-bar-label-bottom">' + label + '</span>' +
         '</div>';
