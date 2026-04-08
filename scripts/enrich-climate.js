@@ -21,6 +21,7 @@
  */
 
 const fetch = require('node-fetch');
+const Jimp  = require('jimp');
 const admin = require('firebase-admin');
 
 let sa;
@@ -132,6 +133,81 @@ function getAirRisk(lat, lng) {
     source: 'Red de Vigilancia de la Calidad del Aire de Andalucía' };
 }
 
+// ── Flood risk via SNCZI WMS + jimp pixel check ──────────────────────────────
+async function getFloodRisk(lat, lng) {
+  const d    = 0.005;
+  const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
+  const W    = 256, H = 256;
+
+  const periods = {
+    t10:  { url: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ10/wms.aspx',
+             layer: 'Z.I. con alta probabilidad' },
+    t100: { url: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ100/wms.aspx',
+             layer: 'Z.I. con probabilidad media u ocasional' },
+    t500: { url: 'https://wms.mapama.gob.es/sig/agua/ZI_LaminasQ500/wms.aspx',
+             layer: 'Z.I. con baja probabilidad o excepcional' }
+  };
+
+  async function checkPeriod(key) {
+    try {
+      const { url, layer } = periods[key];
+      const tileUrl = `${url}?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap` +
+        `&LAYERS=${encodeURIComponent(layer)}&STYLES=&SRS=EPSG:4326` +
+        `&BBOX=${bbox}&WIDTH=${W}&HEIGHT=${H}` +
+        `&FORMAT=image/png&TRANSPARENT=FALSE`;
+
+      const res = await fetch(tileUrl, { timeout: 15000 });
+      if (!res.ok) return null;
+      const buf = await res.buffer();
+      const img = await Jimp.read(buf);
+
+      // Scan all pixels for flood orange (R>200, G 80-220, B<50)
+      let found = false;
+      img.scan(0, 0, W, H, function(x, y, idx) {
+        if (found) return;
+        const r = this.bitmap.data[idx];
+        const g = this.bitmap.data[idx+1];
+        const b = this.bitmap.data[idx+2];
+        if (r > 200 && g > 80 && g < 220 && b < 50) found = true;
+      });
+      return found;
+    } catch(e) {
+      console.warn(`  flood ${key} error: ${e.message}`);
+      return null;
+    }
+  }
+
+  console.log('  💧 checking SNCZI flood zones...');
+  const t10  = await checkPeriod('t10');  await sleep(600);
+  const t100 = await checkPeriod('t100'); await sleep(600);
+  const t500 = await checkPeriod('t500'); await sleep(600);
+  console.log(`  💧 T10:${t10} T100:${t100} T500:${t500}`);
+
+  let score, label, detail;
+  if (t10) {
+    score = 9; label = 'High';
+    detail = 'In high-probability flood zone (T=10 years).';
+  } else if (t100) {
+    score = 6; label = 'Medium';
+    detail = 'In medium-probability flood zone (T=100 years).';
+  } else if (t500) {
+    score = 3; label = 'Low';
+    detail = 'In low-probability flood zone (T=500 years).';
+  } else if (t10 === false) {
+    score = 1; label = 'Very Low';
+    detail = 'Not in any SNCZI mapped flood zone.';
+  } else {
+    score = null; label = null;
+    detail = 'Flood data inconclusive.';
+  }
+
+  return {
+    score, label, detail,
+    zones: { t10, t100, t500 },
+    source: 'SNCZI — Ministerio para la Transición Ecológica'
+  };
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
   const force = process.argv.includes('--force');
@@ -153,47 +229,7 @@ async function main() {
     }
 
     try {
-      // Flood — call Azure Function flood endpoint
-      console.log('  💧 checking flood zones via Azure Function...');
-      let flood;
-      try {
-        const floodUrl = `https://preos-functions-ggebgqgqdxhufwgy.spaincentral-01.azurewebsites.net/api/flood?lat=${prop.lat}&lng=${prop.lng}`;
-        const res = await fetch(floodUrl, { timeout: 30000 });
-        const zones = await res.json();
-        console.log(`  💧 zones:`, zones);
-
-        let score, label, detail;
-        if (zones.t10) {
-          score = 9; label = 'High';
-          detail = 'In high-probability flood zone (T=10 years). Significant flood risk.';
-        } else if (zones.t100) {
-          score = 6; label = 'Medium';
-          detail = 'In medium-probability flood zone (T=100 years). Moderate flood risk.';
-        } else if (zones.t500) {
-          score = 3; label = 'Low';
-          detail = 'In low-probability flood zone (T=500 years). Low but non-zero flood risk.';
-        } else if (zones.t10 === false && zones.t100 === false && zones.t500 === false) {
-          score = 1; label = 'Very Low';
-          detail = 'Not in any SNCZI mapped flood zone.';
-        } else {
-          score = null; label = null;
-          detail = 'Flood zone data inconclusive — check SNCZI viewer manually.';
-        }
-
-        flood = {
-          score, label, detail,
-          zones,
-          source: 'SNCZI — Ministerio para la Transición Ecológica'
-        };
-      } catch(e) {
-        console.warn(`  ⚠️  flood check failed: ${e.message}`);
-        flood = {
-          score: null, label: null,
-          detail: 'Flood data unavailable.',
-          zones: { t10: null, t100: null, t500: null },
-          source: 'SNCZI — Ministerio para la Transición Ecológica'
-        };
-      }
+      const flood = await getFloodRisk(prop.lat, prop.lng);
 
       // Static risks
       const wildfire = getWildfireRisk(prop.lat, prop.lng, prop.city);

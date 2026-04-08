@@ -2233,72 +2233,10 @@ out tags;`;
     }
   }
 
-  // ── Browser-side SNCZI flood zone check ─────────────────────────────────────
-
   async function checkFloodZone(property) {
-    if (!property || !property.lat || !property.lng) return;
-
-    // Check if we already have a real flood score
-    try {
-      const snap = await firebase.firestore()
-        .collection('enrichment').doc(property.id).get();
-      const existing = snap.exists && snap.data().climate?.flood;
-      if (existing && existing.score !== null && existing.score !== undefined) {
-        console.log('[flood] already scored:', existing.score);
-        return;
-      }
-    } catch(e) {}
-
-    console.log('[flood] checking via Azure Function...');
-
-    try {
-      const res = await fetch(
-        'https://preos-functions-ggebgqgqdxhufwgy.spaincentral-01.azurewebsites.net/api/flood' +
-        '?lat=' + property.lat + '&lng=' + property.lng
-      );
-      const zones = await res.json();
-      console.log('[flood] zones:', zones);
-
-      let score, label, detail;
-      if (zones.t10) {
-        score = 9; label = 'High';
-        detail = 'In high-probability flood zone (T=10 years).';
-      } else if (zones.t100) {
-        score = 6; label = 'Medium';
-        detail = 'In medium-probability flood zone (T=100 years).';
-      } else if (zones.t500) {
-        score = 3; label = 'Low';
-        detail = 'In low-probability flood zone (T=500 years).';
-      } else if (zones.t10 === false) {
-        score = 1; label = 'Very Low';
-        detail = 'Not in any SNCZI mapped flood zone.';
-      } else {
-        score = null; label = null;
-        detail = 'Flood data inconclusive.';
-      }
-
-      // Save to Firestore
-      await firebase.firestore()
-        .collection('enrichment').doc(property.id)
-        .set({ climate: { flood: {
-          score, label, detail, zones,
-          source: 'SNCZI — Ministerio para la Transición Ecológica'
-        }}}, { merge: true });
-      console.log('[flood] saved:', score);
-
-      // Update flood card
-      const card = document.querySelectorAll('.climate-card')[0];
-      if (card && score !== null) {
-        const cols = {9:'#B71C1C',6:'#E64A19',3:'#F57F17',1:'#1565C0'};
-        const col  = cols[score] || '#9E9E9E';
-        const badge = card.querySelector('.climate-score-badge');
-        const desc  = card.querySelector('.climate-desc');
-        if (badge) { badge.textContent=score+'/10'; badge.style.background=col; badge.style.color='#fff'; }
-        if (desc)  desc.innerHTML='<span style="font-weight:600;color:'+col+'">'+label+'</span><br><span style="color:#666;font-size:12px">'+detail+'</span><br><small style="color:#aaa;font-size:11px">SNCZI — Ministerio para la Transición Ecológica</small>';
-      }
-    } catch(e) {
-      console.warn('[flood] failed:', e.message);
-    }
+    // Flood score is pre-computed by enrich-climate.js batch script
+    // This function is now a no-op — loadClimateRisks handles rendering
+    return;
   }
 
   // ── Climate risks panel ──────────────────────────────────────────────────────
