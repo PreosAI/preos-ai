@@ -58,14 +58,28 @@ async function scrapePage(url) {
   const blocks = html.split('<h2');
   console.log(`    found ${blocks.length - 1} h2 blocks`);
 
+  let matched = 0;
   for (const block of blocks.slice(1)) {
-    // Must contain a link to /malaga/{municipio}/colegio-...
-    const linkMatch = block.match(/href="(\/malaga\/([^/]+)\/[^"]+)"/);
+    // DEBUG: log first 3 blocks to see what we're working with
+    if (matched === 0 && schools.length === 0 && blocks.indexOf(block) <= 3) {
+      const preview = block.substring(0, 500).replace(/\n/g,'↵');
+      console.log(`    [DEBUG block]: ${preview}`);
+    }
+
+    // Try both relative and absolute URL patterns
+    const linkMatch = block.match(
+      /href="((?:https:\/\/www\.micole\.net)?(?:\/malaga\/[^"]+|\/buscador\/[^"]+))"/
+    );
     if (!linkMatch) continue;
 
-    const path      = linkMatch[1];
-    const municipio = linkMatch[2];
+    const rawHref   = linkMatch[1];
+    const path      = rawHref.startsWith('http')
+      ? new URL(rawHref).pathname
+      : rawHref;
+    const municipio = path.split('/')[2] || null;
     const fullUrl   = 'https://www.micole.net' + path;
+
+    matched++;
 
     // Extract name from anchor text
     const nameMatch = block.match(/>([^<]{5,120})<\/a>/);
