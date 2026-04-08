@@ -2809,9 +2809,7 @@ out tags;`;
           });
         }
         if (typeof loadSunExposure === 'function') {
-          loadSunExposure(prop).catch(function(e) {
-            console.warn('[sun] failed:', e);
-          });
+          setTimeout(function() { loadSunExposure(prop); }, 500);
         }
         if (typeof checkFloodZone === 'function') {
           checkFloodZone(prop).catch(function(e) {
