@@ -20,6 +20,7 @@
  *   node scripts/enrich-climate.js --force
  */
 
+const fetch = require('node-fetch');
 const admin = require('firebase-admin');
 
 let sa;
@@ -152,14 +153,47 @@ async function main() {
     }
 
     try {
-      // Flood — checked browser-side via SNCZI canvas pixel check
-      const flood = {
-        score: null,
-        label: null,
-        detail: 'Flood zone data loaded directly from SNCZI on page load',
-        source: 'SNCZI — Ministerio para la Transición Ecológica',
-        zones: { t10: null, t100: null, t500: null }
-      };
+      // Flood — call Azure Function flood endpoint
+      console.log('  💧 checking flood zones via Azure Function...');
+      let flood;
+      try {
+        const floodUrl = `https://preos-functions-ggebgqgqdxhufwgy.spaincentral-01.azurewebsites.net/api/flood?lat=${prop.lat}&lng=${prop.lng}`;
+        const res = await fetch(floodUrl, { timeout: 30000 });
+        const zones = await res.json();
+        console.log(`  💧 zones:`, zones);
+
+        let score, label, detail;
+        if (zones.t10) {
+          score = 9; label = 'High';
+          detail = 'In high-probability flood zone (T=10 years). Significant flood risk.';
+        } else if (zones.t100) {
+          score = 6; label = 'Medium';
+          detail = 'In medium-probability flood zone (T=100 years). Moderate flood risk.';
+        } else if (zones.t500) {
+          score = 3; label = 'Low';
+          detail = 'In low-probability flood zone (T=500 years). Low but non-zero flood risk.';
+        } else if (zones.t10 === false && zones.t100 === false && zones.t500 === false) {
+          score = 1; label = 'Very Low';
+          detail = 'Not in any SNCZI mapped flood zone.';
+        } else {
+          score = null; label = null;
+          detail = 'Flood zone data inconclusive — check SNCZI viewer manually.';
+        }
+
+        flood = {
+          score, label, detail,
+          zones,
+          source: 'SNCZI — Ministerio para la Transición Ecológica'
+        };
+      } catch(e) {
+        console.warn(`  ⚠️  flood check failed: ${e.message}`);
+        flood = {
+          score: null, label: null,
+          detail: 'Flood data unavailable.',
+          zones: { t10: null, t100: null, t500: null },
+          source: 'SNCZI — Ministerio para la Transición Ecológica'
+        };
+      }
 
       // Static risks
       const wildfire = getWildfireRisk(prop.lat, prop.lng, prop.city);
@@ -167,7 +201,7 @@ async function main() {
       const wind     = getWindRisk(prop.lat, prop.lng);
       const air      = getAirRisk(prop.lat, prop.lng);
 
-      console.log(`  💧 flood:    (browser-side check)`);
+      console.log(`  💧 flood:    ${flood.score ?? '?'}/10 (${flood.label ?? 'unknown'})`);
       console.log(`  🔥 wildfire: ${wildfire.score}/10 (${wildfire.label})`);
       console.log(`  🌡️  heat:     ${heat.score}/10 (${heat.label})`);
       console.log(`  💨 wind:     ${wind.score}/10 (${wind.label})`);
