@@ -2070,68 +2070,57 @@ out tags;`;
 
   async function enrichSchoolsWithRatings(schools) {
     if (!schools || !schools.length) return schools;
-    try {
-      // Fetch all school slugs from the schools collection
-      // that might match our OSM school names
-      const enriched = await Promise.all(schools.map(async (school) => {
-        // Generate slug from OSM name for lookup
-        const slug = school.name
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, '')
-          .trim()
-          .replace(/\s+/g, '-');
 
-        // Try exact slug match first
-        let doc = await firebase.firestore()
-          .collection('schools').doc(slug).get();
-
-        // If no exact match, try without common prefixes
-        // e.g. "colegio-publico-el-tomillar" → try "el-tomillar"
-        if (!doc.exists) {
-          const stripped = slug
-            .replace(/^colegio-(publico|privado|concertado|de-educacion-infantil-y-primaria|infantil|internacional|bilingue)-?/, '')
-            .replace(/^instituto-(de-educacion-secundaria)-?/, '')
-            .replace(/^ceip-/, '')
-            .replace(/^cei-/, '')
-            .replace(/^eei-/, '');
-          if (stripped !== slug) {
-            // Search by partial name match in collection
-            const snap = await firebase.firestore()
-              .collection('schools')
-              .where('slug', '>=', stripped.substring(0, 8))
-              .where('slug', '<=', stripped.substring(0, 8) + '\uf8ff')
-              .limit(3)
-              .get();
-            if (!snap.empty) {
-              // Find best match
-              const best = snap.docs.find(d =>
-                d.data().slug.includes(stripped.substring(0, 8))
-              );
-              if (best) doc = best;
-            }
-          }
-        }
-
-        if (doc.exists) {
-          const data = doc.data();
-          return {
-            ...school,
-            rating:      data.rating,
-            reviews:     data.reviews,
-            tipo:        data.tipo,
-            metodologia: data.metodologia,
-            precio:      data.precio,
-            micoleUrl:   data.url
-          };
-        }
-        return school;
-      }));
-      return enriched;
-    } catch(e) {
-      console.warn('[schools] enrichment failed:', e.message);
-      return schools;
+    function slugify(n) {
+      return n.normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
     }
+
+    // Generate multiple slug candidates from a school name
+    // to maximise chance of matching the micole.net database
+    function slugCandidates(name) {
+      const base = slugify(name);
+      const candidates = [base];
+
+      // Strip common Spanish school prefixes
+      const stripped = base
+        .replace(/^colegio-(publico|privado|concertado|de-educacion-infantil-y-primaria|infantil|internacional|bilingue|diocesano|alemande)-?/, '')
+        .replace(/^instituto-(de-educacion-secundaria|ies)-?/, '')
+        .replace(/^ceip-/, '')
+        .replace(/^cei-/, '')
+        .replace(/^eei-/, '')
+        .replace(/^escuela-infantil-/, '');
+
+      if (stripped !== base) candidates.push('colegio-' + stripped);
+      if (stripped !== base) candidates.push(stripped);
+
+      // Also try with "colegio-" prepended to base if not already there
+      if (!base.startsWith('colegio-')) candidates.push('colegio-' + base);
+
+      return [...new Set(candidates)]; // deduplicate
+    }
+
+    const enriched = await Promise.all(schools.map(async (school) => {
+      const candidates = slugCandidates(school.name);
+
+      for (const slug of candidates) {
+        try {
+          const doc = await firebase.firestore()
+            .collection('schools').doc(slug).get();
+          if (doc.exists) {
+            const d = doc.data();
+            return { ...school,
+              rating: d.rating, reviews: d.reviews,
+              tipo: d.tipo, metodologia: d.metodologia,
+              precio: d.precio, micoleUrl: d.url
+            };
+          }
+        } catch(e) { /* skip */ }
+      }
+      return school; // no match found
+    }));
+
+    return enriched;
   }
 
   function renderPlaceTabs(pois) {
