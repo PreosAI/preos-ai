@@ -2255,7 +2255,7 @@ out tags;`;
     const lng = property.lng;
     // Use 0.005 degree bbox (~500m) — large enough to capture
     // the flood zone polygon if property is within it
-    const d = 0.005;
+    const d = 0.002;
     const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
     const W = 256, H = 256;
 
@@ -2299,7 +2299,6 @@ out tags;`;
 
         return await new Promise((resolve) => {
           const img = new Image();
-          img.crossOrigin = 'anonymous';
           img.onload = function() {
             const canvas = document.createElement('canvas');
             canvas.width = W; canvas.height = H;
