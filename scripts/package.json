@@ -12,6 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "firebase-admin": "^13.7.0",
-    "node-fetch": "^2.7.0"
+    "jimp": "^0.16.13",
+    "node-fetch": "^2.7.0",
+    "node-html-parser": "^6.1.13"
   }
 }
