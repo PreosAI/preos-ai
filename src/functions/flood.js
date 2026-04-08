@@ -47,10 +47,10 @@ async function checkPeriod(key, bbox, W, H, context) {
     const buf = Buffer.from(await res.arrayBuffer());
     const img = await Jimp.read(buf);
 
-    // Sample a 5x5 grid across the centre of the tile
-    for (let px = W*0.3; px <= W*0.7; px += W*0.1) {
-      for (let py = H*0.3; py <= H*0.7; py += H*0.1) {
-        const hex = img.getPixelColor(Math.round(px), Math.round(py));
+    // Scan full tile at 4px intervals
+    for (let px = 0; px < W; px += 4) {
+      for (let py = 0; py < H; py += 4) {
+        const hex = img.getPixelColor(px, py);
         const { r, g, b } = Jimp.intToRGBA(hex);
         if (isFloodPixel(r, g, b)) return true;
       }
@@ -77,7 +77,7 @@ app.http('flood', {
       return { status: 400, headers: CORS, body: 'lat and lng required' };
     }
 
-    const d    = 0.002;
+    const d    = 0.005;
     const bbox = `${lng-d},${lat-d},${lng+d},${lat+d}`;
     const W    = 256, H = 256;
 
