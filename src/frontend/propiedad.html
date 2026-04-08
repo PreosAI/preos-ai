@@ -352,50 +352,66 @@
     .place-tab-btn.active { color:#1a1a1a;
       border-bottom:3px solid #CC0000; }
     .place-tab-btn:hover:not(.active) { color:#1a1a1a; }
-    .place-panel { display: none; }
+    .place-panel { display:none; padding-top:4px; }
     .place-panel.active { display: block; }
+    .place-empty { font-size:13px; color:#aaa;
+      font-style:italic; padding:16px 0; }
+    .place-attribution { font-size:12px; color:#999;
+      margin-top:10px; padding-top:8px;
+      border-top:1px solid #f0f0f0; }
+    .place-attribution a { color:#CC0000;
+      text-decoration:none; }
 
-    /* School rows — Redfin style */
+    /* School rows — Redfin style, no color coding */
     .school-row { display:flex; align-items:flex-start;
-      justify-content:space-between; padding:16px 0;
+      justify-content:space-between; padding:14px 0;
       border-bottom:1px solid #efefef; }
     .school-row:last-child { border-bottom:none; }
     .school-left { flex:1; min-width:0; padding-right:16px; }
-    .school-title { font-size:15px; font-weight:600;
+    .school-title { font-size:14px; font-weight:600;
       color:#1a1a1a; text-decoration:none; display:block;
-      margin-bottom:3px; }
+      margin-bottom:2px; }
     .school-title:hover { color:#CC0000; }
-    .school-subtitle { font-size:13px; color:#777;
-      line-height:1.4; }
-    .school-right { flex-shrink:0; text-align:right; }
+    .school-subtitle { font-size:12px; color:#777; }
+    .school-right { flex-shrink:0; display:flex;
+      align-items:center; gap:4px; }
     .school-score-text { font-size:14px; font-weight:600;
-      color:#1a1a1a; white-space:nowrap; }
-    .school-score-text.score-high { color:#2E7D32; }
-    .school-score-text.score-mid  { color:#F57F17; }
-    .school-score-text.score-low  { color:#C62828; }
-    .school-score-text.score-none { color:#999;
-      font-weight:400; }
-    .school-score-arrow { color:#aaa; margin-left:2px; }
-    .school-attribution { font-size:12px; color:#999;
-      margin-top:12px; padding-top:8px;
-      border-top:1px solid #f0f0f0; }
-    .school-attribution a { color:#CC0000;
-      text-decoration:none; }
+      color:#444; white-space:nowrap; }
+    .school-score-arrow { color:#aaa; font-size:13px; }
 
-    /* Place/transport rows */
-    .place-row { display:flex; align-items:center;
-      justify-content:space-between; padding:13px 0;
-      border-bottom:1px solid #efefef; gap:12px; }
-    .place-row:last-child { border-bottom:none; }
-    .place-row-left { flex:1; min-width:0; }
-    .place-row-name { font-size:14px; font-weight:500;
-      color:#1a1a1a; display:block; }
-    .place-row-type { font-size:12px; color:#888; }
-    .place-row-dist { flex-shrink:0; font-size:13px;
-      color:#777; }
-    .place-empty { font-size:13px; color:#aaa;
-      font-style:italic; padding:16px 0; }
-    .place-panel { padding-top:8px; }
+    /* Places — 2-column grid with category icon */
+    .places-grid { display:grid;
+      grid-template-columns:1fr 1fr; gap:0; }
+    .place-item { display:flex; align-items:flex-start;
+      gap:10px; padding:12px 8px 12px 0;
+      border-bottom:1px solid #efefef; }
+    .place-item:nth-last-child(-n+2) { border-bottom:none; }
+    .place-icon-box { flex-shrink:0; width:36px; height:36px;
+      border-radius:8px; display:flex; align-items:center;
+      justify-content:center; font-size:17px; }
+    .place-item-info { flex:1; min-width:0; }
+    .place-item-name { font-size:13px; font-weight:600;
+      color:#1a1a1a; display:block; line-height:1.3;
+      white-space:nowrap; overflow:hidden;
+      text-overflow:ellipsis; }
+    .place-item-meta { font-size:12px; color:#888;
+      margin-top:1px; }
+
+    /* Transit rows */
+    .transit-row { display:flex; align-items:flex-start;
+      gap:12px; padding:12px 0;
+      border-bottom:1px solid #efefef; }
+    .transit-row:last-child { border-bottom:none; }
+    .transit-icon-box { flex-shrink:0; width:36px; height:36px;
+      border-radius:8px; background:#E3F2FD;
+      display:flex; align-items:center;
+      justify-content:center; font-size:18px; }
+    .transit-info { flex:1; min-width:0; }
+    .transit-name { font-size:14px; font-weight:600;
+      color:#1a1a1a; display:block; margin-bottom:2px; }
+    .transit-meta { font-size:12px; color:#777; }
+    .transit-dist { flex-shrink:0; font-size:12px;
+      color:#888; padding-top:2px; }
 
     /* ─── LIFESTYLE SCORES ──────────────────────────────────── */
     .lifestyle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -2163,81 +2179,139 @@ out tags;`;
   function renderPlaceTabs(pois) {
     if (!pois) return;
 
-    function schoolRow(item) {
-      // Score display — right side like Redfin "9/10 ›"
-      let scoreHtml = '';
-      if (item.rating) {
-        const cls = item.rating >= 4.0 ? 'score-high' :
-                    item.rating >= 3.0 ? 'score-mid' : 'score-low';
-        // Convert 5-point micole scale to 10-point display
-        const outOf10 = Math.round(item.rating * 2);
-        scoreHtml = '<div class="school-right">' +
-          '<span class="school-score-text ' + cls + '">' +
-          outOf10 + '/10' +
-          '<span class="school-score-arrow"> ›</span>' +
-          '</span></div>';
-      } else {
-        scoreHtml = '<div class="school-right">' +
-          '<span class="school-score-text score-none">—</span>' +
-          '</div>';
-      }
+    // ── Category icon + background colours for places ──
+    const PLACE_ICONS = {
+      'Restaurante':  { icon:'🍽️', bg:'#FFF3E0' },
+      'Café':         { icon:'☕',  bg:'#FFF8E1' },
+      'Comida rápida':{ icon:'🍔', bg:'#FFF3E0' },
+      'Bar':          { icon:'🍺', bg:'#F3E5F5' },
+      'Supermercado': { icon:'🛒', bg:'#E8F5E9' },
+      'Tienda':       { icon:'🏪', bg:'#E8F5E9' },
+      'Panadería':    { icon:'🥖', bg:'#FFF8E1' },
+      'Carnicería':   { icon:'🥩', bg:'#FFEBEE' },
+      'Frutería':     { icon:'🍎', bg:'#E8F5E9' },
+      'Farmacia':     { icon:'💊', bg:'#E3F2FD' },
+      'Banco':        { icon:'🏦', bg:'#E3F2FD' },
+      'Salud':        { icon:'🏥', bg:'#FCE4EC' },
+      'Parque':       { icon:'🌳', bg:'#E8F5E9' },
+      'Parque infantil':{ icon:'🛝', bg:'#E8F5E9' },
+      'Deporte':      { icon:'⚽', bg:'#E8F5E9' },
+    };
 
-      // Subtitle: tipo · metodologia · distance
+    // ── Transit icons ──
+    const TRANSIT_ICONS = {
+      'Autobús':  '🚌',
+      'Tren':     '🚆',
+      'Tranvía':  '🚊',
+      'Metro':    '🚇',
+    };
+
+    function distLabel(m) {
+      return m < 1000 ? m + ' m' : (m/1000).toFixed(1) + ' km';
+    }
+
+    // ── School row ──
+    function schoolRow(item) {
+      const dist = distLabel(item.dist);
       const parts = [];
       if (item.tipo) parts.push(item.tipo);
       if (item.metodologia) parts.push(item.metodologia);
-      const dist = item.dist < 1000
-        ? item.dist + ' m' : (item.dist/1000).toFixed(1) + ' km';
       parts.push(dist);
 
       const titleEl = item.micoleUrl
-        ? '<a href="' + item.micoleUrl + '" target="_blank" rel="noopener" class="school-title">' + item.name + '</a>'
-        : '<span class="school-title" style="cursor:default">' + item.name + '</span>';
+        ? '<a href="' + item.micoleUrl +
+          '" target="_blank" rel="noopener" class="school-title">' +
+          item.name + '</a>'
+        : '<span class="school-title" style="cursor:default">' +
+          item.name + '</span>';
+
+      let scoreHtml = '';
+      if (item.rating) {
+        const outOf10 = Math.round(item.rating * 2);
+        scoreHtml = '<div class="school-right">' +
+          '<span class="school-score-text">' + outOf10 + '/10</span>' +
+          '<span class="school-score-arrow"> ›</span></div>';
+      }
 
       return '<div class="school-row">' +
         '<div class="school-left">' + titleEl +
-        '<span class="school-subtitle">' + parts.join(' · ') + '</span>' +
-        '</div>' + scoreHtml + '</div>';
+        '<span class="school-subtitle">' +
+        parts.join(' · ') + '</span></div>' +
+        scoreHtml + '</div>';
     }
 
-    function poiRow(item) {
-      const dist = item.dist < 1000
-        ? item.dist + ' m' : (item.dist/1000).toFixed(1) + ' km';
-      return '<div class="place-row">' +
-        '<div class="place-row-left">' +
-        '<span class="place-row-name">' + item.name + '</span>' +
-        '<span class="place-row-type">' + item.type + '</span>' +
+    // ── Place item (2-col grid) ──
+    function placeItem(item) {
+      const cfg = PLACE_ICONS[item.type] ||
+                  { icon:'📍', bg:'#F5F5F5' };
+      return '<div class="place-item">' +
+        '<div class="place-icon-box" style="background:' +
+        cfg.bg + '">' + cfg.icon + '</div>' +
+        '<div class="place-item-info">' +
+        '<span class="place-item-name">' + item.name + '</span>' +
+        '<span class="place-item-meta">' + item.type +
+        ' · ' + distLabel(item.dist) + '</span>' +
+        '</div></div>';
+    }
+
+    // ── Transit row ──
+    function transitRow(item) {
+      const icon = TRANSIT_ICONS[item.type] || '🚌';
+      return '<div class="transit-row">' +
+        '<div class="transit-icon-box">' + icon + '</div>' +
+        '<div class="transit-info">' +
+        '<span class="transit-name">' + item.name + '</span>' +
+        '<span class="transit-meta">' + item.type + '</span>' +
         '</div>' +
-        '<span class="place-row-dist">' + dist + '</span></div>';
+        '<div class="transit-dist">' +
+        distLabel(item.dist) + '</div></div>';
     }
 
-    const schoolPanel = document.getElementById('place-colegios');
+    // ── Render schools ──
+    var schoolPanel = document.getElementById('place-colegios');
     if (schoolPanel && pois.schools && pois.schools.length) {
-      schoolPanel.innerHTML = '<div class="place-empty" style="color:#ccc;font-style:normal">Cargando...</div>';
+      schoolPanel.innerHTML =
+        '<div class="place-empty" style="color:#ccc;' +
+        'font-style:normal">Cargando...</div>';
       enrichSchoolsWithRatings(pois.schools).then(function(enriched) {
         schoolPanel.innerHTML =
           enriched.map(schoolRow).join('') +
-          '<div class="school-attribution">Valoraciones: ' +
-          '<a href="https://www.micole.net" target="_blank" rel="noopener">micole.net</a>' +
-          '</div>';
+          '<div class="place-attribution">Valoraciones: ' +
+          '<a href="https://www.micole.net" target="_blank"' +
+          ' rel="noopener">micole.net</a></div>';
       });
     } else if (schoolPanel) {
-      schoolPanel.innerHTML = '<div class="place-empty">' +
+      schoolPanel.innerHTML =
+        '<div class="place-empty">' +
         PreosLang.t('places_none_nearby') + '</div>';
     }
 
-    const placesPanel = document.getElementById('place-lugares');
+    // ── Render places ──
+    var placesPanel = document.getElementById('place-lugares');
     if (placesPanel && pois.places && pois.places.length) {
-      placesPanel.innerHTML = pois.places.map(poiRow).join('');
-    } else if (placesPanel && (!pois.places || !pois.places.length)) {
-      placesPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
+      placesPanel.innerHTML =
+        '<div class="places-grid">' +
+        pois.places.map(placeItem).join('') +
+        '</div>' +
+        '<div class="place-attribution">' +
+        'Datos: OpenStreetMap</div>';
+    } else if (placesPanel) {
+      placesPanel.innerHTML =
+        '<div class="place-empty">' +
+        PreosLang.t('places_none_nearby') + '</div>';
     }
 
-    const transportPanel = document.getElementById('place-transporte');
+    // ── Render transport ──
+    var transportPanel = document.getElementById('place-transporte');
     if (transportPanel && pois.transport && pois.transport.length) {
-      transportPanel.innerHTML = pois.transport.map(poiRow).join('');
-    } else if (transportPanel && (!pois.transport || !pois.transport.length)) {
-      transportPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
+      transportPanel.innerHTML =
+        pois.transport.map(transitRow).join('') +
+        '<div class="place-attribution">' +
+        'Datos: OpenStreetMap</div>';
+    } else if (transportPanel) {
+      transportPanel.innerHTML =
+        '<div class="place-empty">' +
+        PreosLang.t('places_none_nearby') + '</div>';
     }
   }
 
