@@ -413,6 +413,37 @@
     .transit-dist { flex-shrink:0; font-size:12px;
       color:#888; padding-top:2px; }
 
+    /* ── Sun exposure card ── */
+    .sun-section { margin-top:32px; padding-top:28px;
+      border-top:1px solid #f0f0f0; }
+    .sun-section h3 { font-size:18px; font-weight:700;
+      color:#1a1a1a; margin:0 0 12px 0; }
+    .sun-card { display:flex; align-items:flex-start;
+      gap:32px; }
+    .sun-text { flex:1; }
+    .sun-description { font-size:14px; color:#444;
+      line-height:1.6; margin:0 0 12px 0; }
+    .sun-link { font-size:14px; font-weight:600;
+      color:#CC0000; text-decoration:none; }
+    .sun-link:hover { text-decoration:underline; }
+    .sun-attribution { font-size:12px; color:#999;
+      margin-top:10px; }
+    .sun-attribution a { color:#999; text-decoration:none; }
+    .sun-attribution a:hover { text-decoration:underline; }
+    .sun-bars { flex-shrink:0; display:flex;
+      flex-direction:column; align-items:flex-end;
+      gap:0; min-width:160px; }
+    .sun-chart { display:flex; align-items:flex-end;
+      gap:24px; height:80px; margin-bottom:4px; }
+    .sun-bar-wrap { display:flex; flex-direction:column;
+      align-items:center; gap:4px; }
+    .sun-bar-label-top { font-size:12px; font-weight:600;
+      color:#1a1a1a; }
+    .sun-bar { width:48px; background:#F5A623;
+      border-radius:3px 3px 0 0;
+      transition:height 0.3s ease; }
+    .sun-bar-label-bottom { font-size:12px; color:#888; }
+
     /* ─── LIFESTYLE SCORES ──────────────────────────────────── */
     .lifestyle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .lifestyle-card { background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
@@ -1620,6 +1651,32 @@
 
       </div>
 
+      <div class="section-sun" id="section-sun" style="display:none">
+        <div class="sun-section">
+          <h3 data-i18n="sun_exposure_title">Exposición solar</h3>
+          <div class="sun-card">
+            <div class="sun-text">
+              <p class="sun-description" id="sun-description"></p>
+              <a href="https://re.jrc.ec.europa.eu/pvg_tools/es/"
+                 target="_blank" rel="noopener"
+                 class="sun-link"
+                 data-i18n="sun_view_tool">
+                Ver herramienta solar →
+              </a>
+              <div class="sun-attribution">
+                <span data-i18n="sun_provided_by">Datos: </span>
+                <a href="https://joint-research-centre.ec.europa.eu/pvgis-photovoltaic-geographical-information-system_en"
+                   target="_blank" rel="noopener">
+                  PVGIS · Comisión Europea</a>
+              </div>
+            </div>
+            <div class="sun-bars">
+              <div class="sun-chart" id="sun-chart"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- RIGHT SIDEBAR -->
@@ -2441,6 +2498,65 @@ out tags;`;
     }
   }
 
+  async function loadSunExposure(prop) {
+    const section = document.getElementById('section-sun');
+    if (!section) return;
+
+    try {
+      const snap = await firebase.firestore()
+        .collection('enrichment').doc(prop.id).get();
+      const sun = snap.data()?.sun;
+      if (!sun || !sun.juneHours) return;
+
+      const june = sun.juneHours;
+      const dec  = sun.decemberHours;
+
+      // ── Description text (like Redfin) ──
+      const lang = window.PreosLang?.currentLang?.() || 'es';
+      let desc;
+      if (lang === 'en') {
+        desc = `In this area, properties receive around ` +
+          `<strong>${june} hours</strong> of sunlight per day in June ` +
+          `and <strong>${dec} hours</strong> in December — ` +
+          `among the highest in Europe for solar exposure.`;
+      } else {
+        desc = `En esta zona, las propiedades reciben alrededor de ` +
+          `<strong>${june} horas</strong> de sol al día en junio ` +
+          `y <strong>${dec} horas</strong> en diciembre — ` +
+          `de las más altas de Europa en exposición solar.`;
+      }
+      document.getElementById('sun-description').innerHTML = desc;
+
+      // ── Bar chart ──
+      const maxH = june; // June is always the tallest
+      const chartHeight = 72; // px for the tallest bar
+      const juneH  = chartHeight;
+      const decH   = Math.round((dec / maxH) * chartHeight);
+
+      document.getElementById('sun-chart').innerHTML =
+        barHtml(june, juneH, lang === 'en' ? 'June' : 'Junio') +
+        barHtml(dec,  decH,  lang === 'en' ? 'December' : 'Diciembre');
+
+      // Re-render on language change
+      document.addEventListener('preos:langchange', function() {
+        loadSunExposure(prop);
+      }, { once: true });
+
+      section.style.display = 'block';
+
+    } catch(e) {
+      console.warn('[sun]', e.message);
+    }
+
+    function barHtml(hours, heightPx, label) {
+      return '<div class="sun-bar-wrap">' +
+        '<span class="sun-bar-label-top">' + hours + ' hrs</span>' +
+        '<div class="sun-bar" style="height:' + heightPx + 'px"></div>' +
+        '<span class="sun-bar-label-bottom">' + label + '</span>' +
+        '</div>';
+    }
+  }
+
   async function checkFloodZone(property) {
     // Flood score is pre-computed by enrich-climate.js batch script
     // This function is now a no-op — loadClimateRisks handles rendering
@@ -2690,6 +2806,11 @@ out tags;`;
         if (typeof loadClimateRisks === 'function') {
           loadClimateRisks(prop).catch(function(e) {
             console.warn('[climate] failed:', e);
+          });
+        }
+        if (typeof loadSunExposure === 'function') {
+          loadSunExposure(prop).catch(function(e) {
+            console.warn('[sun] failed:', e);
           });
         }
         if (typeof checkFloodZone === 'function') {
