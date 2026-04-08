@@ -2068,6 +2068,72 @@ out tags;`;
     if (scores.pois) renderPlaceTabs(scores.pois);
   }
 
+  async function enrichSchoolsWithRatings(schools) {
+    if (!schools || !schools.length) return schools;
+    try {
+      // Fetch all school slugs from the schools collection
+      // that might match our OSM school names
+      const enriched = await Promise.all(schools.map(async (school) => {
+        // Generate slug from OSM name for lookup
+        const slug = school.name
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .trim()
+          .replace(/\s+/g, '-');
+
+        // Try exact slug match first
+        let doc = await firebase.firestore()
+          .collection('schools').doc(slug).get();
+
+        // If no exact match, try without common prefixes
+        // e.g. "colegio-publico-el-tomillar" → try "el-tomillar"
+        if (!doc.exists) {
+          const stripped = slug
+            .replace(/^colegio-(publico|privado|concertado|de-educacion-infantil-y-primaria|infantil|internacional|bilingue)-?/, '')
+            .replace(/^instituto-(de-educacion-secundaria)-?/, '')
+            .replace(/^ceip-/, '')
+            .replace(/^cei-/, '')
+            .replace(/^eei-/, '');
+          if (stripped !== slug) {
+            // Search by partial name match in collection
+            const snap = await firebase.firestore()
+              .collection('schools')
+              .where('slug', '>=', stripped.substring(0, 8))
+              .where('slug', '<=', stripped.substring(0, 8) + '\uf8ff')
+              .limit(3)
+              .get();
+            if (!snap.empty) {
+              // Find best match
+              const best = snap.docs.find(d =>
+                d.data().slug.includes(stripped.substring(0, 8))
+              );
+              if (best) doc = best;
+            }
+          }
+        }
+
+        if (doc.exists) {
+          const data = doc.data();
+          return {
+            ...school,
+            rating:      data.rating,
+            reviews:     data.reviews,
+            tipo:        data.tipo,
+            metodologia: data.metodologia,
+            precio:      data.precio,
+            micoleUrl:   data.url
+          };
+        }
+        return school;
+      }));
+      return enriched;
+    } catch(e) {
+      console.warn('[schools] enrichment failed:', e.message);
+      return schools;
+    }
+  }
+
   function renderPlaceTabs(pois) {
     if (!pois) return;
 
@@ -2075,33 +2141,68 @@ out tags;`;
       return m < 1000 ? m + ' m' : (m/1000).toFixed(1) + ' km';
     }
 
-    function poiRow(item) {
+    function poiRow(item, isSchool) {
+      const dist = item.dist < 1000
+        ? item.dist + ' m'
+        : (item.dist/1000).toFixed(1) + ' km';
+
+      // School rating badge
+      let ratingBadge = '';
+      if (isSchool && item.rating) {
+        const col = item.rating >= 4.5 ? '#2E7D32' :
+                    item.rating >= 4.0 ? '#388E3C' :
+                    item.rating >= 3.5 ? '#F57F17' : '#C62828';
+        const stars = item.rating >= 4.5 ? '⭐' :
+                      item.rating >= 4.0 ? '🟢' : '🟡';
+        ratingBadge = `<span style="font-size:11px;color:${col};font-weight:600;margin-left:6px">${stars} ${item.rating}</span>`;
+        if (item.reviews) ratingBadge += `<span style="font-size:10px;color:#aaa"> (${item.reviews})</span>`;
+      }
+
+      // Type badges for schools
+      let typeBadge = '';
+      if (isSchool) {
+        if (item.metodologia === 'Internacional') typeBadge += '<span style="font-size:10px;background:#E3F2FD;color:#1565C0;padding:1px 5px;border-radius:4px;margin-left:4px">🌍 Int\'l</span>';
+        else if (item.metodologia === 'Bilingüe') typeBadge += '<span style="font-size:10px;background:#E8F5E9;color:#2E7D32;padding:1px 5px;border-radius:4px;margin-left:4px">🌐 Bil</span>';
+        if (item.tipo === 'Privado') typeBadge += '<span style="font-size:10px;background:#FFF3E0;color:#E65100;padding:1px 5px;border-radius:4px;margin-left:4px">Privado</span>';
+        else if (item.tipo === 'Concertado') typeBadge += '<span style="font-size:10px;background:#F3E5F5;color:#6A1B9A;padding:1px 5px;border-radius:4px;margin-left:4px">Concertado</span>';
+      }
+
+      const nameLink = (isSchool && item.micoleUrl)
+        ? `<a href="${item.micoleUrl}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${item.name}</a>`
+        : item.name;
+
       return `<div class="place-row">
         <div class="place-row-info">
-          <span class="place-row-name">${item.name}</span>
+          <span class="place-row-name">${nameLink}${ratingBadge}${typeBadge}</span>
           <span class="place-row-type">${item.type}</span>
         </div>
-        <span class="place-row-dist">${distLabel(item.dist)}</span>
+        <span class="place-row-dist">${dist}</span>
       </div>`;
     }
 
     const schoolPanel = document.getElementById('place-colegios');
     if (schoolPanel && pois.schools && pois.schools.length) {
-      schoolPanel.innerHTML = pois.schools.map(poiRow).join('');
+      // Show loading state while enriching
+      schoolPanel.innerHTML = '<div class="place-empty" style="color:#aaa">Cargando datos de colegios...</div>';
+      enrichSchoolsWithRatings(pois.schools).then(function(enriched) {
+        schoolPanel.innerHTML = enriched.map(function(s) {
+          return poiRow(s, true);
+        }).join('');
+      });
     } else if (schoolPanel && (!pois.schools || !pois.schools.length)) {
       schoolPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
     }
 
     const placesPanel = document.getElementById('place-lugares');
     if (placesPanel && pois.places && pois.places.length) {
-      placesPanel.innerHTML = pois.places.map(poiRow).join('');
+      placesPanel.innerHTML = pois.places.map(function(p) { return poiRow(p, false); }).join('');
     } else if (placesPanel && (!pois.places || !pois.places.length)) {
       placesPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
     }
 
     const transportPanel = document.getElementById('place-transporte');
     if (transportPanel && pois.transport && pois.transport.length) {
-      transportPanel.innerHTML = pois.transport.map(poiRow).join('');
+      transportPanel.innerHTML = pois.transport.map(function(t) { return poiRow(t, false); }).join('');
     } else if (transportPanel && (!pois.transport || !pois.transport.length)) {
       transportPanel.innerHTML = `<div class="place-empty">${PreosLang.t('places_none_nearby')}</div>`;
     }
