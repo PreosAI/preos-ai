@@ -1,24 +1,10 @@
 /**
  * seed-schools.js
- *
- * Scrapes micole.net for all schools in Costa del Sol /
- * Málaga province municipalities and stores in Firestore.
- *
- * Strategy:
- *   1. For each municipality, fetch the buscador page
- *      which lists all schools there
- *   2. Parse school name, rating, reviews, address, type,
- *      methodology, price range, URL slug
- *   3. Store in Firestore 'schools' collection
- *      keyed by normalised slug
- *
- * Usage:
- *   node scripts/seed-schools.js
- *   node scripts/seed-schools.js --force
+ * Scrapes micole.net — all Costa del Sol schools into Firestore.
+ * Uses raw HTML regex parsing (micole has no <article> tags).
  */
 
 const fetch  = require('node-fetch');
-const { parse } = require('node-html-parser');
 const admin  = require('firebase-admin');
 
 let sa;
@@ -39,9 +25,109 @@ function slugify(name) {
     .replace(/\s+/g, '-');
 }
 
-// All Costa del Sol + Málaga province relevant municipalities
-// URL format: micole.net/buscador/colegios-malaga-{slug}
-// Special case for Málaga city: /buscador/malaga-malaga
+function dedup(name) {
+  // micole repeats name: "Colegio X Colegio X" → "Colegio X"
+  const t = name.trim();
+  const half = t.substring(0, Math.floor(t.length / 2)).trim();
+  if (half.length > 4 && t === half + ' ' + half) return half;
+  // Also handle odd-length duplicates
+  const words = t.split(' ');
+  const mid = Math.floor(words.length / 2);
+  const a = words.slice(0, mid).join(' ');
+  const b = words.slice(mid).join(' ');
+  if (a === b) return a;
+  return t;
+}
+
+async function scrapePage(url) {
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      'Accept-Language': 'es-ES,es;q=0.9',
+      'Accept': 'text/html'
+    },
+    timeout: 25000
+  });
+  if (res.status === 404) return [];
+  if (!res.ok) { console.log(`    ⚠️  HTTP ${res.status}`); return []; }
+
+  const html = await res.text();
+  const schools = [];
+
+  // Split page into blocks by <h2> — each school card starts with one
+  const blocks = html.split('<h2');
+  console.log(`    found ${blocks.length - 1} h2 blocks`);
+
+  for (const block of blocks.slice(1)) {
+    // Must contain a link to /malaga/{municipio}/colegio-...
+    const linkMatch = block.match(/href="(\/malaga\/([^/]+)\/[^"]+)"/);
+    if (!linkMatch) continue;
+
+    const path      = linkMatch[1];
+    const municipio = linkMatch[2];
+    const fullUrl   = 'https://www.micole.net' + path;
+
+    // Extract name from anchor text
+    const nameMatch = block.match(/>([^<]{5,120})<\/a>/);
+    if (!nameMatch) continue;
+    const name = dedup(nameMatch[1].trim());
+    if (!name || name.length < 4) continue;
+
+    // Use up to 3000 chars after the h2 for metadata
+    const ctx = block.substring(0, 3000);
+
+    // Rating: digit.digit followed soon by a star image
+    const ratingMatch = ctx.match(/(\d\.\d)\s*\n?\s*<img[^>]+star/);
+    const rating = ratingMatch ? parseFloat(ratingMatch[1]) : null;
+
+    // Reviews: (NN valoraciones)
+    const reviewMatch = ctx.match(/\((\d+)\s*valoraciones?\)/);
+    const reviews = reviewMatch ? parseInt(reviewMatch[1]) : 0;
+
+    // Address: line starting with a street keyword inside a tag
+    const addrMatch = ctx.match(/>\s*((?:Calle|Avenida|Av\.|C\/|Plaza|Paseo|Carretera|Camino|Ronda|Urb\.|Urbanización|Polígono)[^<]{5,80})</i);
+    const address = addrMatch ? addrMatch[1].trim() : null;
+
+    // Tipo: look for exact tag content
+    let tipo = 'Público';
+    if (/>Privado</.test(ctx))    tipo = 'Privado';
+    if (/>Concertado</.test(ctx)) tipo = 'Concertado';
+
+    // Methodology
+    let metodologia = null;
+    if (/>Internacional</.test(ctx))               metodologia = 'Internacional';
+    else if (/>Bilingüe</.test(ctx) ||
+             />Bilingue</.test(ctx))               metodologia = 'Bilingüe';
+    else if (/>Plurilingüe</.test(ctx) ||
+             />Plurilingue</.test(ctx))             metodologia = 'Plurilingüe';
+    else if (/>Idiomas</.test(ctx))                metodologia = 'Idiomas';
+
+    // Price
+    let precio = null;
+    if (/>(&gt;700|>700)€</.test(ctx))            precio = '>700€';
+    else if (/>300-700€</.test(ctx))              precio = '300-700€';
+    else if (/>100-300€</.test(ctx))              precio = '100-300€';
+    else if (/>(0€|&lt;100|<100)/.test(ctx))      precio = '<100€';
+
+    // Stage
+    let etapa = 'Colegio';
+    if (/\bI\.E\.S\b|\bInstituto\b/i.test(name)) etapa = 'Instituto';
+    else if (/infantil|guardería|nursery|baby/i.test(name)) etapa = 'Infantil';
+
+    const slug = slugify(name);
+    if (!slug) continue;
+
+    schools.push({
+      name, slug, url: fullUrl, municipio,
+      rating, reviews,
+      address, tipo, metodologia, precio, etapa,
+      source: 'micole.net'
+    });
+  }
+
+  return schools;
+}
+
 const MUNICIPALITIES = [
   { name: 'Málaga',               slug: 'malaga-malaga' },
   { name: 'Marbella',             slug: 'colegios-malaga-marbella' },
@@ -59,207 +145,80 @@ const MUNICIPALITIES = [
   { name: 'Manilva',              slug: 'colegios-malaga-manilva' },
   { name: 'Casares',              slug: 'colegios-malaga-casares' },
   { name: 'Cártama',              slug: 'colegios-malaga-cartama' },
-  { name: 'Torox',                slug: 'colegios-malaga-torrox' },
+  { name: 'Torrox',               slug: 'colegios-malaga-torrox' },
   { name: 'San Pedro Alcántara',  slug: 'colegios-malaga-san-pedro-de-alcantara' },
   { name: 'Monda',                slug: 'colegios-malaga-monda' },
   { name: 'Ojén',                 slug: 'colegios-malaga-ojen' },
   { name: 'Benahavís',            slug: 'colegios-malaga-benahavis' },
   { name: 'Istán',                slug: 'colegios-malaga-istan' },
+  { name: 'Marbella (San Pedro)', slug: 'colegios-malaga-san-pedro-de-alcantara' },
 ];
 
-// Also scrape these themed lists which contain rated schools
-// from all over Málaga — high value targets
-const THEMED_PAGES = [
-  { name: 'Top Málaga',        url: 'https://www.micole.net/mejores-colegios-de-malaga' },
-  { name: 'Internacionales',   url: 'https://www.micole.net/buscador/colegios-internacionales-malaga' },
-  { name: 'Bilingües',         url: 'https://www.micole.net/buscador/colegios-bilingues-malaga' },
-  { name: 'Top públicos',      url: 'https://www.micole.net/mejores-colegios-publicos-de-malaga' },
-  { name: 'Top privados',      url: 'https://www.micole.net/mejores-colegios-privados-de-malaga' },
+const THEMED = [
+  'https://www.micole.net/mejores-colegios-de-malaga',
+  'https://www.micole.net/buscador/colegios-internacionales-malaga',
+  'https://www.micole.net/buscador/colegios-bilingues-malaga',
+  'https://www.micole.net/mejores-colegios-publicos-de-malaga',
+  'https://www.micole.net/mejores-colegios-privados-de-malaga',
 ];
-
-const BASE = 'https://www.micole.net/buscador/';
-
-async function scrapePage(url, label) {
-  console.log(`  → ${label}: ${url}`);
-  try {
-    const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept-Language': 'es-ES,es;q=0.9',
-        'Accept': 'text/html,application/xhtml+xml'
-      },
-      timeout: 25000
-    });
-
-    if (res.status === 404) {
-      console.log(`    ⚠️  404 — skipping`);
-      return [];
-    }
-    if (!res.ok) {
-      console.log(`    ⚠️  ${res.status} — skipping`);
-      return [];
-    }
-
-    const html = await res.text();
-    const root = parse(html);
-    const schools = [];
-
-    // School cards contain a link with /malaga/ in href
-    const links = root.querySelectorAll('h2 a[href*="/malaga/"]');
-    console.log(`    found ${links.length} school links`);
-
-    for (const link of links) {
-      try {
-        const rawName = link.text.trim();
-        // Skip duplicate text — micole repeats the name twice in the link
-        const name = rawName.split('\n')[0].trim();
-        if (!name || name.length < 5) continue;
-
-        const href = link.getAttribute('href') || '';
-        const fullUrl = href.startsWith('http')
-          ? href : 'https://www.micole.net' + href;
-
-        // Parent card context for metadata
-        // Try different parent levels
-        let card = link.closest('article');
-        if (!card) {
-          let el = link.parentElement;
-          for (let i = 0; i < 6 && el; i++) {
-            if (el.text && el.text.length > 100) { card = el; break; }
-            el = el.parentElement;
-          }
-        }
-        if (!card) continue;
-
-        const cardText = card.text || '';
-
-        // Rating: look for pattern "4.4" near "valoraciones"
-        const ratingMatch = cardText.match(/(\d\.\d)\s*\n.*?\((\d+)\s*valoracion/s);
-        const rating      = ratingMatch ? parseFloat(ratingMatch[1]) : null;
-        const reviews     = ratingMatch ? parseInt(ratingMatch[2]) : 0;
-
-        // Address: text with comma and a town name
-        const addrMatch = cardText.match(/((?:Calle|Avenida|Av\.|C\/|Plaza|Paseo|Carretera|Camino|Ronda|Urbanización|Urb\.)[^,\n]{3,50},\s*[A-ZÁÉÍÓÚ][^,\n]{2,30})/i);
-        const address = addrMatch ? addrMatch[1].trim() : null;
-
-        // Municipality from URL
-        const urlParts  = fullUrl.replace('https://www.micole.net/', '').split('/');
-        const municipio = urlParts[1] || null;
-
-        // Type
-        let tipo = 'Público';
-        if (cardText.includes('Privado'))    tipo = 'Privado';
-        if (cardText.includes('Concertado')) tipo = 'Concertado';
-
-        // Methodology
-        let metodologia = null;
-        if (cardText.includes('Internacional'))              metodologia = 'Internacional';
-        else if (/Bilingüe|Bilingue/i.test(cardText))        metodologia = 'Bilingüe';
-        else if (cardText.includes('Idiomas'))               metodologia = 'Idiomas';
-
-        // Price
-        let precio = null;
-        if (cardText.includes('>700'))             precio = '>700€';
-        else if (cardText.includes('300-700'))     precio = '300-700€';
-        else if (cardText.includes('100-300') ||
-                 cardText.includes('100 y 300'))   precio = '100-300€';
-        else if (/<100|0€\s*o/i.test(cardText))   precio = '<100€';
-
-        // Stage (type of school)
-        let etapa = 'Colegio';
-        if (/instituto/i.test(name) || /I\.E\.S\./i.test(name)) etapa = 'Instituto';
-        else if (/infantil|guardería|nursery|baby/i.test(name)) etapa = 'Infantil';
-        else if (/universidad/i.test(name))                      etapa = 'Universidad';
-
-        const slug = slugify(name);
-        if (!slug) continue;
-
-        schools.push({
-          name, slug, url: fullUrl,
-          rating, reviews,
-          address, municipio, tipo,
-          metodologia, precio, etapa,
-          source: 'micole.net'
-        });
-      } catch(e) {
-        // skip malformed
-      }
-    }
-
-    return schools;
-
-  } catch(e) {
-    console.log(`    ❌ error: ${e.message}`);
-    return [];
-  }
-}
 
 async function main() {
   const force = process.argv.includes('--force');
-  console.log('\n🏫 Preos School Database Seeder — micole.net');
-  console.log(`Mode: ${force ? '⚡ force' : '📦 normal'}\n`);
+  console.log('\n🏫 Preos School Database — micole.net scraper');
+  console.log(force ? '⚡ Force\n' : '📦 Normal\n');
 
-  const allSchools = new Map(); // slug → data (deduplicates across pages)
+  const map = new Map();
 
-  // 1. Scrape themed/ranking pages (highest quality schools)
   console.log('━━━ Themed pages ━━━');
-  for (const page of THEMED_PAGES) {
-    const schools = await scrapePage(page.url, page.name);
-    for (const s of schools) {
-      if (!allSchools.has(s.slug)) allSchools.set(s.slug, s);
-    }
+  for (const url of THEMED) {
+    console.log(`  ${url.split('/').pop()}`);
+    const list = await scrapePage(url);
+    for (const s of list) if (!map.has(s.slug)) map.set(s.slug, s);
     await sleep(2500);
   }
 
-  // 2. Scrape per-municipality pages
   console.log('\n━━━ Municipality pages ━━━');
-  for (const muni of MUNICIPALITIES) {
-    const url = BASE + muni.slug;
-    const schools = await scrapePage(url, muni.name);
-    for (const s of schools) {
-      if (!allSchools.has(s.slug)) allSchools.set(s.slug, s);
-    }
+  for (const m of MUNICIPALITIES) {
+    const url = 'https://www.micole.net/buscador/' + m.slug;
+    console.log(`  ${m.name}`);
+    const list = await scrapePage(url);
+    for (const s of list) if (!map.has(s.slug)) map.set(s.slug, s);
     await sleep(2500);
   }
 
-  console.log(`\n📊 Total unique schools collected: ${allSchools.size}`);
+  console.log(`\n📊 Unique schools scraped: ${map.size}`);
 
-  // 3. Save to Firestore
-  console.log('\n💾 Saving to Firestore collection "schools"...\n');
-  let saved = 0, skipped = 0, failed = 0;
+  // Print preview
+  let rated = 0;
+  for (const s of map.values()) if (s.rating) rated++;
+  console.log(`   With ratings: ${rated} / ${map.size}`);
 
-  for (const [slug, school] of allSchools) {
+  // Save to Firestore
+  console.log('\n💾 Saving to Firestore "schools"...\n');
+  let saved = 0, skipped = 0;
+
+  for (const [slug, school] of map) {
     try {
       if (!force) {
-        const existing = await db.collection('schools').doc(slug).get();
-        if (existing.exists) { skipped++; continue; }
+        const ex = await db.collection('schools').doc(slug).get();
+        if (ex.exists) { skipped++; continue; }
       }
-
       await db.collection('schools').doc(slug).set({
-        ...school,
-        updatedAt: new Date().toISOString()
+        ...school, updatedAt: new Date().toISOString()
       });
-
-      const stars = school.rating
-        ? (school.rating >= 4.5 ? '⭐' : school.rating >= 4.0 ? '🟢' : '🟡')
-        : '⚪';
-      const rating = school.rating
-        ? `${school.rating} (${school.reviews}v)` : 'no rating';
-      console.log(`  ${stars} ${rating} [${school.tipo}] ${school.name}`);
+      const icon = !school.rating ? '⚪' :
+        school.rating >= 4.5 ? '⭐' :
+        school.rating >= 4.0 ? '🟢' : '🟡';
+      const r = school.rating ? `${school.rating}(${school.reviews}v)` : 'unrated';
+      console.log(`  ${icon} ${r} [${school.tipo}] ${school.name}`);
       saved++;
-      await sleep(50);
+      await sleep(80);
     } catch(e) {
       console.error(`  ❌ ${school.name}: ${e.message}`);
-      failed++;
     }
   }
 
-  console.log(`\n✅ Done`);
-  console.log(`   Saved:   ${saved}`);
-  console.log(`   Skipped: ${skipped} (already in DB)`);
-  console.log(`   Failed:  ${failed}`);
-  console.log(`   Total in DB: ~${saved + skipped}\n`);
+  console.log(`\n✅ saved:${saved} skipped:${skipped} total:~${saved+skipped}\n`);
   process.exit(0);
 }
-
-main().catch(e => { console.error('Fatal:', e); process.exit(1); });
+main().catch(e => { console.error(e); process.exit(1); });
