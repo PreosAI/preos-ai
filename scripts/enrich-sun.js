@@ -34,8 +34,8 @@ const MONTH_NAMES = [
 ];
 
 async function fetchSunData(lat, lng) {
-  const url = `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc` +
-    `?lat=${lat}&lon=${lng}&outputformat=json&mr_dni=1`;
+  const url = `https://re.jrc.ec.europa.eu/api/v5_2/PVcalc` +
+    `?lat=${lat}&lon=${lng}&peakpower=1&loss=14&outputformat=json`;
   const res = await fetch(url, { timeout: 20000 });
   if (!res.ok) throw new Error(`PVGIS ${res.status}`);
   const data = await res.json();
@@ -44,11 +44,11 @@ async function fetchSunData(lat, lng) {
   const monthly = data.outputs?.monthly?.fixed || [];
   if (!monthly.length) throw new Error('No monthly data in PVGIS response');
 
-  // Convert Wh/m²/day → sun hours/day (÷1000), round to 1 decimal
+  // H(i)_d = daily global irradiance in kWh/m²/day = peak sun hours
   const sunHours = monthly.map(m => ({
     month: m.month,
     name:  MONTH_NAMES[m.month - 1],
-    hours: Math.round((m['H(h)_m'] / 1000) * 10) / 10
+    hours: Math.round(m['H(i)_d'] * 10) / 10
   }));
 
   const juneHours     = sunHours.find(m => m.month === 6)?.hours;
