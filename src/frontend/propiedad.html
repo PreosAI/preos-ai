@@ -472,10 +472,35 @@
     .avm-confidence.conf-low    { background: #fee2e2; color: #b91c1c; }
     .avm-price { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 4px; }
     .avm-range { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-    .avm-bar-wrap { position: relative; height: 8px; background: #f0f0f0; border-radius: 4px; margin-bottom: 6px; }
-    .avm-bar-fill { position: absolute; left: 0; top: 0; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #22c55e 0%, #facc15 50%, #ef4444 100%); }
-    .avm-bar-dot  { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: #1a1a1a; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+    .avm-bar-wrap {
+      position: relative;
+      height: 8px;
+      border-radius: 4px;
+      margin: 10px 0 4px;
+      background: linear-gradient(
+        to right,
+        #4CAF50 0%,
+        #8BC34A 25%,
+        #FFC107 50%,
+        #FF9800 75%,
+        #F44336 100%
+      );
+    }
+    .avm-bar-fill { display: none; }
+    .avm-bar-dot {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #333;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      transition: left 0.3s ease;
+    }
     .avm-bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 14px; }
+    #avm-bar-low, #avm-bar-high { display: none; }
     .avm-market-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px; margin-bottom: 14px; }
     .avm-badge-below { background: #dcfce7; color: #15803d; }
     .avm-badge-at    { background: #f0f9ff; color: #0369a1; }
@@ -2740,15 +2765,11 @@ out tags;`;
       document.getElementById('avm-market-badge').innerHTML =
         '<span class="avm-market-badge ' + badgeClass + '">' + badgeText + '</span>';
 
-      document.getElementById('avm-bar-low').textContent  = fmtPrice(low);
-      document.getElementById('avm-bar-high').textContent = fmtPrice(high);
-
-      const range = high - low;
-      const pos = range > 0
-        ? Math.min(Math.max(((prop.price || 0) - low) / range, 0), 1)
-        : 0.5;
-      document.getElementById('avm-bar-fill').style.width = Math.round(pos * 100) + '%';
-      document.getElementById('avm-bar-dot').style.left   = Math.round(pos * 100) + '%';
+      // Position dot on gradient: -20% diff = 0% (green), 0% = 50% (yellow), +20% = 100% (red)
+      const clampedDiff = Math.max(-20, Math.min(20, diff));
+      const dotPct = Math.round((clampedDiff + 20) / 40 * 100);
+      document.getElementById('avm-bar-fill').style.display = 'none';
+      document.getElementById('avm-bar-dot').style.left = dotPct + '%';
 
       document.getElementById('avm-comparables').textContent = txText;
 
