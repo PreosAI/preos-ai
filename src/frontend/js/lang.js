@@ -866,8 +866,8 @@ window.PreosLang = (function () {
 
       // AVM — price estimator
       avm_preos_estimate:  'Estimación Preos',
-      avm_source_label:    'Basado en datos de mercado de',
-      avm_source_suffix:   '',
+      avm_source_label:    'Transacciones notariales',
+      avm_source_suffix:   ' · Notariado de España',
       avm_range_label:     'Rango estimado',
       avm_based_on:        'Basado en precio/m² del mercado local',
       avm_below_market:    'Por debajo del mercado',
@@ -1730,8 +1730,8 @@ window.PreosLang = (function () {
 
       // AVM — price estimator
       avm_preos_estimate:  'Preos Estimate',
-      avm_source_label:    'Based on market data from',
-      avm_source_suffix:   '',
+      avm_source_label:    'Notarial transactions',
+      avm_source_suffix:   ' · Notariado de España',
       avm_range_label:     'Estimated range',
       avm_based_on:        'Based on local market price/m²',
       avm_below_market:    'Below market',
