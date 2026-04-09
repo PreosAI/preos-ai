@@ -1866,51 +1866,44 @@
   }
 
   // ── AVM market badge helpers ──────────────────────────────────
-  var _marketCache = {};
+  const MARKET_PRICES = {
+    'malaga': 3564, 'marbella': 4270, 'torremolinos': 3546,
+    'fuengirola': 3496, 'benalmadena': 3465, 'estepona': 3416,
+    'nerja': 3200, 'mijas': 3119, 'rincon-de-la-victoria': 3020,
+    'manilva': 2800, 'velez-malaga': 2423, 'torrox': 2400,
+    'alhaurin-de-la-torre': 2312, 'casares': 2200, 'coin': 1900,
+  };
 
-  function getMarketData(citySlug) {
-    if (_marketCache[citySlug]) return Promise.resolve(_marketCache[citySlug]);
-    return firebase.firestore().collection('market_data').doc(citySlug).get()
-      .then(function(snap) {
-        if (!snap.exists) return null;
-        _marketCache[citySlug] = snap.data();
-        return snap.data();
-      })
-      .catch(function() { return null; });
+  function getMarketPriceM2(city) {
+    const slug = (city || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return MARKET_PRICES[slug] || null;
   }
 
   function addMarketBadge(card, prop) {
     if (!prop.price || !prop.size_m2) return;
-    const citySlug = (prop.city || '').toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, '-');
-    if (!citySlug) return;
-
-    getMarketData(citySlug).then(function(market) {
-      if (!market) return;
-      const listingPerM2 = prop.price / prop.size_m2;
-      const diff = (listingPerM2 - market.pricePerM2) / market.pricePerM2;
-      const priceEl = card.querySelector('.h-card-price');
-      if (!priceEl) return;
-
-      const lang = localStorage.getItem('preos-lang') || 'es';
-      let badgeClass, badgeText;
-      if (diff < -0.08) {
-        badgeClass = 'badge-below';
-        badgeText  = lang === 'en' ? '▼ Below market' : '▼ Por debajo del mercado';
-      } else if (diff > 0.08) {
-        badgeClass = 'badge-above';
-        badgeText  = lang === 'en' ? '▲ Above market' : '▲ Por encima del mercado';
-      } else {
-        badgeClass = 'badge-at';
-        badgeText  = lang === 'en' ? '● In line with market' : '● En línea con el mercado';
-      }
-
-      const badge = document.createElement('div');
-      badge.className = 'card-market-badge ' + badgeClass;
-      badge.textContent = badgeText;
-      priceEl.insertAdjacentElement('afterend', badge);
-    });
+    const marketM2 = getMarketPriceM2(prop.city);
+    if (!marketM2) return;
+    const listingM2 = prop.price / prop.size_m2;
+    const diff = ((listingM2 - marketM2) / marketM2) * 100;
+    const lang = localStorage.getItem('preos_lang') || 'es';
+    let cls, txt;
+    if (diff < -8) {
+      cls = 'badge-below';
+      txt = lang === 'en' ? '↓ Below market' : '↓ Bajo precio';
+    } else if (diff > 8) {
+      cls = 'badge-above';
+      txt = lang === 'en' ? '↑ Above market' : '↑ Alto precio';
+    } else {
+      cls = 'badge-at';
+      txt = lang === 'en' ? '≈ Market price' : '≈ Precio justo';
+    }
+    const priceEl = card.querySelector('.h-card-price');
+    if (priceEl) {
+      priceEl.insertAdjacentHTML('beforeend',
+        '<span class="card-market-badge ' + cls + '">' + txt + '</span>');
+    }
   }
 
   // ── Initial load ──────────────────────────────────────────────
