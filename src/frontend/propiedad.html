@@ -1328,7 +1328,7 @@
         <div class="preos-estimate-card">
           <div>
             <div class="preos-estimate-label">Estimación Preos</div>
-            <div class="preos-estimate-value">— Estimación próximamente</div>
+            <div class="preos-estimate-value" data-i18n="avm_placeholder">— Estimación próximamente</div>
           </div>
         </div>
 
@@ -1362,7 +1362,7 @@
 
         <!-- Lifestyle scores -->
         <div class="subsection">
-          <div class="subsection-title">Estilo de vida</div>
+          <div class="subsection-title" data-i18n="lifestyle_title">Estilo de vida</div>
           <div class="lifestyle-grid">
             <div class="lifestyle-card" data-score-type="walkability">
               <div class="lifestyle-icon">🚶</div>
@@ -1553,7 +1553,7 @@
               <span class="calc-row-value">€65</span>
             </div>
             <div class="calc-row">
-              <span class="calc-row-label">Comunidad (est.)</span>
+              <span class="calc-row-label" data-i18n="price_comunidad">Comunidad (est.)</span>
               <span class="calc-row-value">€180</span>
             </div>
             <div class="calc-row">
@@ -1581,14 +1581,14 @@
             <tr>
               <th>Fecha</th>
               <th>Evento</th>
-              <th>Precio</th>
+              <th data-i18n="price_label">Precio</th>
               <th>Variación</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Feb 2024</td>
-              <td><span class="badge-reducido">Precio reducido</span></td>
+              <td><span class="badge-reducido" data-i18n="price_reduced">Precio reducido</span></td>
               <td>€1.489.000</td>
               <td class="change-neg">−5,1%</td>
             </tr>
@@ -1604,13 +1604,13 @@
         <!-- Tax history placeholder -->
         <div class="subsection">
           <div class="subsection-title">Historial fiscal (IBI)</div>
-          <div class="coming-soon-text">🔜 Disponible tras integración con Catastro</div>
+          <div class="coming-soon-text" data-i18n="catastro_coming_soon">🔜 Disponible tras integración con Catastro</div>
         </div>
 
         <!-- Permit history placeholder -->
         <div class="subsection">
           <div class="subsection-title">Licencias de obras</div>
-          <div class="coming-soon-text">🔜 Disponible tras integración con ayuntamientos</div>
+          <div class="coming-soon-text" data-i18n="ayto_coming_soon">🔜 Disponible tras integración con ayuntamientos</div>
         </div>
 
       </div>
@@ -1672,7 +1672,7 @@
 
       <div class="sidebar-card">
         <div class="sidebar-card-title">¿Pensando en vender?</div>
-        <div class="sidebar-card-sub">Precio estimado de venta para propiedades similares en esta zona:</div>
+        <div class="sidebar-card-sub" data-i18n="avm_similar_zone">Precio estimado de venta para propiedades similares en esta zona:</div>
         <div class="price-range">€1.350.000 – €1.620.000</div>
         <a href="#" class="btn-red" id="btn-agente-sidebar">Habla con un agente</a>
       </div>
@@ -2372,13 +2372,21 @@ out tags;`;
 
   function renderAllScores(scores) {
     window._lastNbScores = scores; // keep for langchange re-render
-    const TIERS = {
+    const isEN = (window.PreosLang?.currentLang?.() || 'es') === 'en';
+    const TIERS = isEN ? {
       walkability: [[8,"Walker's Paradise"],[6,'Very Walkable'],[4,'Walkable'],[2,'Some Walkability'],[0,'Car-Dependent']],
       transit:     [[8,'Excellent Transit'],[6,'Good Transit'],[4,'Some Transit'],[2,'Minimal Transit'],[0,'No Transit']],
       bike:        [[8,"Biker's Paradise"],[6,'Very Bikeable'],[4,'Bikeable'],[2,'Some Bike Infra'],[0,'Minimal Bike Infra']],
       noise:       [[8,'Quiet Area'],[6,'Mostly Quiet'],[4,'Some Noise'],[2,'Noisy'],[0,'Very Noisy']],
       wellness:    [[8,'Wellness Paradise'],[6,'Healthy Area'],[4,'Some Wellness'],[0,'Limited Wellness']],
       green:       [[8,'Tree-Filled'],[6,'Good Green Space'],[4,'Some Green Space'],[0,'Limited Green Space']]
+    } : {
+      walkability: [[8,'Paraíso peatonal'],[6,'Muy caminable'],[4,'Algo caminable'],[2,'Accesible a pie'],[0,'Depende del coche']],
+      transit:     [[8,'Transporte excelente'],[6,'Buen transporte'],[4,'Algo de transporte'],[2,'Transporte limitado'],[0,'Sin transporte']],
+      bike:        [[8,'Paraíso ciclista'],[6,'Muy en bici'],[4,'En bici posible'],[2,'Algo de carril bici'],[0,'Infraestructura mínima']],
+      noise:       [[8,'Zona tranquila'],[6,'Bastante tranquilo'],[4,'Algo de ruido'],[2,'Ruidoso'],[0,'Muy ruidoso']],
+      wellness:    [[8,'Paraíso wellness'],[6,'Zona saludable'],[4,'Algo de bienestar'],[0,'Bienestar limitado']],
+      green:       [[8,'Lleno de naturaleza'],[6,'Buenas zonas verdes'],[4,'Algo de zonas verdes'],[0,'Pocas zonas verdes']]
     };
 
     function scoreLabel(score, type) {

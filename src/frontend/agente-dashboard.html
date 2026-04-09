@@ -464,7 +464,7 @@
   <div class="crm-main">
 
     <div class="crm-header">
-      <div class="crm-header-title">CRM Agente</div>
+      <div class="crm-header-title" data-i18n="crm_title">CRM Agente</div>
       <div class="crm-agent-info">
         <div class="crm-agent-avatar" id="agent-avatar">A</div>
         <span id="agent-name">Agente</span>
@@ -476,7 +476,7 @@
       <!-- Loading -->
       <div class="crm-spinner-wrap" id="crm-loading">
         <div class="crm-spinner"></div>
-        <div style="font-size:13px;color:var(--muted);">Cargando leads...</div>
+        <div style="font-size:13px;color:var(--muted);" data-i18n="crm_loading">Cargando leads...</div>
       </div>
 
       <!-- ── Section: Leads nuevos ─────────────────────── -->
@@ -491,13 +491,13 @@
         <div class="section-title">📋 <span data-i18n="crmAllLeads">Todos los leads</span></div>
         <div class="section-subtitle" id="subtitle-todos" data-i18n="crmAllLeads">Todos los leads</div>
         <div class="filter-bar" id="filter-bar">
-          <button class="filter-btn active" data-filter="all">Todos</button>
-          <button class="filter-btn" data-filter="nuevo">Nuevo</button>
-          <button class="filter-btn" data-filter="contactado">Contactado</button>
-          <button class="filter-btn" data-filter="visita">Visita</button>
-          <button class="filter-btn" data-filter="oferta">Oferta</button>
-          <button class="filter-btn" data-filter="cerrado">Cerrado</button>
-          <button class="filter-btn" data-filter="cancelled">Cancelado</button>
+          <button class="filter-btn active" data-filter="all" data-i18n="crm_filter_all">Todos</button>
+          <button class="filter-btn" data-filter="nuevo" data-i18n="crm_filter_nuevo">Nuevo</button>
+          <button class="filter-btn" data-filter="contactado" data-i18n="crm_filter_contactado">Contactado</button>
+          <button class="filter-btn" data-filter="visita" data-i18n="crm_filter_visita">Visita</button>
+          <button class="filter-btn" data-filter="oferta" data-i18n="crm_filter_oferta">Oferta</button>
+          <button class="filter-btn" data-filter="cerrado" data-i18n="crm_filter_cerrado">Cerrado</button>
+          <button class="filter-btn" data-filter="cancelled" data-i18n="crm_filter_cancelled">Cancelado</button>
         </div>
         <div class="leads-list" id="list-todos"></div>
       </div>

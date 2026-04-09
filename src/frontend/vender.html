@@ -390,9 +390,9 @@
   <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <h1 class="hero-title">Vende tu propiedad con Preos</h1>
-    <p class="hero-subtitle">La forma más transparente de vender. Precio justo, agentes con salario fijo, sin comisiones ocultas.</p>
-    <button class="btn-red" onclick="(function(){var u=typeof firebase!=='undefined'?firebase.auth().currentUser:null;window.location=u?'dashboard.html':'ingresar.html';})()">
+    <h1 class="hero-title" data-i18n="vender_hero_title">Vende tu propiedad con Preos</h1>
+    <p class="hero-subtitle" data-i18n="vender_hero_subtitle">La forma más transparente de vender. Precio justo, agentes con salario fijo, sin comisiones ocultas.</p>
+    <button class="btn-red" data-i18n="vender_hero_btn" onclick="(function(){var u=typeof firebase!=='undefined'?firebase.auth().currentUser:null;window.location=u?'dashboard.html':'ingresar.html';})()">
       Publicar mi propiedad
     </button>
   </div>
@@ -401,26 +401,26 @@
 <!-- ═══ CÓMO FUNCIONA ══════════════════════════════════════════ -->
 <section class="how-section">
   <div class="how-inner">
-    <div class="section-tag">Proceso simple</div>
-    <h2 class="section-heading">¿Cómo funciona?</h2>
+    <div class="section-tag" data-i18n="vender_how_tag">Proceso simple</div>
+    <h2 class="section-heading" data-i18n="vender_how_title">¿Cómo funciona?</h2>
     <div class="steps-grid">
 
       <div class="step-card">
         <div class="step-number">1</div>
-        <div class="step-title">Regístrate</div>
-        <div class="step-desc">Crea tu cuenta en menos de 2 minutos. Verificamos tu identidad para garantizar la seguridad de todas las transacciones.</div>
+        <div class="step-title" data-i18n="vender_step1_title">Regístrate</div>
+        <div class="step-desc" data-i18n="vender_step1_desc">Crea tu cuenta en menos de 2 minutos. Verificamos tu identidad para garantizar la seguridad de todas las transacciones.</div>
       </div>
 
       <div class="step-card">
         <div class="step-number">2</div>
-        <div class="step-title">Publica tu propiedad</div>
-        <div class="step-desc">Sube fotos, añade los detalles y establece el precio. Nuestros agentes certificados te ayudarán a encontrar el precio óptimo.</div>
+        <div class="step-title" data-i18n="vender_step2_title">Publica tu propiedad</div>
+        <div class="step-desc" data-i18n="vender_step2_desc">Sube fotos, añade los detalles y establece el precio. Nuestros agentes certificados te ayudarán a encontrar el precio óptimo.</div>
       </div>
 
       <div class="step-card">
         <div class="step-number">3</div>
-        <div class="step-title">Recibe ofertas</div>
-        <div class="step-desc">Recibe ofertas directamente en tu panel. Nuestros agentes te acompañan en todo el proceso hasta cerrar la venta.</div>
+        <div class="step-title" data-i18n="vender_step3_title">Recibe ofertas</div>
+        <div class="step-desc" data-i18n="vender_step3_desc">Recibe ofertas directamente en tu panel. Nuestros agentes te acompañan en todo el proceso hasta cerrar la venta.</div>
       </div>
 
     </div>

@@ -513,11 +513,11 @@
 
 <!-- ═══ TABS BAR ════════════════════════════════════════════════ -->
 <div class="tabs-bar">
-  <a href="dashboard.html" class="tab active">Panel de propietarios</a>
-  <a href="favoritos.html" class="tab">Mis favoritos</a>
-  <a href="visitas.html" class="tab">Mis visitas</a>
-  <a href="mis-ofertas.html" class="tab">Mis ofertas</a>
-  <a href="perfil.html" class="tab">Configuración de mi perfil</a>
+  <a href="dashboard.html" class="tab active" data-i18n="dash_tab_owner">Panel de propietarios</a>
+  <a href="favoritos.html" class="tab" data-i18n="dash_tab_favorites">Mis favoritos</a>
+  <a href="visitas.html" class="tab" data-i18n="dash_tab_visits">Mis visitas</a>
+  <a href="mis-ofertas.html" class="tab" data-i18n="dash_tab_offers">Mis ofertas</a>
+  <a href="perfil.html" class="tab" data-i18n="dash_tab_profile">Configuración de mi perfil</a>
 </div>
 
 <!-- ═══ PAGE BODY ════════════════════════════════════════════════ -->
@@ -525,24 +525,24 @@
 
   <!-- Welcome row -->
   <div class="welcome-row">
-    <div class="welcome-title">Bienvenido, <span id="user-first-name">—</span> 👋</div>
+    <div class="welcome-title"><span data-i18n="dash_welcome">Bienvenido,</span> <span id="user-first-name">—</span> 👋</div>
   </div>
 
   <!-- PROPERTY CARD (populated dynamically) -->
   <div id="property-card-wrap">
     <div class="empty-state">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <p>Cargando tu propiedad...</p>
+      <p data-i18n="dash_loading_prop">Cargando tu propiedad...</p>
     </div>
   </div>
 
   <!-- STATS SECTION -->
-  <div class="section-title">Actividad de mercado — Últimos 30 días</div>
+  <div class="section-title" data-i18n="dash_market_title">Actividad de mercado — Últimos 30 días</div>
 
   <div class="stats-grid">
 
     <div class="stat-card">
-      <div class="stat-label">Estimación Preos</div>
+      <div class="stat-label" data-i18n="dash_stat_avm">Estimación Preos</div>
       <div class="stat-value" id="stat-estimacion">—</div>
       <div class="stat-change">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
@@ -552,7 +552,7 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-label">Propiedades vendidas en tu zona</div>
+      <div class="stat-label" data-i18n="dash_stat_sold">Propiedades vendidas en tu zona</div>
       <div class="stat-value">9</div>
       <div class="stat-change">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
@@ -562,7 +562,7 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-label">Precio medio de venta</div>
+      <div class="stat-label" data-i18n="dash_stat_avg_price">Precio medio de venta</div>
       <div class="stat-value">€485.000</div>
       <div class="stat-change">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
@@ -572,7 +572,7 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-label">Días en el mercado</div>
+      <div class="stat-label" data-i18n="dash_stat_days">Días en el mercado</div>
       <div class="stat-value">24 días</div>
       <div class="stat-change">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
