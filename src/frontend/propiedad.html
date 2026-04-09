@@ -1326,21 +1326,20 @@
         <div class="avm-card">
           <div class="avm-header">
             <div class="avm-label" data-i18n="avm_preos_estimate">Estimación Preos</div>
-            <div class="avm-confidence" id="avm-confidence-badge"></div>
+            <div class="avm-confidence" id="avm-confidence-label"></div>
           </div>
           <div class="avm-price" id="avm-price"></div>
           <div class="avm-range" id="avm-range"></div>
           <div class="avm-bar-wrap">
-            <div class="avm-bar-fill" style="width:100%;"></div>
+            <div class="avm-bar-fill" id="avm-bar-fill" style="width:50%;"></div>
             <div class="avm-bar-dot" id="avm-bar-dot" style="left:50%;"></div>
           </div>
           <div class="avm-bar-labels">
-            <span data-i18n="avm_below_market">Por debajo del mercado</span>
-            <span data-i18n="avm_at_market">En línea con el mercado</span>
-            <span data-i18n="avm_above_market">Por encima del mercado</span>
+            <span id="avm-bar-low"></span>
+            <span id="avm-bar-high"></span>
           </div>
-          <div class="avm-market-badge" id="avm-market-badge"></div>
-          <div class="avm-comparables" id="avm-based-on"></div>
+          <div id="avm-market-badge"></div>
+          <div class="avm-comparables" id="avm-comparables"></div>
           <div class="avm-source" id="avm-source"></div>
         </div>
       </div>
@@ -2590,107 +2589,180 @@ out tags;`;
 
   async function loadAVM(prop) {
     const section = document.getElementById('section-avm');
-    if (!section) return;
+    if (!section || !prop) return;
 
     try {
-      const citySlug = (prop.city || '').toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, '-');
-
-      const snap = await firebase.firestore().collection('market_data').doc(citySlug).get();
-      if (!snap.exists) return;
-
-      const market = snap.data();
-      const mktPricePerM2 = market.pricePerM2;
-
-      // ── AVM multipliers ──
-      let multiplier = 1.0;
-      if (prop.type) {
-        const t = prop.type.toLowerCase();
-        if (t.includes('ático') || t.includes('atico') || t.includes('penthouse')) multiplier *= 1.12;
-        else if (t.includes('villa') || t.includes('chalet'))                        multiplier *= 1.08;
-        else if (t.includes('estudio') || t.includes('studio'))                      multiplier *= 0.90;
-      }
-      if (prop.terrace_m2 && prop.size_m2) {
-        const terraceRatio = prop.terrace_m2 / prop.size_m2;
-        if (terraceRatio > 0.3) multiplier *= 1.05;
-      }
-      if (prop.year_built) {
-        const age = new Date().getFullYear() - parseInt(prop.year_built, 10);
-        if (age < 5)       multiplier *= 1.06;
-        else if (age > 30) multiplier *= 0.92;
-      }
-      const energyBonus = { A: 1.04, B: 1.02, C: 1.0, D: 0.98, E: 0.96, F: 0.94 };
-      if (prop.energy_rating && energyBonus[prop.energy_rating]) {
-        multiplier *= energyBonus[prop.energy_rating];
-      }
-      if (prop.features) {
-        const f = prop.features;
-        if (f.pool)  multiplier *= 1.04;
-        if (f.views) multiplier *= 1.03;
-      }
-
-      const areaM2 = prop.size_m2 || 100;
-      const estimatedTotal = Math.round(mktPricePerM2 * multiplier * areaM2 / 1000) * 1000;
-      const low  = Math.round(estimatedTotal * 0.85 / 1000) * 1000;
-      const high = Math.round(estimatedTotal * 1.10 / 1000) * 1000;
-
-      // ── Market position ──
-      const listingPerM2 = prop.price / areaM2;
-      const diff = (listingPerM2 - mktPricePerM2) / mktPricePerM2;
+      const sizeM2 = prop.size_m2 || 0;
+      if (!sizeM2 || sizeM2 < 10) return;
 
       const lang = localStorage.getItem('preos_lang') || 'es';
 
-      document.getElementById('avm-price').textContent = fmt(estimatedTotal);
-      document.getElementById('avm-range').textContent =
-        (window.PreosLang ? window.PreosLang.t('avm_range_label') : 'Rango estimado') +
-        ': ' + fmt(low) + ' – ' + fmt(high);
+      // ── Determine property type codes ──────────────────
+      const isNewBuild = prop.obra_nueva === true ||
+        (prop.year_built && parseInt(prop.year_built) >= 2020);
+      const tipoCod = isNewBuild ? 7 : 9; // 7=nueva, 9=resale
 
-      // Confidence badge
-      const confBadge = document.getElementById('avm-confidence-badge');
-      const confKey = market.confidence === 'high' ? 'avm_confidence_high'
-                    : market.confidence === 'medium' ? 'avm_confidence_medium'
-                    : 'avm_confidence_low';
-      confBadge.textContent = window.PreosLang ? window.PreosLang.t(confKey) : market.confidence;
-      confBadge.className = 'avm-confidence conf-' + (market.confidence || 'medium');
+      const typeStr = (prop.type || prop.subtype || '').toLowerCase();
+      const isHouse = typeStr.includes('villa') ||
+        typeStr.includes('chalet') || typeStr.includes('unifamiliar') ||
+        typeStr.includes('townhouse') || typeStr.includes('adosado') ||
+        typeStr.includes('house');
+      const claseCod = isHouse ? 15 : 14; // 15=house, 14=flat
 
-      // Bar dot position: 0% = -30% diff, 50% = 0%, 100% = +30% diff
-      const clampedDiff = Math.max(-0.30, Math.min(0.30, diff));
-      const dotPct = ((clampedDiff + 0.30) / 0.60 * 100).toFixed(1);
-      document.getElementById('avm-bar-dot').style.left = dotPct + '%';
+      // ── Try postcode first ─────────────────────────────
+      let market = null;
+      let geoLevel = 'municipio';
 
-      // Market badge
-      const badge = document.getElementById('avm-market-badge');
-      if (diff < -0.08) {
-        badge.className = 'avm-market-badge avm-badge-below';
-        badge.textContent = '▼ ' + (window.PreosLang ? window.PreosLang.t('avm_below_market') : 'Por debajo del mercado');
-      } else if (diff > 0.08) {
-        badge.className = 'avm-market-badge avm-badge-above';
-        badge.textContent = '▲ ' + (window.PreosLang ? window.PreosLang.t('avm_above_market') : 'Por encima del mercado');
-      } else {
-        badge.className = 'avm-market-badge avm-badge-at';
-        badge.textContent = '● ' + (window.PreosLang ? window.PreosLang.t('avm_at_market') : 'En línea con el mercado');
+      const enrichSnap = await firebase.firestore()
+        .collection('enrichment').doc(prop.id).get();
+      const enrich = enrichSnap.data() || {};
+      const postcode = enrich.postcode;
+
+      if (postcode) {
+        const cpSnap = await firebase.firestore()
+          .collection('market_data_cp').doc(postcode).get();
+        if (cpSnap.exists) {
+          market = cpSnap.data();
+          geoLevel = 'código postal ' + postcode;
+        }
       }
 
-      document.getElementById('avm-based-on').textContent =
-        window.PreosLang ? window.PreosLang.t('avm_based_on') : 'Basado en precio/m² del mercado local';
+      // ── Fall back to municipality ──────────────────────
+      if (!market) {
+        const city = (prop.city || '').toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+          .replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+        const muniSnap = await firebase.firestore()
+          .collection('market_data').doc(city).get();
+        if (muniSnap.exists) market = muniSnap.data();
+      }
+
+      if (!market) return;
+
+      // ── Pick best price for this property type ─────────
+      let basePrice = null;
+      let priceLabel = '';
+
+      if (tipoCod === 7 && claseCod === 15 && market.priceNewHouse) {
+        basePrice = market.priceNewHouse;
+        priceLabel = lang === 'en' ? 'new build house' : 'obra nueva unifamiliar';
+      } else if (tipoCod === 7 && claseCod === 14 && market.priceNewFlat) {
+        basePrice = market.priceNewFlat;
+        priceLabel = lang === 'en' ? 'new build flat' : 'obra nueva piso';
+      } else if (tipoCod === 9 && claseCod === 15 && market.priceResaleHouse) {
+        basePrice = market.priceResaleHouse;
+        priceLabel = lang === 'en' ? 'resale house' : 'segunda mano unifamiliar';
+      } else if (tipoCod === 9 && claseCod === 14 && market.priceResaleFlat) {
+        basePrice = market.priceResaleFlat;
+        priceLabel = lang === 'en' ? 'resale flat' : 'segunda mano piso';
+      } else {
+        basePrice = market.pricePerM2;
+        priceLabel = lang === 'en' ? 'all types' : 'todos los tipos';
+      }
+
+      if (!basePrice) return;
+
+      // ── Adjustments ────────────────────────────────────
+      let adj = 1.0;
+      const terraceM2 = prop.terrace_m2 || 0;
+      if (terraceM2 > 30)      adj *= 1.05;
+      else if (terraceM2 > 15) adj *= 1.03;
+
+      const yearBuilt = parseInt(prop.year_built) || 0;
+      if (yearBuilt >= 2015)      adj *= 1.04;
+      else if (yearBuilt >= 2000) adj *= 1.01;
+      else if (yearBuilt < 1990)  adj *= 0.96;
+
+      const walkScore = enrich.neighborhood?.walkability || 5;
+      if (walkScore >= 8)      adj *= 1.02;
+      else if (walkScore < 4)  adj *= 0.98;
+
+      const floodScore = enrich.climate?.flood?.score || 5;
+      if (floodScore >= 7)     adj *= 0.97;
+      else if (floodScore <= 2) adj *= 0.94;
+
+      const energy = (prop.energy_rating || '').toUpperCase();
+      if (['A','B'].includes(energy))      adj *= 1.02;
+      else if (['F','G'].includes(energy)) adj *= 0.98;
+
+      // ── Estimate ───────────────────────────────────────
+      const estimatedM2 = Math.round(basePrice * adj);
+      const estimated   = Math.round(estimatedM2 * sizeM2 / 1000) * 1000;
+      const band = market.confidence === 'high' ? 0.10 : 0.15;
+      const low  = Math.round(estimated * (1 - band) / 1000) * 1000;
+      const high = Math.round(estimated * (1 + band) / 1000) * 1000;
+
+      // ── Price vs market badge ──────────────────────────
+      const listingM2 = (prop.price || 0) / sizeM2;
+      const diff = ((listingM2 - estimatedM2) / estimatedM2) * 100;
+      let badgeClass, badgeText;
+      if (diff < -8) {
+        badgeClass = 'avm-badge-below';
+        badgeText  = lang === 'en'
+          ? '✅ Below market price' : '✅ Precio por debajo del mercado';
+      } else if (diff > 8) {
+        badgeClass = 'avm-badge-above';
+        badgeText  = lang === 'en'
+          ? '⚠️ Above market price' : '⚠️ Precio por encima del mercado';
+      } else {
+        badgeClass = 'avm-badge-at';
+        badgeText  = lang === 'en'
+          ? '📊 At market price' : '📊 Precio en línea con el mercado';
+      }
+
+      // ── Confidence label ───────────────────────────────
+      const confLabels = {
+        high:   lang === 'en' ? 'High confidence' : 'Alta confianza',
+        medium: lang === 'en' ? 'Medium confidence' : 'Confianza media',
+        low:    lang === 'en' ? 'Low confidence' : 'Baja confianza',
+      };
+
+      // ── Transactions label ─────────────────────────────
+      const txCount = market.transactions || market.transactionsResaleFlat;
+      const txText = txCount
+        ? (lang === 'en'
+            ? `Based on ${txCount.toLocaleString()} notarial transactions in ${geoLevel}`
+            : `Basado en ${txCount.toLocaleString()} transacciones notariales en ${geoLevel}`)
+        : '';
+
+      // ── Render ─────────────────────────────────────────
+      const fmtPrice = n => '€' + Math.round(n).toLocaleString('es-ES');
+
+      document.getElementById('avm-price').textContent = fmtPrice(estimated);
+      document.getElementById('avm-range').textContent =
+        (lang === 'en' ? 'Estimated range: ' : 'Rango estimado: ') +
+        fmtPrice(low) + ' – ' + fmtPrice(high);
+
+      const confLabel = document.getElementById('avm-confidence-label');
+      confLabel.textContent = confLabels[market.confidence] || '';
+      confLabel.className = 'avm-confidence conf-' + (market.confidence || 'medium');
+
+      document.getElementById('avm-market-badge').innerHTML =
+        '<span class="avm-market-badge ' + badgeClass + '">' + badgeText + '</span>';
+
+      document.getElementById('avm-bar-low').textContent  = fmtPrice(low);
+      document.getElementById('avm-bar-high').textContent = fmtPrice(high);
+
+      const range = high - low;
+      const pos = range > 0
+        ? Math.min(Math.max(((prop.price || 0) - low) / range, 0), 1)
+        : 0.5;
+      document.getElementById('avm-bar-fill').style.width = Math.round(pos * 100) + '%';
+      document.getElementById('avm-bar-dot').style.left   = Math.round(pos * 100) + '%';
+
+      document.getElementById('avm-comparables').textContent = txText;
 
       document.getElementById('avm-source').textContent =
-        (window.PreosLang ? window.PreosLang.t('avm_source_label') : 'Basado en datos de mercado de') +
-        ' ' + market.source;
+        'Portal Estadístico del Notariado · Notariado de España';
 
       section.style.display = 'block';
 
-      // Re-render on language change
-      if (!window._avmLangListenerAdded) {
-        window._avmLangListenerAdded = true;
-        document.addEventListener('preos:langchange', function() {
-          loadAVM(prop);
-        });
-      }
+      document.addEventListener('preos:langchange', function() {
+        loadAVM(prop);
+      }, { once: true });
 
-    } catch (e) {
-      console.warn('[AVM] failed:', e);
+    } catch(e) {
+      console.warn('[AVM]', e.message);
     }
   }
 
