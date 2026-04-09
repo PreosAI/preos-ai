@@ -81,11 +81,11 @@ firebase.auth().onAuthStateChanged(function (user) {
       ? `<img src="${photoURL}" alt="${firstName}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;">`
       : `<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--red,#cc1f1f);color:#fff;font-size:12px;font-weight:700;vertical-align:middle;margin-right:6px;">${firstName.charAt(0).toUpperCase()}</span>`;
 
-    const myAccountLabel  = window.PreosLang ? window.PreosLang.t('nav_myaccount')  : 'Mi cuenta';
-    const myFavsLabel     = window.PreosLang ? window.PreosLang.t('nav_myfavs')     : 'Mis favoritos';
-    const myVisitsLabel   = window.PreosLang ? window.PreosLang.t('myVisits')        : 'Mis visitas';
-    const myOffersLabel   = window.PreosLang ? window.PreosLang.t('myOffers')        : 'Mis ofertas';
-    const signOutLabel    = window.PreosLang ? window.PreosLang.t('nav_signout')     : 'Cerrar sesión';
+    const myAccountLabel  = window.PreosLang ? window.PreosLang.t('nav_my_account') : 'Mi cuenta';
+    const myFavsLabel     = window.PreosLang ? window.PreosLang.t('nav_saved')      : 'Mis favoritos';
+    const myVisitsLabel   = window.PreosLang ? window.PreosLang.t('nav_my_visits')  : 'Mis visitas';
+    const myOffersLabel   = window.PreosLang ? window.PreosLang.t('nav_my_offers')  : 'Mis ofertas';
+    const signOutLabel    = window.PreosLang ? window.PreosLang.t('nav_sign_out')   : 'Cerrar sesión';
 
     const isAgent = !!(user.email && user.email.endsWith('@preos.ai'));
     const agentCrmHTML = isAgent
@@ -136,7 +136,7 @@ firebase.auth().onAuthStateChanged(function (user) {
   } else {
     // Not logged in
     ingresarBtn.style.display = '';
-    const myAccountLabel = window.PreosLang ? window.PreosLang.t('nav_myaccount') : 'Mi cuenta';
+    const myAccountLabel = window.PreosLang ? window.PreosLang.t('nav_my_account') : 'Mi cuenta';
     miCuenta.innerHTML = `<a href="ingresar.html" style="font-size:13px;font-weight:500;color:inherit;text-decoration:none;">${myAccountLabel}</a>`;
   }
 

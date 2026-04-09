@@ -732,6 +732,127 @@ window.PreosLang = (function () {
       intl_banner_sub:      'Eres nuevo en España. Estamos aquí.',
       intl_banner_body:     'Comprar una propiedad en España como extranjero implica NIE, notaría, revisión legal, hipotecas en otro idioma y mucho más. Nuestros agentes bilingües te guían en cada paso.',
       intl_banner_cta:      'Habla con un agente',
+
+      // Nav (user menu)
+      nav_my_account:       'Mi cuenta',
+      nav_saved:            'Propiedades guardadas',
+      nav_my_visits:        'Mis visitas',
+      nav_my_offers:        'Mis ofertas',
+      nav_sign_out:         'Cerrar sesión',
+
+      // Gallery buttons
+      btn_3d_tour:          'Recorrido 3D',
+      btn_floor_plans:      'Planos',
+      btn_street_view:      'Vista de calle',
+
+      // Listing status
+      status_active:        'VENTA ACTIVA',
+      status_sold:          'VENDIDA',
+      status_reserved:      'RESERVADA',
+
+      // Spec labels
+      spec_surface:         'Superficie',
+      spec_year_built:      'Año construcción',
+
+      // Section titles
+      section_about:        'Acerca de esta casa',
+      section_details:      'Detalles de la propiedad',
+      section_legal:        'Información legal y energética',
+      section_history:      'Historial',
+      section_sales_history:'Historial de ventas',
+      section_tax_history:  'Historial fiscal (IBI)',
+      section_permits:      'Licencias de obras',
+      section_climate:      'Riesgos climáticos',
+      section_calculator:   'Calculadora de pagos',
+
+      // AVM
+      avm_label:            'Estimación Preos',
+
+      // Place/transit type labels
+      place_restaurant:     'Restaurante',
+      place_pharmacy:       'Farmacia',
+      place_cafe:           'Café',
+      place_bar:            'Bar',
+      place_supermarket:    'Supermercado',
+      place_bakery:         'Panadería',
+      place_park:           'Parque',
+      place_health:         'Salud',
+      transit_bus:          'Autobús',
+      transit_train:        'Tren',
+      transit_tram:         'Tranvía',
+
+      // Sun exposure
+      sun_june:             'Junio',
+      sun_december:         'Diciembre',
+      sun_reach:            'La radiación solar en esta zona alcanza',
+      sun_in_june:          'al día en junio y',
+      sun_in_december:      'en diciembre — entre las más altas de Europa, ideal para luz natural y aprovechamiento solar.',
+
+      // Details grid labels
+      det_bedrooms:         'Dormitorios',
+      det_bathrooms:        'Aseos',
+      det_built_area:       'Superficie construida',
+      det_useful_area:      'Superficie útil',
+      det_kitchen:          'Cocina',
+      det_kitchen_equipped: 'Equipada',
+      det_floors:           'Suelos',
+      det_floors_parquet:   'Parquet',
+      det_heating:          'Calefacción',
+      det_heating_radiator: 'Radiadores',
+      det_ac:               'Aire acondicionado',
+      det_orientation:      'Orientación',
+      det_storage:          'Trastero',
+      det_garden:           'Jardín',
+      det_concierge:        'Portero',
+      det_security:         'Seguridad',
+      det_property_type:    'Tipo de inmueble',
+      det_regime:           'Régimen',
+      det_condition:        'Estado',
+      det_energy_rating:    'Eficiencia energética',
+      det_energy_consumption: 'Consumo energético',
+
+      // Mortgage calculator
+      calc_monthly_est:     'Cuota mensual estimada',
+      calc_per_month:       '/mes',
+      calc_disclaimer:      'Estimación orientativa. No incluye seguros ni comisiones bancarias.',
+      calc_term:            'Plazo',
+      calc_deposit:         'Entrada',
+      calc_rate:            'Tipo de interés anual (%)',
+      calc_rate_type:       'Tipo de interés',
+      calc_fixed:           'Fijo',
+      calc_variable:        'Variable',
+      calc_mixed:           'Mixto',
+      calc_breakdown:       'Desglose mensual',
+      calc_principal:       'Capital + intereses',
+      calc_home_insurance:  'Seguro de hogar (est.)',
+      calc_ibi:             'IBI mensualizado (est.)',
+      calc_total:           'Total estimado / mes',
+
+      // Property history
+      hist_date:            'Fecha',
+      hist_event:           'Evento',
+      hist_change:          'Variación',
+      hist_listed:          'Listado',
+
+      // Climate descriptions
+      climate_flood_low:    'No se encuentra en ninguna zona de inundación mapeada por SNCZI.',
+      climate_flood_medium: 'Zona de riesgo de inundación moderado (T100).',
+      climate_flood_high:   'Zona de alto riesgo de inundación (T10).',
+      climate_fire_low:     'Ubicación costera — menor riesgo de incendio por urbanización.',
+      climate_fire_medium:  'Riesgo moderado de incendio forestal.',
+      climate_fire_high:    'Zona de alto riesgo de incendio forestal.',
+      climate_heat_low:     'Veranos suaves con influencia marina.',
+      climate_heat_medium:  'Veranos cálidos con moderada brisa marina.',
+      climate_heat_high:    'Ubicación interior — veranos muy calurosos.',
+      climate_wind_low:     'Zona bien protegida del viento costero.',
+      climate_wind_medium:  'Exposición moderada al viento.',
+      climate_wind_high:    'Exposición alta al viento.',
+      climate_air_low:      'Calidad del aire excelente.',
+      climate_air_medium:   'Calidad del aire moderada.',
+      climate_air_high:     'Calidad del aire deficiente.',
+      climate_source_snczi: 'Fuente: SNCZI — Ministerio para la Transición Ecológica',
+      climate_source_effis: 'Fuente: EFFIS / Junta de Andalucía',
+      climate_source_aemet: 'Fuente: AEMET normas climáticas 1991-2020',
     },
 
     en: {
@@ -1452,6 +1573,127 @@ window.PreosLang = (function () {
       intl_banner_sub:      "You're new to Spain. We've got you.",
       intl_banner_body:     'Buying property in Spain as a foreigner involves NIE numbers, notaries, legal checks, mortgages in another language and much more. Our bilingual agents guide you every step of the way.',
       intl_banner_cta:      'Talk to an agent',
+
+      // Nav (user menu)
+      nav_my_account:       'My account',
+      nav_saved:            'Saved properties',
+      nav_my_visits:        'My visits',
+      nav_my_offers:        'My offers',
+      nav_sign_out:         'Sign out',
+
+      // Gallery buttons
+      btn_3d_tour:          '3D Tour',
+      btn_floor_plans:      'Floor plans',
+      btn_street_view:      'Street view',
+
+      // Listing status
+      status_active:        'ACTIVE LISTING',
+      status_sold:          'SOLD',
+      status_reserved:      'RESERVED',
+
+      // Spec labels
+      spec_surface:         'Floor area',
+      spec_year_built:      'Year built',
+
+      // Section titles
+      section_about:        'About this home',
+      section_details:      'Property details',
+      section_legal:        'Legal & energy info',
+      section_history:      'History',
+      section_sales_history:'Sales history',
+      section_tax_history:  'Tax history (IBI)',
+      section_permits:      'Building permits',
+      section_climate:      'Climate risks',
+      section_calculator:   'Payment calculator',
+
+      // AVM
+      avm_label:            'Preos Estimate',
+
+      // Place/transit types
+      place_restaurant:     'Restaurant',
+      place_pharmacy:       'Pharmacy',
+      place_cafe:           'Café',
+      place_bar:            'Bar',
+      place_supermarket:    'Supermarket',
+      place_bakery:         'Bakery',
+      place_park:           'Park',
+      place_health:         'Healthcare',
+      transit_bus:          'Bus',
+      transit_train:        'Train',
+      transit_tram:         'Tram',
+
+      // Sun exposure
+      sun_june:             'June',
+      sun_december:         'December',
+      sun_reach:            'Solar irradiance in this area reaches',
+      sun_in_june:          'per day in June and',
+      sun_in_december:      'in December — among the highest in Europe for natural light and solar energy potential.',
+
+      // Details grid
+      det_bedrooms:         'Bedrooms',
+      det_bathrooms:        'Bathrooms',
+      det_built_area:       'Built area',
+      det_useful_area:      'Usable area',
+      det_kitchen:          'Kitchen',
+      det_kitchen_equipped: 'Fitted',
+      det_floors:           'Flooring',
+      det_floors_parquet:   'Parquet',
+      det_heating:          'Heating',
+      det_heating_radiator: 'Radiators',
+      det_ac:               'Air conditioning',
+      det_orientation:      'Orientation',
+      det_storage:          'Storage room',
+      det_garden:           'Garden',
+      det_concierge:        'Concierge',
+      det_security:         'Security',
+      det_property_type:    'Property type',
+      det_regime:           'Tenure',
+      det_condition:        'Condition',
+      det_energy_rating:    'Energy rating',
+      det_energy_consumption: 'Energy consumption',
+
+      // Mortgage calculator
+      calc_monthly_est:     'Estimated monthly payment',
+      calc_per_month:       '/month',
+      calc_disclaimer:      'Indicative estimate only. Does not include insurance or bank fees.',
+      calc_term:            'Term',
+      calc_deposit:         'Deposit',
+      calc_rate:            'Annual interest rate (%)',
+      calc_rate_type:       'Interest type',
+      calc_fixed:           'Fixed',
+      calc_variable:        'Variable',
+      calc_mixed:           'Mixed',
+      calc_breakdown:       'Monthly breakdown',
+      calc_principal:       'Principal + interest',
+      calc_home_insurance:  'Home insurance (est.)',
+      calc_ibi:             'IBI monthly (est.)',
+      calc_total:           'Estimated total / month',
+
+      // Property history
+      hist_date:            'Date',
+      hist_event:           'Event',
+      hist_change:          'Change',
+      hist_listed:          'Listed',
+
+      // Climate descriptions
+      climate_flood_low:    'Not in any SNCZI mapped flood zone.',
+      climate_flood_medium: 'Moderate flood risk zone (T100).',
+      climate_flood_high:   'High flood risk zone (T10).',
+      climate_fire_low:     'Coastal location — lower wildfire risk due to urbanisation.',
+      climate_fire_medium:  'Moderate wildfire risk.',
+      climate_fire_high:    'High wildfire risk area.',
+      climate_heat_low:     'Mild summers with sea influence.',
+      climate_heat_medium:  'Warm summers with moderate sea breeze.',
+      climate_heat_high:    'Inland location — very hot summers.',
+      climate_wind_low:     'Well-sheltered from coastal winds.',
+      climate_wind_medium:  'Moderate wind exposure.',
+      climate_wind_high:    'High wind exposure.',
+      climate_air_low:      'Excellent air quality.',
+      climate_air_medium:   'Moderate air quality.',
+      climate_air_high:     'Poor air quality.',
+      climate_source_snczi: 'Source: SNCZI — Ministerio para la Transición Ecológica',
+      climate_source_effis: 'Source: EFFIS / Junta de Andalucía fire risk assessment',
+      climate_source_aemet: 'Source: AEMET climate normals 1991-2020',
     }
   };
 
