@@ -658,6 +658,19 @@
       margin-bottom: 4px;
     }
 
+    .card-market-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+    .badge-below { background: #dcfce7; color: #15803d; }
+    .badge-at    { background: #f0f9ff; color: #0369a1; }
+    .badge-above { background: #fee2e2; color: #b91c1c; }
+
     .h-card-address {
       font-size: 12px;
       color: var(--muted);
@@ -1618,6 +1631,14 @@
       </a>`;
     }).join('');
 
+    // Add market badges after cards are rendered
+    if (typeof addMarketBadge === 'function') {
+      const cards = list.querySelectorAll('a.h-card');
+      cards.forEach(function(card, i) {
+        if (sorted[i]) addMarketBadge(card, sorted[i]);
+      });
+    }
+
     const rawArea = query ? (sorted[0].city || query) : 'Málaga';
     const areaName = rawArea.charAt(0).toUpperCase() + rawArea.slice(1);
     _lastResultsState = { count: sorted.length, area: areaName };
@@ -1842,6 +1863,54 @@
       ${chips ? `<div class="empty-chips">${chips}</div>` : ''}
       <button class="empty-all-btn" onclick="document.getElementById('searchInput').value='';document.getElementById('searchClear').style.display='none';runSearch('')">${allBtn}</button>
     </div>`;
+  }
+
+  // ── AVM market badge helpers ──────────────────────────────────
+  var _marketCache = {};
+
+  function getMarketData(citySlug) {
+    if (_marketCache[citySlug]) return Promise.resolve(_marketCache[citySlug]);
+    return firebase.firestore().collection('market_data').doc(citySlug).get()
+      .then(function(snap) {
+        if (!snap.exists) return null;
+        _marketCache[citySlug] = snap.data();
+        return snap.data();
+      })
+      .catch(function() { return null; });
+  }
+
+  function addMarketBadge(card, prop) {
+    if (!prop.price || !prop.size_m2) return;
+    const citySlug = (prop.city || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-');
+    if (!citySlug) return;
+
+    getMarketData(citySlug).then(function(market) {
+      if (!market) return;
+      const listingPerM2 = prop.price / prop.size_m2;
+      const diff = (listingPerM2 - market.pricePerM2) / market.pricePerM2;
+      const priceEl = card.querySelector('.h-card-price');
+      if (!priceEl) return;
+
+      const lang = localStorage.getItem('preos-lang') || 'es';
+      let badgeClass, badgeText;
+      if (diff < -0.08) {
+        badgeClass = 'badge-below';
+        badgeText  = lang === 'en' ? '▼ Below market' : '▼ Por debajo del mercado';
+      } else if (diff > 0.08) {
+        badgeClass = 'badge-above';
+        badgeText  = lang === 'en' ? '▲ Above market' : '▲ Por encima del mercado';
+      } else {
+        badgeClass = 'badge-at';
+        badgeText  = lang === 'en' ? '● In line with market' : '● En línea con el mercado';
+      }
+
+      const badge = document.createElement('div');
+      badge.className = 'card-market-badge ' + badgeClass;
+      badge.textContent = badgeText;
+      priceEl.insertAdjacentElement('afterend', badge);
+    });
   }
 
   // ── Initial load ──────────────────────────────────────────────

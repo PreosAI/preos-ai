@@ -863,6 +863,19 @@ window.PreosLang = (function () {
       tour_confirmed:      '¡Recorrido agendado!',
       share_whatsapp:      'Compartir por WhatsApp',
       share_email:         'Compartir por email',
+
+      // AVM — price estimator
+      avm_preos_estimate:  'Estimación Preos',
+      avm_source_label:    'Basado en datos de mercado de',
+      avm_source_suffix:   '',
+      avm_range_label:     'Rango estimado',
+      avm_based_on:        'Basado en precio/m² del mercado local',
+      avm_below_market:    'Por debajo del mercado',
+      avm_at_market:       'En línea con el mercado',
+      avm_above_market:    'Por encima del mercado',
+      avm_confidence_high:   'Confianza alta',
+      avm_confidence_medium: 'Confianza media',
+      avm_confidence_low:    'Confianza baja',
     },
 
     en: {
@@ -1714,6 +1727,19 @@ window.PreosLang = (function () {
       tour_confirmed:      'Tour scheduled!',
       share_whatsapp:      'Share on WhatsApp',
       share_email:         'Share by email',
+
+      // AVM — price estimator
+      avm_preos_estimate:  'Preos Estimate',
+      avm_source_label:    'Based on market data from',
+      avm_source_suffix:   '',
+      avm_range_label:     'Estimated range',
+      avm_based_on:        'Based on local market price/m²',
+      avm_below_market:    'Below market',
+      avm_at_market:       'In line with market',
+      avm_above_market:    'Above market',
+      avm_confidence_high:   'High confidence',
+      avm_confidence_medium: 'Medium confidence',
+      avm_confidence_low:    'Low confidence',
     }
   };
 

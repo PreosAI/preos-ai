@@ -462,6 +462,28 @@
     .climate-desc { font-size: 11px; color: var(--muted); line-height: 1.45; margin-bottom: 4px; }
     .climate-source { font-size: 10px; color: #b0b7c3; margin-top: 4px; }
 
+    /* ─── AVM PRICE ESTIMATOR ──────────────────────────────── */
+    .avm-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+    .avm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+    .avm-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .avm-confidence { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
+    .avm-confidence.conf-high   { background: #dcfce7; color: #15803d; }
+    .avm-confidence.conf-medium { background: #fef9c3; color: #92400e; }
+    .avm-confidence.conf-low    { background: #fee2e2; color: #b91c1c; }
+    .avm-price { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 4px; }
+    .avm-range { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .avm-bar-wrap { position: relative; height: 8px; background: #f0f0f0; border-radius: 4px; margin-bottom: 6px; }
+    .avm-bar-fill { position: absolute; left: 0; top: 0; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #22c55e 0%, #facc15 50%, #ef4444 100%); }
+    .avm-bar-dot  { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: #1a1a1a; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+    .avm-bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 14px; }
+    .avm-market-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px; margin-bottom: 14px; }
+    .avm-badge-below { background: #dcfce7; color: #15803d; }
+    .avm-badge-at    { background: #f0f9ff; color: #0369a1; }
+    .avm-badge-above { background: #fee2e2; color: #b91c1c; }
+    .avm-comparables { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .avm-source { font-size: 11px; color: #b0b7c3; }
+    .avm-unavail { font-size: 13px; color: var(--muted); text-align: center; padding: 20px; }
+
     /* ─── COMING SOON ───────────────────────────────────────── */
     .coming-soon-text { font-size: 13px; color: var(--muted); padding: 16px; text-align: center; background: #f9fafb; border-radius: 10px; border: 1px dashed var(--border); }
 
@@ -1296,6 +1318,30 @@
             <div class="spec-value">2018</div>
             <div class="spec-label" data-i18n="spec_year_built">Año construcción</div>
           </div>
+        </div>
+      </div>
+
+      <!-- ══ AVM: Price Estimator ══════════════════════════════ -->
+      <div id="section-avm" style="display:none;">
+        <div class="avm-card">
+          <div class="avm-header">
+            <div class="avm-label" data-i18n="avm_preos_estimate">Estimación Preos</div>
+            <div class="avm-confidence" id="avm-confidence-badge"></div>
+          </div>
+          <div class="avm-price" id="avm-price"></div>
+          <div class="avm-range" id="avm-range"></div>
+          <div class="avm-bar-wrap">
+            <div class="avm-bar-fill" style="width:100%;"></div>
+            <div class="avm-bar-dot" id="avm-bar-dot" style="left:50%;"></div>
+          </div>
+          <div class="avm-bar-labels">
+            <span data-i18n="avm_below_market">Por debajo del mercado</span>
+            <span data-i18n="avm_at_market">En línea con el mercado</span>
+            <span data-i18n="avm_above_market">Por encima del mercado</span>
+          </div>
+          <div class="avm-market-badge" id="avm-market-badge"></div>
+          <div class="avm-comparables" id="avm-based-on"></div>
+          <div class="avm-source" id="avm-source"></div>
         </div>
       </div>
 
@@ -2559,6 +2605,120 @@ out tags;`;
     }
   }
 
+  // ── AVM: price estimator ─────────────────────────────────────────────────────
+
+  async function loadAVM(prop) {
+    const section = document.getElementById('section-avm');
+    if (!section) return;
+
+    try {
+      const citySlug = (prop.city || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-');
+
+      const snap = await firebase.firestore().collection('market_data').doc(citySlug).get();
+      if (!snap.exists) return;
+
+      const market = snap.data();
+      const mktPricePerM2 = market.pricePerM2;
+
+      // ── AVM multipliers ──
+      let multiplier = 1.0;
+      if (prop.type) {
+        const t = prop.type.toLowerCase();
+        if (t.includes('ático') || t.includes('atico') || t.includes('penthouse')) multiplier *= 1.12;
+        else if (t.includes('villa') || t.includes('chalet'))                        multiplier *= 1.08;
+        else if (t.includes('estudio') || t.includes('studio'))                      multiplier *= 0.90;
+      }
+      if (prop.terrace_m2 && prop.size_m2) {
+        const terraceRatio = prop.terrace_m2 / prop.size_m2;
+        if (terraceRatio > 0.3) multiplier *= 1.05;
+      }
+      if (prop.year_built) {
+        const age = new Date().getFullYear() - parseInt(prop.year_built, 10);
+        if (age < 5)       multiplier *= 1.06;
+        else if (age > 30) multiplier *= 0.92;
+      }
+      const energyBonus = { A: 1.04, B: 1.02, C: 1.0, D: 0.98, E: 0.96, F: 0.94 };
+      if (prop.energy_rating && energyBonus[prop.energy_rating]) {
+        multiplier *= energyBonus[prop.energy_rating];
+      }
+      if (prop.features) {
+        const f = prop.features;
+        if (f.pool)  multiplier *= 1.04;
+        if (f.views) multiplier *= 1.03;
+      }
+
+      const areaM2 = prop.size_m2 || 100;
+      const estimatedTotal = Math.round(mktPricePerM2 * multiplier * areaM2 / 1000) * 1000;
+      const low  = Math.round(estimatedTotal * 0.85 / 1000) * 1000;
+      const high = Math.round(estimatedTotal * 1.10 / 1000) * 1000;
+
+      // ── Market position ──
+      const listingPerM2 = prop.price / areaM2;
+      const diff = (listingPerM2 - mktPricePerM2) / mktPricePerM2;
+
+      function formatK(n) {
+        return n >= 1000000
+          ? '€' + (n / 1000000).toFixed(2).replace(/\.?0+$/, '') + 'M'
+          : '€' + (n / 1000).toFixed(0) + 'K';
+      }
+
+      const lang = window.PreosLang ? window.PreosLang.currentLang() : 'es';
+
+      document.getElementById('avm-price').textContent = formatK(estimatedTotal);
+      document.getElementById('avm-range').textContent =
+        (window.PreosLang ? window.PreosLang.t('avm_range_label') : 'Rango estimado') +
+        ': ' + formatK(low) + ' – ' + formatK(high);
+
+      // Confidence badge
+      const confBadge = document.getElementById('avm-confidence-badge');
+      const confKey = market.confidence === 'high' ? 'avm_confidence_high'
+                    : market.confidence === 'medium' ? 'avm_confidence_medium'
+                    : 'avm_confidence_low';
+      confBadge.textContent = window.PreosLang ? window.PreosLang.t(confKey) : market.confidence;
+      confBadge.className = 'avm-confidence conf-' + (market.confidence || 'medium');
+
+      // Bar dot position: 0% = -30% diff, 50% = 0%, 100% = +30% diff
+      const clampedDiff = Math.max(-0.30, Math.min(0.30, diff));
+      const dotPct = ((clampedDiff + 0.30) / 0.60 * 100).toFixed(1);
+      document.getElementById('avm-bar-dot').style.left = dotPct + '%';
+
+      // Market badge
+      const badge = document.getElementById('avm-market-badge');
+      if (diff < -0.08) {
+        badge.className = 'avm-market-badge avm-badge-below';
+        badge.textContent = '▼ ' + (window.PreosLang ? window.PreosLang.t('avm_below_market') : 'Por debajo del mercado');
+      } else if (diff > 0.08) {
+        badge.className = 'avm-market-badge avm-badge-above';
+        badge.textContent = '▲ ' + (window.PreosLang ? window.PreosLang.t('avm_above_market') : 'Por encima del mercado');
+      } else {
+        badge.className = 'avm-market-badge avm-badge-at';
+        badge.textContent = '● ' + (window.PreosLang ? window.PreosLang.t('avm_at_market') : 'En línea con el mercado');
+      }
+
+      document.getElementById('avm-based-on').textContent =
+        window.PreosLang ? window.PreosLang.t('avm_based_on') : 'Basado en precio/m² del mercado local';
+
+      document.getElementById('avm-source').textContent =
+        (window.PreosLang ? window.PreosLang.t('avm_source_label') : 'Basado en datos de mercado de') +
+        ' ' + market.source;
+
+      section.style.display = '';
+
+      // Re-render on language change
+      if (!window._avmLangListenerAdded) {
+        window._avmLangListenerAdded = true;
+        document.addEventListener('preos:langchange', function() {
+          loadAVM(prop);
+        });
+      }
+
+    } catch (e) {
+      console.warn('[AVM] failed:', e);
+    }
+  }
+
   async function checkFloodZone(property) {
     // Flood score is pre-computed by enrich-climate.js batch script
     // This function is now a no-op — loadClimateRisks handles rendering
@@ -2827,6 +2987,11 @@ out tags;`;
         }
         if (typeof loadSunExposure === 'function') {
           setTimeout(function() { loadSunExposure(prop); }, 500);
+        }
+        if (typeof loadAVM === 'function') {
+          loadAVM(prop).catch(function(e) {
+            console.warn('[avm] failed:', e);
+          });
         }
         if (typeof checkFloodZone === 'function') {
           checkFloodZone(prop).catch(function(e) {
