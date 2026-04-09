@@ -2664,7 +2664,7 @@ out tags;`;
           : '€' + (n / 1000).toFixed(0) + 'K';
       }
 
-      const lang = window.PreosLang ? window.PreosLang.currentLang() : 'es';
+      const lang = localStorage.getItem('preos_lang') || 'es';
 
       document.getElementById('avm-price').textContent = formatK(estimatedTotal);
       document.getElementById('avm-range').textContent =
