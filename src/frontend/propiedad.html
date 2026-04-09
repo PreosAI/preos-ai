@@ -2658,16 +2658,12 @@ out tags;`;
       const listingPerM2 = prop.price / areaM2;
       const diff = (listingPerM2 - mktPricePerM2) / mktPricePerM2;
 
-      function formatK(n) {
-        return '€' + n.toLocaleString('es-ES');
-      }
-
       const lang = localStorage.getItem('preos_lang') || 'es';
 
-      document.getElementById('avm-price').textContent = formatK(estimatedTotal);
+      document.getElementById('avm-price').textContent = fmt(estimatedTotal);
       document.getElementById('avm-range').textContent =
         (window.PreosLang ? window.PreosLang.t('avm_range_label') : 'Rango estimado') +
-        ': ' + formatK(low) + ' – ' + formatK(high);
+        ': ' + fmt(low) + ' – ' + fmt(high);
 
       // Confidence badge
       const confBadge = document.getElementById('avm-confidence-badge');
