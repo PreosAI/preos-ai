@@ -2659,9 +2659,7 @@ out tags;`;
       const diff = (listingPerM2 - mktPricePerM2) / mktPricePerM2;
 
       function formatK(n) {
-        return n >= 1000000
-          ? '€' + (n / 1000000).toFixed(2).replace(/\.?0+$/, '') + 'M'
-          : '€' + (n / 1000).toFixed(0) + 'K';
+        return '€' + n.toLocaleString('es-ES');
       }
 
       const lang = localStorage.getItem('preos_lang') || 'es';
@@ -2704,7 +2702,7 @@ out tags;`;
         (window.PreosLang ? window.PreosLang.t('avm_source_label') : 'Basado en datos de mercado de') +
         ' ' + market.source;
 
-      section.style.display = '';
+      section.style.display = 'block';
 
       // Re-render on language change
       if (!window._avmLangListenerAdded) {
@@ -2989,9 +2987,7 @@ out tags;`;
           setTimeout(function() { loadSunExposure(prop); }, 500);
         }
         if (typeof loadAVM === 'function') {
-          loadAVM(prop).catch(function(e) {
-            console.warn('[avm] failed:', e);
-          });
+          setTimeout(function() { loadAVM(prop); }, 600);
         }
         if (typeof checkFloodZone === 'function') {
           checkFloodZone(prop).catch(function(e) {
