@@ -1398,7 +1398,6 @@
         <div class="preos-estimate-card">
           <div>
             <div class="preos-estimate-label" data-i18n="avm_label">Estimación Preos</div>
-            <div class="preos-estimate-value" data-i18n="avm_placeholder">— Estimación próximamente</div>
           </div>
         </div>
 
@@ -3057,7 +3056,7 @@ out tags;`;
           setTimeout(function() { loadSunExposure(prop); }, 500);
         }
         if (typeof loadAVM === 'function') {
-          setTimeout(function() { loadAVM(prop); }, 600);
+          setTimeout(function() { loadAVM(prop); }, 3000);
         }
         if (typeof checkFloodZone === 'function') {
           checkFloodZone(prop).catch(function(e) {
