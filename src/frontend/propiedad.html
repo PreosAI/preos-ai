@@ -2892,6 +2892,7 @@ out tags;`;
     // Store for interactive features
     window._currentProp = p;
     window._lbImages    = p.images;
+    window.dispatchEvent(new CustomEvent('preos:propLoaded', { detail: window._currentProp }));
 
 
     // Track viewed properties
@@ -3056,7 +3057,9 @@ out tags;`;
           setTimeout(function() { loadSunExposure(prop); }, 500);
         }
         if (typeof loadAVM === 'function') {
-          setTimeout(function() { loadAVM(prop); }, 3000);
+          setTimeout(function() {
+            if (window._currentProp) loadAVM(window._currentProp);
+          }, 3500);
         }
         if (typeof checkFloodZone === 'function') {
           checkFloodZone(prop).catch(function(e) {
@@ -3377,6 +3380,11 @@ out tags;`;
           alert(lang === 'en' ? 'Could not save booking. Please try again.' : 'No se pudo guardar la reserva. Inténtalo de nuevo.');
         });
     });
+
+  // AVM standalone trigger — fires after all data loads
+  window.addEventListener('preos:propLoaded', function(e) {
+    if (e.detail) setTimeout(function() { loadAVM(e.detail); }, 500);
+  });
   </script>
 
   <script>
