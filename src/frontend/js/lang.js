@@ -853,6 +853,16 @@ window.PreosLang = (function () {
       climate_source_snczi: 'Fuente: SNCZI — Ministerio para la Transición Ecológica',
       climate_source_effis: 'Fuente: EFFIS / Junta de Andalucía',
       climate_source_aemet: 'Fuente: AEMET normas climáticas 1991-2020',
+
+      // Tour / share / floor plan modals
+      btn_schedule_tour:   'Agenda un recorrido',
+      btn_schedule_tour2:  'Programar recorrido',
+      btn_share:           'Compartir propiedad',
+      modal_floor_plans:   'Planos de la propiedad',
+      modal_plans_unavail: 'Planos no disponibles para esta propiedad. Contacta con el agente para más información.',
+      tour_confirmed:      '¡Recorrido agendado!',
+      share_whatsapp:      'Compartir por WhatsApp',
+      share_email:         'Compartir por email',
     },
 
     en: {
@@ -1694,6 +1704,16 @@ window.PreosLang = (function () {
       climate_source_snczi: 'Source: SNCZI — Ministerio para la Transición Ecológica',
       climate_source_effis: 'Source: EFFIS / Junta de Andalucía fire risk assessment',
       climate_source_aemet: 'Source: AEMET climate normals 1991-2020',
+
+      // Tour / share / floor plan modals
+      btn_schedule_tour:   'Schedule a tour',
+      btn_schedule_tour2:  'Schedule tour',
+      btn_share:           'Share property',
+      modal_floor_plans:   'Floor plans',
+      modal_plans_unavail: 'Floor plans not available for this property. Contact the agent for more information.',
+      tour_confirmed:      'Tour scheduled!',
+      share_whatsapp:      'Share on WhatsApp',
+      share_email:         'Share by email',
     }
   };
 

@@ -1698,7 +1698,7 @@
       </div>
 
       <div class="sidebar-card">
-        <div class="sidebar-card-title">Agenda un recorrido</div>
+        <div class="sidebar-card-title" data-i18n="btn_schedule_tour">Agenda un recorrido</div>
 
         <!-- Step 1: Date pills -->
         <div class="tour-dates" id="tour-date-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
@@ -1731,7 +1731,7 @@
           </label>
         </div>
 
-        <button class="btn-red" id="btn-programar">Programar recorrido</button>
+        <button class="btn-red" id="btn-programar" data-i18n="btn_schedule_tour2">Programar recorrido</button>
         <a href="#" class="btn-outline" id="btn-iniciar-oferta">Iniciar una oferta</a>
 
         <div class="sidebar-phone">
@@ -1758,7 +1758,7 @@
 <div class="modal-overlay" id="modal-3d">
   <div class="modal-card" style="max-width:640px;">
     <button class="modal-close" id="modal-3d-close">✕</button>
-    <div class="modal-title" id="modal-3d-title">Recorrido 3D</div>
+    <div class="modal-title" id="modal-3d-title" data-i18n="btn_3d_tour">Recorrido 3D</div>
     <div id="modal-3d-content" style="margin-top:12px;"></div>
     <button class="btn-red" id="modal-3d-contact-btn" style="display:none;width:auto;padding:11px 24px;margin-top:16px;">Contactar agente</button>
   </div>
@@ -1768,8 +1768,8 @@
 <div class="modal-overlay" id="modal-planos">
   <div class="modal-card">
     <button class="modal-close" onclick="closeModal('modal-planos')">✕</button>
-    <div class="modal-title">Planos de la propiedad</div>
-    <div class="modal-sub">Planos no disponibles para esta propiedad. Contacta con el agente para más información.</div>
+    <div class="modal-title" data-i18n="modal_floor_plans">Planos de la propiedad</div>
+    <div class="modal-sub" data-i18n="modal_plans_unavail">Planos no disponibles para esta propiedad. Contacta con el agente para más información.</div>
     <button class="btn-red" style="width:auto;padding:11px 24px;" onclick="closeModal('modal-planos');openModal('modal-agente');">Contactar agente</button>
   </div>
 </div>
@@ -1816,7 +1816,7 @@
 <div class="modal-overlay" id="modal-share">
   <div class="modal-card">
     <button class="modal-close" onclick="closeModal('modal-share')">✕</button>
-    <div class="modal-title">Compartir propiedad</div>
+    <div class="modal-title" data-i18n="btn_share">Compartir propiedad</div>
     <div class="share-prop-info">
       <div class="share-prop-title" id="share-prop-title">—</div>
       <div class="share-prop-price" id="share-prop-price">—</div>
@@ -1826,10 +1826,10 @@
         <span class="share-btn-icon">🔗</span> Copiar enlace
       </button>
       <a class="share-btn" id="share-whatsapp" href="#" target="_blank" rel="noopener">
-        <span class="share-btn-icon">💬</span> Compartir por WhatsApp
+        <span class="share-btn-icon">💬</span> <span data-i18n="share_whatsapp">Compartir por WhatsApp</span>
       </a>
       <a class="share-btn" id="share-email-btn" href="#">
-        <span class="share-btn-icon">✉️</span> Compartir por email
+        <span class="share-btn-icon">✉️</span> <span data-i18n="share_email">Compartir por email</span>
       </a>
     </div>
   </div>
@@ -1840,7 +1840,7 @@
   <div class="modal-card" style="text-align:center;padding:40px 32px;">
     <button class="modal-close" onclick="closeModal('modal-tour-confirm')">✕</button>
     <div style="font-size:48px;margin-bottom:16px;">✅</div>
-    <div class="modal-title">¡Recorrido agendado!</div>
+    <div class="modal-title" data-i18n="tour_confirmed">¡Recorrido agendado!</div>
     <div class="modal-sub" id="tour-confirm-text">Te contactaremos para confirmar.</div>
   </div>
 </div>
@@ -1850,7 +1850,7 @@
   <div class="modal-card" style="text-align:center;padding:40px 32px;">
     <button class="modal-close" onclick="closeModal('modal-tour-success')">✕</button>
     <div style="font-size:48px;margin-bottom:16px;">🗓️</div>
-    <div class="modal-title">¡Recorrido agendado!</div>
+    <div class="modal-title" data-i18n="tour_confirmed">¡Recorrido agendado!</div>
     <div class="modal-sub" id="tour-success-text" style="margin-top:12px;line-height:1.7;">Te contactaremos para confirmar tu visita.</div>
     <a href="visitas.html" id="modal-visitas-link" style="display:inline-block;margin-top:16px;font-size:13px;font-weight:600;color:#cc1f1f;text-decoration:none;" data-i18n="viewMyVisits">Ver mis visitas →</a>
   </div>
