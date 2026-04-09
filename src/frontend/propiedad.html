@@ -1267,7 +1267,7 @@
           </div>
           <div>
             <div class="spec-value">4</div>
-            <div class="spec-label">Habitaciones</div>
+            <div class="spec-label" data-i18n="spec_bedrooms">Habitaciones</div>
           </div>
         </div>
         <div class="spec-item">
@@ -1276,7 +1276,7 @@
           </div>
           <div>
             <div class="spec-value">3</div>
-            <div class="spec-label">Baños</div>
+            <div class="spec-label" data-i18n="spec_bathrooms">Baños</div>
           </div>
         </div>
         <div class="spec-item">
@@ -1344,26 +1344,20 @@
       <!-- ══ SECTION 2: Neighborhood ══════════════════════════════ -->
       <div id="section-neighborhood" class="main-section">
 
-        <div class="section-title">El barrio</div>
+        <div class="section-title" data-i18n="section_el_barrio">El barrio</div>
 
         <!-- Around this home -->
         <div class="section">
-          <div class="subsection-title">Alrededor de esta propiedad</div>
+          <div class="subsection-title" data-i18n="barrio_around">Alrededor de esta propiedad</div>
           <div class="place-tabs">
-            <button class="place-tab-btn active" data-place="colegios">🎓 Colegios</button>
-            <button class="place-tab-btn" data-place="lugares">🛒 Lugares</button>
-            <button class="place-tab-btn" data-place="transporte">🚌 Transporte</button>
+            <button class="place-tab-btn active" data-place="colegios" data-i18n="tab_colegios">🎓 Colegios</button>
+            <button class="place-tab-btn" data-place="lugares" data-i18n="tab_lugares">🛒 Lugares</button>
+            <button class="place-tab-btn" data-place="transporte" data-i18n="tab_transporte">🚌 Transporte</button>
           </div>
 
-          <div class="place-panel active" id="place-colegios">
-            <div class="coming-soon-text">🔜 Datos de colegios próximamente · GreatSchools</div>
-          </div>
-          <div class="place-panel" id="place-lugares">
-            <div class="coming-soon-text">🔜 Supermercados, restaurantes, servicios · Próximamente</div>
-          </div>
-          <div class="place-panel" id="place-transporte">
-            <div class="coming-soon-text">🔜 Paradas cercanas · Próximamente</div>
-          </div>
+          <div class="place-panel active" id="place-colegios"></div>
+          <div class="place-panel" id="place-lugares"></div>
+          <div class="place-panel" id="place-transporte"></div>
         </div>
 
         <!-- Lifestyle scores -->
@@ -1453,9 +1447,9 @@
         <div class="details-grid">
 
           <div class="details-section">
-            <div class="details-section-header">Interior</div>
+            <div class="details-section-header" data-i18n="details_interior">Interior</div>
             <div class="details-row"><span class="details-row-label">Dormitorios</span><span class="details-row-value">4</span></div>
-            <div class="details-row"><span class="details-row-label">Baños completos</span><span class="details-row-value">2</span></div>
+            <div class="details-row"><span class="details-row-label" data-i18n="details_full_baths">Baños completos</span><span class="details-row-value">2</span></div>
             <div class="details-row"><span class="details-row-label">Aseos</span><span class="details-row-value">1</span></div>
             <div class="details-row"><span class="details-row-label">Superficie construida</span><span class="details-row-value">210 m²</span></div>
             <div class="details-row"><span class="details-row-label">Superficie útil</span><span class="details-row-value">192 m²</span></div>
@@ -1467,16 +1461,16 @@
           </div>
 
           <div class="details-section">
-            <div class="details-section-header">Exterior y comunidad</div>
-            <div class="details-row"><span class="details-row-label">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
-            <div class="details-row"><span class="details-row-label">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
+            <div class="details-section-header" data-i18n="details_exterior">Exterior y comunidad</div>
+            <div class="details-row"><span class="details-row-label" data-i18n="details_terrace">Terraza</span><span class="details-row-value">Sí (25 m²)</span></div>
+            <div class="details-row"><span class="details-row-label" data-i18n="details_garage">Garaje</span><span class="details-row-value">Plaza incluida</span></div>
             <div class="details-row"><span class="details-row-label">Trastero</span><span class="details-row-value">No</span></div>
-            <div class="details-row"><span class="details-row-label">Piscina</span><span class="details-row-value">Comunitaria</span></div>
+            <div class="details-row"><span class="details-row-label" data-i18n="details_pool">Piscina</span><span class="details-row-value">Comunitaria</span></div>
             <div class="details-row"><span class="details-row-label">Jardín</span><span class="details-row-value">Comunitario</span></div>
-            <div class="details-row"><span class="details-row-label">Ascensor</span><span class="details-row-value">Sí</span></div>
+            <div class="details-row"><span class="details-row-label" data-i18n="details_elevator">Ascensor</span><span class="details-row-value">Sí</span></div>
             <div class="details-row"><span class="details-row-label">Portero</span><span class="details-row-value">24 horas</span></div>
             <div class="details-row"><span class="details-row-label">Seguridad</span><span class="details-row-value">Sistema 24h</span></div>
-            <div class="details-row"><span class="details-row-label">Planta</span><span class="details-row-value">3ª de 6</span></div>
+            <div class="details-row"><span class="details-row-label" data-i18n="details_floor">Planta</span><span class="details-row-value">3ª de 6</span></div>
             <div class="details-row"><span class="details-row-label">Año construcción</span><span class="details-row-value">2018</span></div>
           </div>
 
@@ -1510,7 +1504,7 @@
 
           <div class="calc-fields">
             <div class="calc-field">
-              <label>Precio de la vivienda</label>
+              <label data-i18n="details_price_label">Precio de la vivienda</label>
               <input type="text" id="calc-precio" value="€1.489.000" readonly style="background:#f9fafb; color:var(--muted); cursor:default;">
             </div>
             <div class="calc-field">
@@ -2229,6 +2223,12 @@ out tags;`;
 
   function renderPlaceTabs(pois) {
     if (!pois) return;
+    window._lastPois = pois;
+
+    // Re-render on language change
+    document.addEventListener('preos:langchange', function() {
+      if (window._lastPois) renderPlaceTabs(window._lastPois);
+    }, { once: true });
 
     // ── Category icon + background colours for places ──
     const PLACE_ICONS = {
@@ -2264,9 +2264,13 @@ out tags;`;
     // ── School row ──
     function schoolRow(item) {
       const dist = distLabel(item.dist);
+      const tipoKey = { 'Público':'school_tipo_publico', 'Concertado':'school_tipo_concertado', 'Privado':'school_tipo_privado' };
+      const metodKey = { 'Internacional':'school_metod_internacional', 'Bilingüe':'school_metod_bilingue', 'Plurilingüe':'school_metod_plurilingue', 'Idiomas':'school_metod_idiomas' };
+      const tipoLabel = item.tipo ? PreosLang.t(tipoKey[item.tipo] || 'school_tipo_publico') : '';
+      const metodLabel = item.metodologia ? PreosLang.t(metodKey[item.metodologia] || '') : '';
       const parts = [];
-      if (item.tipo) parts.push(item.tipo);
-      if (item.metodologia) parts.push(item.metodologia);
+      if (tipoLabel) parts.push(tipoLabel);
+      if (metodLabel) parts.push(metodLabel);
       parts.push(dist);
 
       const titleEl = item.micoleUrl
@@ -2327,7 +2331,7 @@ out tags;`;
       enrichSchoolsWithRatings(pois.schools).then(function(enriched) {
         schoolPanel.innerHTML =
           enriched.map(schoolRow).join('') +
-          '<div class="place-attribution">Valoraciones: ' +
+          '<div class="place-attribution">' + PreosLang.t('school_attribution') +
           '<a href="https://www.micole.net" target="_blank"' +
           ' rel="noopener">micole.net</a></div>';
       });
@@ -2345,7 +2349,7 @@ out tags;`;
         pois.places.map(placeItem).join('') +
         '</div>' +
         '<div class="place-attribution">' +
-        'Datos: OpenStreetMap</div>';
+        PreosLang.t('osm_attribution') + '</div>';
     } else if (placesPanel) {
       placesPanel.innerHTML =
         '<div class="place-empty">' +
@@ -2358,7 +2362,7 @@ out tags;`;
       transportPanel.innerHTML =
         pois.transport.map(transitRow).join('') +
         '<div class="place-attribution">' +
-        'Datos: OpenStreetMap</div>';
+        PreosLang.t('osm_attribution') + '</div>';
     } else if (transportPanel) {
       transportPanel.innerHTML =
         '<div class="place-empty">' +
@@ -2536,7 +2540,7 @@ out tags;`;
       // Re-render on language change
       document.addEventListener('preos:langchange', function() {
         loadSunExposure(prop);
-      }, { once: true });
+      });
 
       section.style.display = 'block';
 
