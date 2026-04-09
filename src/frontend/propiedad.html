@@ -2372,27 +2372,19 @@ out tags;`;
 
   function renderAllScores(scores) {
     window._lastNbScores = scores; // keep for langchange re-render
-    const isEN = (window.PreosLang?.currentLang?.() || 'es') === 'en';
-    const TIERS = isEN ? {
-      walkability: [[8,"Walker's Paradise"],[6,'Very Walkable'],[4,'Walkable'],[2,'Some Walkability'],[0,'Car-Dependent']],
-      transit:     [[8,'Excellent Transit'],[6,'Good Transit'],[4,'Some Transit'],[2,'Minimal Transit'],[0,'No Transit']],
-      bike:        [[8,"Biker's Paradise"],[6,'Very Bikeable'],[4,'Bikeable'],[2,'Some Bike Infra'],[0,'Minimal Bike Infra']],
-      noise:       [[8,'Quiet Area'],[6,'Mostly Quiet'],[4,'Some Noise'],[2,'Noisy'],[0,'Very Noisy']],
-      wellness:    [[8,'Wellness Paradise'],[6,'Healthy Area'],[4,'Some Wellness'],[0,'Limited Wellness']],
-      green:       [[8,'Tree-Filled'],[6,'Good Green Space'],[4,'Some Green Space'],[0,'Limited Green Space']]
-    } : {
-      walkability: [[8,'Paraíso peatonal'],[6,'Muy caminable'],[4,'Algo caminable'],[2,'Accesible a pie'],[0,'Depende del coche']],
-      transit:     [[8,'Transporte excelente'],[6,'Buen transporte'],[4,'Algo de transporte'],[2,'Transporte limitado'],[0,'Sin transporte']],
-      bike:        [[8,'Paraíso ciclista'],[6,'Muy en bici'],[4,'En bici posible'],[2,'Algo de carril bici'],[0,'Infraestructura mínima']],
-      noise:       [[8,'Zona tranquila'],[6,'Bastante tranquilo'],[4,'Algo de ruido'],[2,'Ruidoso'],[0,'Muy ruidoso']],
-      wellness:    [[8,'Paraíso wellness'],[6,'Zona saludable'],[4,'Algo de bienestar'],[0,'Bienestar limitado']],
-      green:       [[8,'Lleno de naturaleza'],[6,'Buenas zonas verdes'],[4,'Algo de zonas verdes'],[0,'Pocas zonas verdes']]
-    };
 
     function scoreLabel(score, type) {
       if (score === null || score === undefined) return '—';
-      const tier = (TIERS[type] || []).find(([min]) => score >= min);
-      return tier ? tier[1] : '—';
+      const high = score >= 8, mid = score >= 5, low = score >= 3;
+      const keys = {
+        walkability: high ? 'score_walk_high'     : mid ? 'score_walk_mid'     : low ? 'score_walk_low'     : 'score_walk_none',
+        bike:        high ? 'score_bike_high'     : mid ? 'score_bike_mid'     : low ? 'score_bike_low'     : 'score_bike_none',
+        transit:     high ? 'score_transit_high'  : mid ? 'score_transit_mid'  : low ? 'score_transit_low'  : 'score_transit_none',
+        noise:       high ? 'score_noise_high'    : mid ? 'score_noise_mid'    : low ? 'score_noise_low'    : 'score_noise_none',
+        wellness:    high ? 'score_wellness_high' : mid ? 'score_wellness_mid' : low ? 'score_wellness_low' : 'score_wellness_none',
+        green:       high ? 'score_green_high'    : mid ? 'score_green_mid'    : low ? 'score_green_low'    : 'score_green_none',
+      };
+      return PreosLang.t(keys[type] || 'score_walk_none');
     }
 
     function scoreLevel(score) {
