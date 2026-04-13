@@ -32,9 +32,12 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
       background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      transition: box-shadow 0.2s ease;
       height: var(--nav-h); display: flex; align-items: center;
       padding: 0 32px; gap: 16px;
     }
+
+    nav.scrolled { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
     .navbar-brand { flex-shrink: 0; text-decoration: none; }
     .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; margin-left: auto; }
     .nav-links a { text-decoration: none; font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; transition: color .2s; }
@@ -43,7 +46,12 @@
     .btn-ingresar { background: var(--red); color: #fff; border: none; padding: 7px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; white-space: nowrap; transition: background .2s; }
     .btn-ingresar:hover { background: #b01a1a; }
     .lang-toggle { font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; user-select: none; white-space: nowrap; }
-    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; margin-left: auto; }
+    .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; margin-left: auto; 
+      min-width: 44px;
+      min-height: 44px;
+      align-items: center;
+      -webkit-tap-highlight-color: transparent;
+    }
     .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
     .mobile-menu { display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--border); z-index: 199; padding: 16px 20px 24px; flex-direction: column; gap: 4px; box-shadow: 0 8px 24px rgba(0,0,0,.1); }
     .mobile-menu.open { display: flex; }
@@ -243,5 +251,11 @@
 </script>
 <script src="js/analytics.js"></script>
 <script src="js/cookie-consent.js"></script>
+
+<script>
+  window.addEventListener('scroll', function() {
+    document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
 </body>
 </html>

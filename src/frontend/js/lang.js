@@ -876,6 +876,7 @@ window.PreosLang = (function () {
       avm_confidence_high:   'Confianza alta',
       avm_confidence_medium: 'Confianza media',
       avm_confidence_low:    'Confianza baja',
+      back_to_results:       'Volver',
     },
 
     en: {
@@ -1740,6 +1741,7 @@ window.PreosLang = (function () {
       avm_confidence_high:   'High confidence',
       avm_confidence_medium: 'Medium confidence',
       avm_confidence_low:    'Low confidence',
+      back_to_results:       'Back',
     }
   };
 

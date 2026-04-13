@@ -47,12 +47,15 @@
       z-index: 200;
       background: #fff;
       box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      transition: box-shadow 0.2s ease;
       height: var(--nav-h);
       display: flex;
       align-items: center;
       padding: 0 32px;
       gap: 16px;
     }
+    nav.scrolled { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
 
     .nav-brand { flex-shrink: 0; text-decoration: none; }
 
@@ -928,5 +931,11 @@
 </script>
 <script src="js/analytics.js"></script>
 <script src="js/cookie-consent.js"></script>
+
+<script>
+  window.addEventListener('scroll', function() {
+    document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
 </body>
 </html>

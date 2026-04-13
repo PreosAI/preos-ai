@@ -46,11 +46,14 @@
       z-index: 200;
       background: #fff;
       box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      transition: box-shadow 0.2s ease;
       height: var(--nav-h);
       display: flex;
       align-items: center;
       padding: 0 40px;
     }
+    nav.scrolled { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
 
     .nav-brand { flex-shrink: 0; text-decoration: none; }
 
@@ -1124,9 +1127,14 @@
       background: none;
       border: none;
       cursor: pointer;
-      padding: 4px;
+      padding: 8px;
       margin-left: 8px;
       flex-shrink: 0;
+    
+      min-width: 44px;
+      min-height: 44px;
+      align-items: center;
+      -webkit-tap-highlight-color: transparent;
     }
     .hamburger span {
       display: block;
@@ -1193,12 +1201,36 @@
       .gallery { height: 200px; }
       .listing-price { font-size: 22px; }
     }
+
+    /* ─── BACK BUTTON (mobile only) ────────────────────────── */
+    .prop-back-btn { display: none; }
+
+    @media (max-width: 900px) {
+      .prop-back-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 4px;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+      .prop-back-btn svg { flex-shrink: 0; }
+      nav .navbar-brand { display: none; }
+    }
   </style>
 </head>
 <body>
 
 <!-- ═══ NAV ═══════════════════════════════════════════════════ -->
 <nav>
+  <a href="buscar.html" class="prop-back-btn" onclick="event.preventDefault(); history.length > 1 ? history.back() : location.href='buscar.html'">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13 16l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span data-i18n="back_to_results">Volver</span>
+  </a>
   <a class="navbar-brand" href="index.html">
     <img class="site-logo" src="Images/logo.png" alt="Preos" style="height: 36px; width: auto;">
   </a>
@@ -3399,5 +3431,11 @@ out tags;`;
   </script>
 <script src="js/analytics.js"></script>
 <script src="js/cookie-consent.js"></script>
+
+<script>
+  window.addEventListener('scroll', function() {
+    document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
 </body>
 </html>
