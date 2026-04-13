@@ -137,7 +137,7 @@
 
   <div class="legal-section" id="cookies-usamos">
     <h2>2. Cookies que utilizamos</h2>
-    <p>Actualmente, Preos utiliza exclusivamente cookies de carácter funcional y de sesión, necesarias para el correcto funcionamiento de la plataforma. No utilizamos cookies publicitarias.</p>
+    <p>Preos utiliza cookies funcionales necesarias para el correcto funcionamiento de la plataforma, y cookies analíticas que solo se activan con el consentimiento explícito del usuario. No utilizamos cookies publicitarias.</p>
 
     <table class="cookie-table">
       <thead>
@@ -153,35 +153,42 @@
         <tr>
           <td>Firebase Auth Session</td>
           <td>Google Firebase</td>
-          <td>Gestión de la sesión de autenticación del usuario</td>
+          <td>Gestión de sesión de autenticación del usuario</td>
           <td>Sesión / funcional</td>
           <td>No requerido (necesario para el servicio)</td>
         </tr>
         <tr>
           <td>preos-lang</td>
           <td>Preos</td>
-          <td>Almacenar la preferencia de idioma del usuario (ES/EN)</td>
+          <td>Almacenar preferencia de idioma del usuario (ES/EN)</td>
           <td>Persistente / funcional</td>
-          <td>No requerido (preferencia del usuario)</td>
+          <td>No requerido</td>
         </tr>
         <tr>
           <td>preos_last_search</td>
           <td>Preos</td>
-          <td>Recordar la última búsqueda realizada por el usuario</td>
+          <td>Recordar la última búsqueda realizada</td>
           <td>Persistente / funcional</td>
-          <td>No requerido (mejora de experiencia)</td>
+          <td>No requerido</td>
         </tr>
         <tr>
-          <td>Cookies de analítica (futuras)</td>
-          <td>Por determinar</td>
-          <td>Análisis de uso de la plataforma para su mejora</td>
-          <td>Analítica</td>
-          <td>Requerido (opt-in previo)</td>
+          <td>preos_cookie_consent</td>
+          <td>Preos</td>
+          <td>Guardar la preferencia de consentimiento de cookies del usuario</td>
+          <td>Persistente / funcional</td>
+          <td>No requerido</td>
+        </tr>
+        <tr>
+          <td>_ga, _ga_*</td>
+          <td>Google Analytics (GA4)</td>
+          <td>Análisis de uso de la plataforma, páginas visitadas y sesiones para mejora del servicio</td>
+          <td>Analítica persistente (hasta 2 años)</td>
+          <td>Requerido — opt-in previo obligatorio</td>
         </tr>
       </tbody>
     </table>
 
-    <p style="margin-top:12px;">En este momento, <strong>Preos no utiliza ninguna cookie publicitaria</strong> ni comparte datos con redes de publicidad.</p>
+    <p style="margin-top:12px;"><strong>Preos no utiliza ninguna cookie publicitaria</strong> ni comparte datos con redes de publicidad.</p>
   </div>
 
   <div class="legal-section" id="gestion">
@@ -200,7 +207,9 @@
   <div class="legal-section" id="consentimiento">
     <h2>4. Consentimiento</h2>
     <p>Las cookies funcionales son <strong>estrictamente necesarias</strong> para el funcionamiento del servicio y no requieren consentimiento previo conforme al artículo 22.2 de la Ley 34/2002 de Servicios de la Sociedad de la Información (LSSI-CE).</p>
-    <p>Cuando en el futuro Preos implemente cookies de analítica u otras cookies no esenciales, le solicitaremos su consentimiento explícito mediante un banner o panel de preferencias de cookies antes de activarlas.</p>
+    <p>Al entrar en Preos por primera vez, aparece un <strong>banner en la parte inferior de la pantalla</strong> con dos opciones de igual prominencia: <strong>Aceptar</strong> y <strong>Rechazar</strong>. Google Analytics GA4 solo se activa si el usuario pulsa <em>Aceptar</em>. Si el usuario pulsa <em>Rechazar</em>, GA4 no se carga en ningún momento durante esa sesión ni en las siguientes.</p>
+    <p>Las cookies funcionales (sesión de usuario, preferencia de idioma, preferencia de consentimiento) no requieren consentimiento y están siempre activas.</p>
+    <p>El usuario puede cambiar su preferencia en cualquier momento borrando los datos del sitio en su navegador (Configuración → Privacidad → Borrar datos de sitios) o escribiendo a <a href="mailto:privacidad@preos.ai">privacidad@preos.ai</a>.</p>
   </div>
 
   <div class="legal-section" id="actualizacion">
@@ -272,5 +281,6 @@
   }
 </script>
 <script src="js/analytics.js"></script>
+<script src="js/cookie-consent.js"></script>
 </body>
 </html>
