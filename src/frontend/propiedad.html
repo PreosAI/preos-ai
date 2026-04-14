@@ -2923,6 +2923,14 @@ out tags;`;
       const fmtPrice = n => '€' + Math.round(n).toLocaleString('es-ES');
 
       document.getElementById('avm-price').textContent = fmtPrice(estimated);
+
+      // Also populate the inline .preos-estimate-card in #section-overview
+      var estEl = document.getElementById('preos-estimate-value');
+      if (estEl) {
+        estEl.textContent = fmtPrice(estimated);
+        estEl.style.color = 'var(--text)';
+      }
+
       document.getElementById('avm-range').textContent =
         (lang === 'en' ? 'Estimated range: ' : 'Rango estimado: ') +
         fmtPrice(low) + ' – ' + fmtPrice(high);
