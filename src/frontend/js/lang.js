@@ -877,6 +877,8 @@ window.PreosLang = (function () {
       avm_confidence_medium: 'Confianza media',
       avm_confidence_low:    'Confianza baja',
       back_to_results:       'Volver',
+      schedule_tour_short:   'Pedir cita',
+      make_offer_short:      'Hacer oferta',
     },
 
     en: {
@@ -1742,6 +1744,8 @@ window.PreosLang = (function () {
       avm_confidence_medium: 'Medium confidence',
       avm_confidence_low:    'Low confidence',
       back_to_results:       'Back',
+      schedule_tour_short:   'Book tour',
+      make_offer_short:      'Make offer',
     }
   };
 

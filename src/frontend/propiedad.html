@@ -1220,6 +1220,138 @@
       }
       .prop-back-btn svg { flex-shrink: 0; }
       nav .navbar-brand { display: none; }
+
+      /* FIX 1: main layout stacks on mobile */
+      .main-layout {
+        flex-direction: column;
+        gap: 0;
+        padding: 16px 16px 100px; /* 100px bottom for sticky bar */
+      }
+      .sidebar-col {
+        position: static;
+        width: 100%;
+      }
+
+      /* FIX 2: sticky bottom bar */
+      .mobile-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 180;
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        background: #fff;
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      }
+      .mobile-cta-tour {
+        flex: 1;
+        height: 48px;
+        background: var(--red);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-cta-offer {
+        flex: 1;
+        height: 48px;
+        background: white;
+        color: var(--text);
+        border: 2px solid var(--red);
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-cta-tour:active { opacity: 0.85; }
+      .mobile-cta-offer:active { background: #fef2f2; }
+    }
+
+    /* ─── MOBILE ACTION BAR (hidden on desktop) ─────────────── */
+    .mobile-action-bar { display: none; }
+
+    /* ─── TOUR BOTTOM SHEET ─────────────────────────────────── */
+    .tour-sheet-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 290;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .tour-sheet-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+    .tour-bottom-sheet {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      max-height: 85vh;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+    .tour-bottom-sheet.active {
+      display: block;
+      transform: translateY(0);
+    }
+    .tour-sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px 8px;
+      position: relative;
+    }
+    .tour-sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #d1d5db;
+      border-radius: 2px;
+    }
+    .tour-sheet-close {
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      color: var(--muted);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tour-sheet-close:active { background: #f3f4f6; }
+    .tour-sheet-body {
+      padding: 0 20px 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      overflow-y: auto;
+      max-height: calc(85vh - 50px);
+      -webkit-overflow-scrolling: touch;
     }
   </style>
 </head>
@@ -3436,6 +3568,133 @@ out tags;`;
   window.addEventListener('scroll', function() {
     document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 10);
   }, { passive: true });
+</script>
+
+<!-- ═══ MOBILE ACTION BAR ════════════════════════════════════ -->
+<div class="mobile-action-bar">
+  <button class="mobile-cta-tour" id="mobile-btn-tour">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span data-i18n="schedule_tour_short">Pedir cita</span>
+  </button>
+  <button class="mobile-cta-offer" id="mobile-btn-offer">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+    <span data-i18n="make_offer_short">Hacer oferta</span>
+  </button>
+</div>
+
+<!-- ═══ TOUR BOTTOM SHEET ═════════════════════════════════════ -->
+<div class="tour-sheet-backdrop" id="tour-sheet-backdrop"></div>
+<div class="tour-bottom-sheet" id="tour-bottom-sheet">
+  <div class="tour-sheet-header">
+    <div class="tour-sheet-handle"></div>
+    <button class="tour-sheet-close" id="tour-sheet-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="tour-sheet-body" id="tour-sheet-body">
+    <!-- Content populated by JS from existing sidebar tour card -->
+  </div>
+</div>
+
+<script>
+// ── Mobile action bar & bottom sheet ──────────────────────────
+(function() {
+  if (window.innerWidth > 900) return;
+
+  var tourBtn   = document.getElementById('mobile-btn-tour');
+  var offerBtn  = document.getElementById('mobile-btn-offer');
+  var backdrop  = document.getElementById('tour-sheet-backdrop');
+  var sheet     = document.getElementById('tour-bottom-sheet');
+  var closeBtn  = document.getElementById('tour-sheet-close');
+  var sheetBody = document.getElementById('tour-sheet-body');
+
+  // Offer button → trigger existing sidebar offer button
+  if (offerBtn) {
+    offerBtn.addEventListener('click', function() {
+      var existing = document.getElementById('btn-iniciar-oferta');
+      if (existing) existing.click();
+    });
+  }
+
+  // Populate bottom sheet with tour card content from sidebar
+  function populateSheet() {
+    var sidebarCards = document.querySelectorAll('.sidebar-col .sidebar-card');
+    // Tour card: find the one containing #btn-programar
+    var tourCard = null;
+    sidebarCards.forEach(function(c) { if (c.querySelector('#btn-programar')) tourCard = c; });
+    if (!tourCard) tourCard = sidebarCards[1]; // fallback: index 1
+    if (tourCard && sheetBody) {
+      sheetBody.innerHTML = tourCard.innerHTML;
+      rebindTourButtons();
+    }
+  }
+
+  function rebindTourButtons() {
+    // Date pills
+    var dateBtns = sheetBody.querySelectorAll('.tour-dates button, #tour-date-pills button');
+    dateBtns.forEach(function(btn, idx) {
+      btn.addEventListener('click', function() {
+        dateBtns.forEach(function(b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        // Sync with original sidebar
+        var origBtns = document.querySelectorAll('.sidebar-col #tour-date-pills button');
+        origBtns.forEach(function(b) { b.classList.remove('selected'); });
+        if (origBtns[idx]) origBtns[idx].classList.add('selected');
+      });
+    });
+    // Time pills
+    var timeBtns = sheetBody.querySelectorAll('#tour-time-pills button');
+    timeBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        timeBtns.forEach(function(b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+      });
+    });
+    // Schedule button
+    var scheduleBtn = sheetBody.querySelector('#btn-programar, .btn-red');
+    if (scheduleBtn) {
+      var newBtn = scheduleBtn.cloneNode(true);
+      newBtn.id = 'mobile-btn-programar';
+      scheduleBtn.parentNode.replaceChild(newBtn, scheduleBtn);
+      newBtn.addEventListener('click', function() {
+        var origBtn = document.getElementById('btn-programar');
+        if (origBtn) origBtn.click();
+        closeSheet();
+      });
+    }
+  }
+
+  function openSheet() {
+    populateSheet();
+    backdrop.style.display = 'block';
+    sheet.style.display = 'block';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        backdrop.classList.add('active');
+        sheet.classList.add('active');
+      });
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSheet() {
+    sheet.classList.remove('active');
+    backdrop.classList.remove('active');
+    setTimeout(function() {
+      sheet.style.display = 'none';
+      backdrop.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+
+  if (tourBtn)  tourBtn.addEventListener('click', openSheet);
+  if (closeBtn) closeBtn.addEventListener('click', closeSheet);
+  if (backdrop) backdrop.addEventListener('click', closeSheet);
+
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 900) closeSheet();
+  });
+})();
 </script>
 </body>
 </html>
