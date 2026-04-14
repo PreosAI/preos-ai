@@ -339,10 +339,6 @@
     .popularity-title { font-weight: 600; font-size: 14px; color: #C05000; margin-bottom: 2px; }
     .popularity-desc { font-size: 13px; color: #7A4000; }
 
-    /* ─── PREOS ESTIMATE CARD ───────────────────────────────── */
-    .preos-estimate-card { background: #f9fafb; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-top: 24px; display: flex; align-items: center; gap: 14px; }
-    .preos-estimate-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
-    .preos-estimate-value { font-size: 18px; font-weight: 700; color: #9ca3af; margin-top: 2px; }
 
     /* ── El Barrio tabs ── */
     .place-tabs { display:flex; gap:0; margin-bottom:0;
@@ -578,6 +574,7 @@
 
     /* ─── MAP ──────────────────────────────────────────────── */
     .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    #prop-map { position: relative; z-index: 1; } /* stacking context — contains Leaflet z-indices */
 
 /* ─── MORTGAGE CALCULATOR ──────────────────────────────── */
     .calc-result {
@@ -1555,13 +1552,6 @@
             Espectacular piso en el corazón de Madrid, ubicado en la icónica Calle Mayor. Esta propiedad de lujo ofrece 210 m² de espacios diáfanos y luminosos con acabados de alta calidad. La vivienda cuenta con cuatro amplias habitaciones, tres baños completos con materiales premium, y una cocina de diseño totalmente equipada con electrodomésticos de última generación.
             <br><br>
             El salón principal conecta con una terraza privada con vistas a la calle peatonal, ideal para disfrutar del ambiente madrileño. El edificio dispone de ascensor, portero físico, sistema de seguridad 24 horas y plaza de garaje incluida en el precio. Zona excelente con acceso inmediato a transporte público, restaurantes, museos y los principales centros de negocio de la ciudad.
-          </div>
-        </div>
-
-        <!-- Preos estimate placeholder -->
-        <div class="preos-estimate-card">
-          <div>
-            <div class="preos-estimate-label" data-i18n="avm_label">Estimación Preos</div>
           </div>
         </div>
 
