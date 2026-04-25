@@ -11,7 +11,7 @@
  *     'https://preos-functions.azurewebsites.net/api/resales';
  */
 
-const RESALES_API_URL     = '';
+const RESALES_API_URL     = 'https://preos-resales-proxy.azurewebsites.net/api/resales/listings';
 const PROPERTIES_JSON_URL = 'data/properties.json';
 
 let _cache       = null;
@@ -141,19 +141,13 @@ function mapResalesProperty(p, index) {
 /* ── Data loading ───────────────────────────────────────── */
 
 async function fetchFromAPI() {
-  var url  = RESALES_API_URL +
-             '?fn=SearchProperties&P_PageSize=200&P_PageNo=1';
-  var res  = await fetch(url);
-  var data = await res.json();
-  if (data.transaction && data.transaction.status === 'error') {
-    throw new Error('Resales API error: ' +
-      JSON.stringify(data.transaction));
-  }
-  var props = data.Property || [];
-  console.log('[properties.js] Loaded', props.length,
-    'properties from Resales API (' +
-    ((data.transaction && data.transaction.mode) || 'live') + ')');
-  return props.map(mapResalesProperty);
+    var res = await fetch(RESALES_API_URL);
+    var data = await res.json();
+    if (data.error) {
+        throw new Error('Listings API error: ' + data.error);
+    }
+    console.log('[properties.js] Loaded', data.length, 'properties from Firestore API');
+    return data;
 }
 
 async function fetchFromJSON() {

@@ -1,8 +1,10 @@
 .claude/
 
+# Node dependencies
+node_modules/
+
 # Azure Functions local settings (contains secrets)
 src/functions/local.settings.json
 
 # Enrichment script credentials (never commit)
 scripts/serviceAccount.json
-scripts/node_modules/
