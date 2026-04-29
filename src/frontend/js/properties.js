@@ -233,7 +233,7 @@ async function searchProperties(filters) {
 
   var results = props.filter(function(p) {
     if (type && type !== 'todos' &&
-        p.type.toLowerCase() !== type.toLowerCase()) return false;
+        norm(p.type) !== norm(type)) return false;
     if (minPrice && p.price < minPrice) return false;
     if (maxPrice && maxPrice > 0 && p.price > maxPrice) return false;
     if (minBedrooms && minBedrooms > 0 &&

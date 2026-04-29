@@ -468,6 +468,17 @@
     }
     .filter-option:hover { background: #f3f4f6; }
     .filter-option.selected { color: var(--red); font-weight: 600; background: rgba(204,31,31,.04); }
+    .filter-section-label {
+      padding: 10px 12px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-top: 1px solid #f0f0f0;
+      margin-top: 4px;
+      cursor: default;
+    }
 
     /* ── iOS: labels as full tap targets ── */
     [class*="filter"] label {
@@ -1025,10 +1036,18 @@
     <div class="filter-dropdown" id="dd-tipo">
       <div class="filter-option selected" data-value="todos" data-i18n="filter_tipo_all">Todos</div>
       <div class="filter-option" data-value="piso" data-i18n="filter_tipo_piso">Piso</div>
-      <div class="filter-option" data-value="casa" data-i18n="filter_tipo_casa">Casa</div>
-      <div class="filter-option" data-value="villa" data-i18n="filter_tipo_villa">Villa</div>
+      <div class="filter-option" data-value="casa_villa" data-i18n="filter_tipo_casa_villa">Casa / Villa</div>
       <div class="filter-option" data-value="atico" data-i18n="filter_tipo_atico">Ático</div>
+      <div class="filter-option" data-value="adosado" data-i18n="filter_tipo_adosado">Adosado</div>
+      <div class="filter-option" data-value="duplex" data-i18n="filter_tipo_duplex">Dúplex</div>
+      <div class="filter-section-label" data-i18n="filter_tipo_more_section">Más tipos</div>
+      <div class="filter-option" data-value="finca" data-i18n="filter_tipo_finca">Finca</div>
+      <div class="filter-option" data-value="solar" data-i18n="filter_tipo_solar">Solar</div>
       <div class="filter-option" data-value="local" data-i18n="filter_tipo_local">Local</div>
+      <div class="filter-option" data-value="oficina" data-i18n="filter_tipo_oficina">Oficina</div>
+      <div class="filter-option" data-value="garaje" data-i18n="filter_tipo_garaje">Garaje</div>
+      <div class="filter-option" data-value="hotel" data-i18n="filter_tipo_hotel">Hotel</div>
+      <div class="filter-option" data-value="restaurante" data-i18n="filter_tipo_restaurante">Restaurante</div>
     </div>
   </div>
 
@@ -1199,7 +1218,20 @@
   };
 
   // Map dropdown tipo values to JSON type values
-  const tipoMap = { piso: 'Apartamento', villa: 'Villa', adosado: 'Adosado' };
+  const tipoMap = {
+    piso:        'Apartamento',
+    casa_villa:  'Villa',
+    atico:       'Ático',
+    adosado:     'Adosado',
+    duplex:      'Duplex',
+    finca:       'Finca - Cortijo',
+    solar:       'Solar',
+    local:       'Local',
+    oficina:     'Office',
+    garaje:      'Garage',
+    hotel:       'Hotel',
+    restaurante: 'Restaurant',
+  };
 
   // ── Dropdown portal — open at body level to escape fixed-parent touch trap ──
   var _ddOriginalParents = {};
