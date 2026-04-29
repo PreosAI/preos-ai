@@ -18,7 +18,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1642,19 +1645,32 @@
   }
 
   // ── Render map markers ────────────────────────────────────────
-  let mapMarkers = [];
+  let mapClusterGroup = null;
 
   function renderMapMarkers(props) {
-    mapMarkers.forEach(m => m.remove());
-    mapMarkers = props.map(p => {
+    if (!mapClusterGroup) {
+      mapClusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 60,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+      });
+      map.addLayer(mapClusterGroup);
+    } else {
+      mapClusterGroup.clearLayers();
+    }
+    const validProps = props.filter(p =>
+      p.lat != null && p.lng != null && !isNaN(p.lat) && !isNaN(p.lng)
+    );
+    const markers = validProps.map(p => {
       const popup = `
         <div class="map-popup">
           <div class="map-popup-price">${formatPrice(p.price)}</div>
           <div class="map-popup-addr">${p.location}</div>
           <a href="propiedad.html?id=${p.id}" class="map-popup-link">Ver propiedad</a>
         </div>`;
-      return L.marker([p.lat, p.lng], { icon: redIcon }).addTo(map).bindPopup(popup, { maxWidth: 220 });
+      return L.marker([p.lat, p.lng], { icon: redIcon }).bindPopup(popup, { maxWidth: 220 });
     });
+    mapClusterGroup.addLayers(markers);
   }
 
   // ── Apply filters + sort ──────────────────────────────────────
@@ -1990,16 +2006,20 @@
     }
   });
 
-  // ── Map bounds filter ─────────────────────────────────────────
+  // ── Map bounds filter (debounced) ────────────────────────────
+  var _moveendTimer = null;
   map.on('moveend', function() {
-    if (!allProps.length) return;
-    var bounds = map.getBounds();
-    var inView = allProps.filter(function(p) {
-      return p.lat && p.lng && bounds.contains([p.lat, p.lng]);
-    });
-    if (inView.length > 0 && inView.length < allProps.length) {
-      renderListings(inView, document.getElementById('searchInput').value, document.getElementById('sort-select').value);
-    }
+    clearTimeout(_moveendTimer);
+    _moveendTimer = setTimeout(function() {
+      if (!allProps.length) return;
+      var bounds = map.getBounds();
+      var inView = allProps.filter(function(p) {
+        return p.lat != null && p.lng != null && bounds.contains([p.lat, p.lng]);
+      });
+      if (inView.length > 0 && inView.length < allProps.length) {
+        renderListings(inView, document.getElementById('searchInput').value, document.getElementById('sort-select').value);
+      }
+    }, 250);
   });
 </script>
 
