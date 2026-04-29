@@ -18,13 +18,17 @@ async function geocode(query) {
     const url = 'https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
         q: query, format: 'json', limit: '1', countrycodes: 'es'
     });
-    const res = await fetch(url, {
-        headers: { 'User-Agent': 'PreosAI/1.0 (preos.ai)' }
-    });
-    const data = await res.json();
-    if (data && data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    }
+    try {
+        const res = await fetch(url, {
+            headers: { 'User-Agent': 'PreosAI/1.0 (preos.ai)' }
+        });
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('json')) return null;
+        const data = await res.json();
+        if (data && data.length > 0) {
+            return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        }
+    } catch (e) { /* rate-limit / parse / network — treat as failed geocode */ }
     return null;
 }
 
