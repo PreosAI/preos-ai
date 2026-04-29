@@ -116,7 +116,7 @@ app.http('resales-sync', {
 
         const startPage = parseInt(request.query.get('startPage') || '1');
         const filterAlias = request.query.get('filter') || process.env.RESALES_FILTER_ID || '1';
-        const pageSize = 100;
+        const pageSize = 40;
         const startTime = Date.now();
         const MAX_RUNTIME_MS = 8.5 * 60 * 1000; // Stop at 8.5 min to leave buffer
         let page = startPage;
@@ -138,8 +138,8 @@ app.http('resales-sync', {
                 context.log('Fetching page', page);
                 const data = await resalesFetch('SearchProperties', {
                     p_agency_filterid: filterAlias,
-                    p_pagesize: String(pageSize),
-                    p_pagenumber: String(page),
+                    p_PageSize: String(pageSize),
+                    p_PageNo: String(page),
                 });
 
                 if (data.transaction && data.transaction.status === 'error') {
