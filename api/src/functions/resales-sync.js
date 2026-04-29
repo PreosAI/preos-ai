@@ -118,7 +118,7 @@ app.http('resales-sync', {
         const filterAlias = request.query.get('filter') || process.env.RESALES_FILTER_ID || '1';
         const pageSize = 40;
         const startTime = Date.now();
-        const MAX_RUNTIME_MS = 8.5 * 60 * 1000; // Stop at 8.5 min to leave buffer
+        const MAX_RUNTIME_MS = 150 * 1000; // 2.5 min — stay under 230s Azure gateway timeout
         let page = startPage;
         let totalSynced = 0;
         let totalProperties = 0;
