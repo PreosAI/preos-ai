@@ -1090,7 +1090,6 @@
         <option value="all" data-i18n="filter_status_all">Todos</option>
         <option value="obra_nueva" data-i18n="filter_status_nueva">Obra nueva</option>
         <option value="resale" data-i18n="filter_status_resale">Segunda mano</option>
-        <option value="bank" data-i18n="filter_status_bank">Banco</option>
       </select>
     </div>
 
@@ -1120,18 +1119,6 @@
       </div>
     </div>
 
-    <!-- Year built -->
-    <div>
-      <div class="filter-group-title" data-i18n="filter_year_built">Año de construcción</div>
-      <select class="filter-select-sm" id="exp-year">
-        <option value="any" data-i18n="filter_year_any">Cualquier año</option>
-        <option value="before_2000" data-i18n="filter_year_before_2000">Antes de 2000</option>
-        <option value="2000_2010" data-i18n="filter_year_2000_2010">2000–2010</option>
-        <option value="2010_2020" data-i18n="filter_year_2010_2020">2010–2020</option>
-        <option value="after_2020" data-i18n="filter_year_after_2020">Después de 2020</option>
-      </select>
-    </div>
-
     <!-- Features -->
     <div>
       <div class="filter-group-title" data-i18n="filter_features">Características</div>
@@ -1143,15 +1130,12 @@
       <label class="filter-checkbox-row"><input type="checkbox" data-feature="air_conditioning"> <span data-i18n="feat_ac">Aire acondicionado</span></label>
     </div>
 
-    <!-- More features + 3D Tour -->
+    <!-- More features -->
     <div>
       <div class="filter-group-title" style="margin-bottom:8px;">&nbsp;</div>
       <label class="filter-checkbox-row"><input type="checkbox" data-feature="sea_views"> <span data-i18n="feat_sea_views">Vistas al mar</span></label>
       <label class="filter-checkbox-row"><input type="checkbox" data-feature="beachfront"> <span data-i18n="feat_beachfront">Primera línea de playa</span></label>
       <label class="filter-checkbox-row"><input type="checkbox" data-feature="home_automation"> <span data-i18n="feat_home_auto">Domótica</span></label>
-      <div style="margin-top:12px;">
-        <label class="filter-checkbox-row"><input type="checkbox" id="exp-3d-tour"> <span data-i18n="filter_3d_tour">Con Recorrido 3D</span></label>
-      </div>
     </div>
 
   </div>
@@ -1195,9 +1179,7 @@
     priceCustomMin: 0, priceCustomMax: 0,
     bathrooms: 0, status: 'all',
     minSize: 0, maxSize: 0,
-    yearRange: 'any',
     features: [],
-    has3dTour: false,
   };
 
   const priceBands = {
@@ -1207,14 +1189,6 @@
     700000:  [400000, 700000],
     1000000: [700000, 1000000],
     9999999: [1000000, Infinity],
-  };
-
-  const yearRangeMap = {
-    any:          [0, 0],
-    before_2000:  [0, 1999],
-    '2000_2010':  [2000, 2010],
-    '2010_2020':  [2010, 2020],
-    after_2020:   [2021, 0],
   };
 
   // Map dropdown tipo values to JSON type values
@@ -1395,13 +1369,12 @@
 
   // ── Expanded filter controls — fire immediately on change ─────
   // (no need to click Apply; Apply button still works as a confirm)
-  ['exp-bathrooms', 'exp-status', 'exp-year'].forEach(function(id) {
+  ['exp-bathrooms', 'exp-status'].forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('change', function() {
       state.bathrooms = parseInt(document.getElementById('exp-bathrooms').value) || 0;
       state.status    = document.getElementById('exp-status').value || 'all';
-      state.yearRange = document.getElementById('exp-year').value || 'any';
       updateMoreBadge();
       applyFilters();
     });
@@ -1416,12 +1389,6 @@
       updateMoreBadge();
       applyFilters();
     });
-  });
-
-  document.getElementById('exp-3d-tour').addEventListener('change', function() {
-    state.has3dTour = this.checked;
-    updateMoreBadge();
-    applyFilters();
   });
 
   document.querySelectorAll('.filter-checkbox-row input[data-feature]').forEach(function(cb) {
@@ -1444,8 +1411,6 @@
     if (state.status !== 'all') count++;
     if (state.minSize > 0 || state.maxSize > 0) count++;
     if (state.features.length > 0) count += state.features.length;
-    if (state.yearRange !== 'any') count++;
-    if (state.has3dTour) count++;
     if (state.priceCustomMin > 0 || state.priceCustomMax > 0) count++;
     var badge = document.getElementById('more-filters-badge');
     var btnMas = document.getElementById('btn-mas');
@@ -1502,8 +1467,6 @@
     state.status    = document.getElementById('exp-status').value || 'all';
     state.minSize   = parseInt(document.getElementById('exp-size-min').value) || 0;
     state.maxSize   = parseInt(document.getElementById('exp-size-max').value) || 0;
-    state.yearRange = document.getElementById('exp-year').value || 'any';
-    state.has3dTour = document.getElementById('exp-3d-tour').checked;
     state.features  = [];
     document.querySelectorAll('.filter-checkbox-row input[data-feature]:checked').forEach(function(cb) {
       state.features.push(cb.getAttribute('data-feature'));
@@ -1523,8 +1486,6 @@
     state.bathrooms = 0;
     state.status = 'all';
     state.minSize = 0; state.maxSize = 0;
-    state.yearRange = 'any';
-    state.has3dTour = false;
     state.features = [];
     state.priceCustomMin = 0; state.priceCustomMax = 0;
     // Reset UI
@@ -1532,8 +1493,6 @@
     document.getElementById('exp-status').value = 'all';
     document.getElementById('exp-size-min').value = '0';
     document.getElementById('exp-size-max').value = '0';
-    document.getElementById('exp-year').value = 'any';
-    document.getElementById('exp-3d-tour').checked = false;
     document.getElementById('price-custom-min').value = '';
     document.getElementById('price-custom-max').value = '';
     document.querySelectorAll('.filter-checkbox-row input[data-feature]').forEach(function(cb) {
@@ -1833,7 +1792,6 @@
       priceMin = band[0];
       priceMax = band[1] === Infinity ? 0 : band[1];
     }
-    const [yearMin, yearMax] = yearRangeMap[state.yearRange] || [0, 0];
     const filters = {
       query:        query || '',
       type:         state.tipo !== 'todos' ? (tipoMap[state.tipo] || state.tipo) : 'todos',
@@ -1844,10 +1802,7 @@
       minSize:      state.minSize,
       maxSize:      state.maxSize,
       features:     state.features,
-      has3dTour:    state.has3dTour,
       status:       state.status,
-      yearBuiltMin: yearMin,
-      yearBuiltMax: yearMax,
     };
     searchProperties(filters).then(function(results) {
       window._currentResults = results;

@@ -225,10 +225,7 @@ async function searchProperties(filters) {
   var minSize      = filters.minSize;
   var maxSize      = filters.maxSize;
   var features     = filters.features;
-  var has3dTour    = filters.has3dTour;
   var status       = filters.status;
-  var yearBuiltMin = filters.yearBuiltMin;
-  var yearBuiltMax = filters.yearBuiltMax;
   var bathrooms    = filters.bathrooms;
 
   var results = props.filter(function(p) {
@@ -242,17 +239,10 @@ async function searchProperties(filters) {
         (p.bathrooms || 0) < bathrooms) return false;
     if (minSize && minSize > 0 && (p.size_m2 || 0) < minSize) return false;
     if (maxSize && maxSize > 0 && (p.size_m2 || 0) > maxSize) return false;
-    if (has3dTour && !p.has_3d_tour) return false;
     if (status && status !== 'all') {
       if (status === 'obra_nueva' && !p.obra_nueva) return false;
-      if (status === 'resale' &&
-          (p.obra_nueva || p.status === 'bank')) return false;
-      if (status === 'bank' && p.status !== 'bank') return false;
+      if (status === 'resale' && p.obra_nueva) return false;
     }
-    if (yearBuiltMin && yearBuiltMin > 0 &&
-        (p.year_built || 0) < yearBuiltMin) return false;
-    if (yearBuiltMax && yearBuiltMax > 0 &&
-        (p.year_built || 9999) > yearBuiltMax) return false;
     if (features && features.length > 0) {
       var pf = p.features || [];
       for (var i = 0; i < features.length; i++) {
