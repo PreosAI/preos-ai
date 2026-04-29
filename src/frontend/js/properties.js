@@ -278,74 +278,96 @@ async function searchProperties(filters) {
   return results;
 }
 
+function _buildSuggestIndex(props) {
+  var provinces = new Map();         // name → count
+  var cities = new Map();            // name → province
+  var areas = new Map();             // name → city
+  var neighbourhoods = new Map();    // name → city
+  for (var i = 0; i < props.length; i++) {
+    var p = props[i];
+    if (p.province) provinces.set(p.province, (provinces.get(p.province) || 0) + 1);
+    if (p.city) cities.set(p.city, p.province || '');
+    if (p.area) areas.set(p.area, p.city || '');
+    if (p.neighbourhood && p.neighbourhood !== p.city)
+      neighbourhoods.set(p.neighbourhood, p.city || '');
+  }
+  function toEntries(map, secondaryFn) {
+    var arr = [];
+    map.forEach(function(secondary, name) {
+      arr.push({ name: name, normName: norm(name), secondary: secondary });
+    });
+    return arr;
+  }
+  return {
+    provinces:      toEntries(provinces),
+    cities:         toEntries(cities),
+    areas:          toEntries(areas),
+    neighbourhoods: toEntries(neighbourhoods),
+  };
+}
+
 async function getSuggestions(query) {
   if (!query || query.trim().length < 1) return [];
-  var props         = await getAllProperties();
-  var q             = norm(query.trim());
-  var provinces     = new Map();
-  var cities        = new Map();
-  var areas         = new Map();
-  var neighbourhoods = new Map();
-  var titles        = [];
+  var props = await getAllProperties();
+  if (!window._suggestIndex) window._suggestIndex = _buildSuggestIndex(props);
+  var idx = window._suggestIndex;
+  var q = norm(query.trim());
 
-  for (var i = 0; i < props.length; i++) {
-    var p        = props[i];
-    var province = p.province      || '';
-    var city     = p.city          || '';
-    var area     = p.area          || '';
-    var nbhd     = p.neighbourhood || '';
-    var title    = p.title         || '';
-    if (province && norm(province).indexOf(q) === 0)
-      provinces.set(province, (provinces.get(province) || 0) + 1);
-    if (city && norm(city).indexOf(q) === 0)
-      cities.set(city, province);
-    if (area) {
-      if (norm(area).indexOf(q) === 0) areas.set(area, city);
-      else if (norm(area).indexOf(q) > -1) areas.set(area, city);
+  function pickPrefix(entries, limit) {
+    var out = [];
+    for (var i = 0; i < entries.length && out.length < limit; i++) {
+      if (entries[i].normName.indexOf(q) === 0) out.push(entries[i]);
     }
-    if (nbhd && nbhd !== city && norm(nbhd).indexOf(q) === 0)
-      neighbourhoods.set(nbhd, city);
-    if (title && norm(title).indexOf(q) > -1 && titles.length < 2)
-      titles.push({ text: title, id: p.id });
+    return out;
   }
+  function pickContains(entries, limit, exclude) {
+    var out = [];
+    var seen = new Set(exclude.map(function(e) { return e.name; }));
+    for (var i = 0; i < entries.length && out.length < limit; i++) {
+      if (seen.has(entries[i].name)) continue;
+      if (entries[i].normName.indexOf(q) > -1) out.push(entries[i]);
+    }
+    return out;
+  }
+
+  var provinceMatches = pickPrefix(idx.provinces, 5);
+  var cityMatches = pickPrefix(idx.cities, 5);
+  var areaPrefix = pickPrefix(idx.areas, 5);
+  var areaContains = pickContains(idx.areas, 5 - areaPrefix.length, areaPrefix);
+  var areaMatches = areaPrefix.concat(areaContains);
+  var nbhdMatches = pickPrefix(idx.neighbourhoods, 5);
 
   var suggestions = [];
-  provinces.forEach(function(count, province) {
+  provinceMatches.forEach(function(e) {
     suggestions.push({
-      type: 'province', text: province,
-      secondary: 'Provincia · ' + count + ' ' +
-        (count === 1 ? 'propiedad' : 'propiedades'),
-      searchValue: province + ' provincia'
+      type: 'province', text: e.name,
+      secondary: 'Provincia · ' + e.secondary + ' ' +
+        (e.secondary === 1 ? 'propiedad' : 'propiedades'),
+      searchValue: e.name + ' provincia'
     });
   });
-  cities.forEach(function(province, city) {
+  cityMatches.forEach(function(e) {
     suggestions.push({
-      type: 'city', text: city,
-      secondary: province ? 'Ciudad · ' + province : 'Ciudad',
-      searchValue: city
+      type: 'city', text: e.name,
+      secondary: e.secondary ? 'Ciudad · ' + e.secondary : 'Ciudad',
+      searchValue: e.name
     });
   });
-  areas.forEach(function(city, area) {
+  areaMatches.forEach(function(e) {
     suggestions.push({
-      type: 'area', text: area,
-      secondary: city ? 'Zona · ' + city : 'Zona',
-      searchValue: area
+      type: 'area', text: e.name,
+      secondary: e.secondary ? 'Zona · ' + e.secondary : 'Zona',
+      searchValue: e.name
     });
   });
-  neighbourhoods.forEach(function(city, nbhd) {
+  nbhdMatches.forEach(function(e) {
     suggestions.push({
-      type: 'neighbourhood', text: nbhd,
-      secondary: city ? 'Barrio · ' + city : 'Barrio',
-      searchValue: nbhd
+      type: 'neighbourhood', text: e.name,
+      secondary: e.secondary ? 'Barrio · ' + e.secondary : 'Barrio',
+      searchValue: e.name
     });
   });
-  for (var j = 0; j < titles.length; j++) {
-    suggestions.push({
-      type: 'property', text: titles[j].text,
-      secondary: 'Propiedad', id: titles[j].id,
-      searchValue: titles[j].text
-    });
-  }
+
   var capped = suggestions.slice(0, 7);
   capped.push({
     type: 'all', text: query.trim(),
