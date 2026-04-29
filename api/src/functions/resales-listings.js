@@ -39,7 +39,7 @@ function mapToFrontend(doc) {
 
     let normalizedType = type;
     if (t.indexOf('apartment') > -1 || t.indexOf('flat') > -1 || t.indexOf('studio') > -1) normalizedType = 'Apartamento';
-    else if (t.indexOf('villa') > -1 || t.indexOf('chalet') > -1 || t.indexOf('house') > -1) normalizedType = 'Villa';
+    else if (t.indexOf('villa') > -1 || t.indexOf('chalet') > -1 || t.indexOf('house') > -1 || t.indexOf('casa') > -1) normalizedType = 'Villa';
     else if (t.indexOf('townhouse') > -1 || t.indexOf('semi') > -1) normalizedType = 'Adosado';
     else if (t.indexOf('penthouse') > -1) normalizedType = 'Ático';
     else if (t.indexOf('plot') > -1 || t.indexOf('land') > -1) normalizedType = 'Solar';
@@ -75,11 +75,15 @@ function mapToFrontend(doc) {
         description_en: '',
         features: (d.features || []).map(f => {
             const map = {
-                'Pool': 'pool', 'Garden': 'garden', 'Parking': 'garage',
-                'Garage': 'garage', 'Air Conditioning': 'air_conditioning',
+                'Pool': 'pool',
+                'Garden': 'garden',
+                'Parking': 'garage', 'Garage': 'garage',
+                'Air Conditioning': 'air_conditioning',
                 'Elevator': 'elevator', 'Lift': 'elevator',
-                'Sea Views': 'sea_views', 'Beachfront': 'beachfront',
-                'Terrace': 'terrace'
+                'Sea': 'sea_views', 'Sea Views': 'sea_views',
+                'Beachfront': 'beachfront', 'Beach': 'beachfront', 'Beachside': 'beachfront',
+                'Home Automation': 'home_automation', 'Domotica': 'home_automation', 'Domótica': 'home_automation',
+                'Terrace': 'terrace', 'Private Terrace': 'terrace', 'Covered Terrace': 'terrace',
             };
             return map[f] || f.toLowerCase().replace(/\s+/g, '_');
         }),
