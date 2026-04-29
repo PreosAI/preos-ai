@@ -83,9 +83,6 @@ function mapProperty(raw) {
         features: features,
         images: images,
         imageCount: images.length,
-        lat: null,
-        lng: null,
-        locationConfidence: 'none',
         syncedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 }
