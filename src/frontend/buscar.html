@@ -1560,10 +1560,44 @@
 
   document.addEventListener('preos:langchange', updateResultsCount);
 
-  // Re-render cards on language switch so badge/spec text updates
-  document.addEventListener('preos:langchange', function() {
-    applyFilters();
-  });
+  // Re-translate card text in place on lang switch — no re-fetch / re-filter / re-render
+  function relabelCards() {
+    if (!_allPropsCache || _allPropsCache.length === 0) return;
+    const lang = localStorage.getItem('preos-lang') || 'es';
+    const byId = window._propsById || (window._propsById = (function() {
+      const m = {};
+      for (let i = 0; i < _allPropsCache.length; i++) m[_allPropsCache[i].id] = _allPropsCache[i];
+      return m;
+    })());
+    const cards = document.querySelectorAll('.listings-list a.h-card');
+    cards.forEach(function(card) {
+      const href = card.getAttribute('href') || '';
+      const idMatch = href.match(/[?&]id=([^&]+)/);
+      if (!idMatch) return;
+      const p = byId[decodeURIComponent(idMatch[1])];
+      if (!p) return;
+      const cardTitle = lang === 'en' ? (p.title_en || p.title) : p.title;
+      const bedLabel  = lang === 'en' ? 'bed'  : 'hab.';
+      const bathLabel = p.bathrooms === 1
+        ? (lang === 'en' ? 'bath' : 'baño')
+        : (lang === 'en' ? 'baths' : 'baños');
+      const newLabel  = lang === 'en' ? 'New'      : 'Nuevo';
+      const tourLabel = lang === 'en' ? '3D Tour'  : 'Recorrido 3D';
+
+      const addr = card.querySelector('.h-card-address');
+      if (addr) addr.textContent = cardTitle;
+      const img  = card.querySelector('.h-card-img img');
+      if (img)  img.setAttribute('alt', cardTitle);
+      const specs = card.querySelectorAll('.h-card-spec');
+      if (specs[0]) specs[0].textContent = p.bedrooms  + ' ' + bedLabel;
+      if (specs[1]) specs[1].textContent = p.bathrooms + ' ' + bathLabel;
+      const newBadge  = card.querySelector('.badge.badge-nuevo');
+      if (newBadge)  newBadge.textContent  = newLabel;
+      const tourBadge = card.querySelector('.badge.badge-3d');
+      if (tourBadge) tourBadge.textContent = tourLabel;
+    });
+  }
+  document.addEventListener('preos:langchange', relabelCards);
 
   function renderListings(props, query, sortValOverride) {
     const sortVal = sortValOverride || document.getElementById('sort-select').value;
