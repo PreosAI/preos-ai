@@ -1,7 +1,18 @@
 const { app } = require('@azure/functions');
-const { fetch: undiciFetch, ProxyAgent } = require('undici');
+const admin = require('firebase-admin');
 
-const RESALES_BASE = 'https://webapi.resales-online.com/V6';
+let db;
+function getDb() {
+    if (db) return db;
+    const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+    if (!b64) throw new Error('FIREBASE_SERVICE_ACCOUNT_BASE64 not set');
+    const sa = JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
+    if (!admin.apps.length) {
+        admin.initializeApp({ credential: admin.credential.cert(sa) });
+    }
+    db = admin.firestore();
+    return db;
+}
 
 function getCorsHeaders(request) {
     const origin = request.headers.get('origin') || '';
@@ -12,6 +23,69 @@ function getCorsHeaders(request) {
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Max-Age': '86400'
+    };
+}
+
+function mapToDetail(d) {
+    const type = d.propertyType || 'Propiedad';
+    const sub = d.subtype || '';
+    const t = (type + ' ' + sub).toLowerCase();
+
+    let normalizedType = type;
+    if (t.indexOf('apartment') > -1 || t.indexOf('flat') > -1 || t.indexOf('studio') > -1) normalizedType = 'Apartamento';
+    else if (t.indexOf('villa') > -1 || t.indexOf('chalet') > -1 || t.indexOf('house') > -1 || t.indexOf('casa') > -1) normalizedType = 'Villa';
+    else if (t.indexOf('townhouse') > -1 || t.indexOf('semi') > -1) normalizedType = 'Adosado';
+    else if (t.indexOf('penthouse') > -1) normalizedType = 'Ático';
+    else if (t.indexOf('plot') > -1 || t.indexOf('land') > -1) normalizedType = 'Solar';
+    else if (t.indexOf('commercial') > -1) normalizedType = 'Local';
+
+    const beds = d.bedrooms || 0;
+    const loc = d.location || d.area || '';
+
+    return {
+        id: d.reference,
+        title: (beds > 0 ? beds + ' hab. ' : '') + normalizedType + (loc ? ' en ' + loc : ''),
+        title_en: (beds > 0 ? beds + '-bed ' : '') + normalizedType + (loc ? ' in ' + loc : ''),
+        price: d.price || 0,
+        bedrooms: d.bedrooms || 0,
+        bathrooms: d.bathrooms || 0,
+        size_m2: d.built || null,
+        plot_m2: d.gardenPlot || null,
+        terrace_m2: d.terrace || null,
+        location: [d.subLocation, d.location, d.area].filter(Boolean).join(', '),
+        city: d.location || '',
+        area: d.area || '',
+        neighbourhood: d.subLocation || '',
+        province: d.province || 'Málaga',
+        lat: d.lat || null,
+        lng: d.lng || null,
+        type: normalizedType,
+        subtype: d.subtype || '',
+        status: d.status === 'Available' ? null : (d.status || '').toLowerCase().replace(/\s+/g, '_') || null,
+        obra_nueva: (d.propertyTypeId || '').charAt(0) === '5',
+        has_3d_tour: false,
+        images: d.images || [],
+        description: d.description || '',
+        description_en: '',
+        features: (d.features || []).map(f => {
+            const map = {
+                'Pool': 'pool',
+                'Garden': 'garden',
+                'Parking': 'garage', 'Garage': 'garage',
+                'Air Conditioning': 'air_conditioning',
+                'Elevator': 'elevator', 'Lift': 'elevator',
+                'Sea': 'sea_views', 'Sea Views': 'sea_views',
+                'Beachfront': 'beachfront', 'Beach': 'beachfront', 'Beachside': 'beachfront',
+                'Home Automation': 'home_automation', 'Domotica': 'home_automation', 'Domótica': 'home_automation',
+                'Terrace': 'terrace', 'Private Terrace': 'terrace', 'Covered Terrace': 'terrace',
+            };
+            return map[f] || f.toLowerCase().replace(/\s+/g, '_');
+        }),
+        energy_rating: d.energyRated || null,
+        agent: '',
+        agency_ref: d.agencyRef || '',
+        listed_date: null,
+        resales_ref: d.reference
     };
 }
 
@@ -26,19 +100,7 @@ app.http('resales-property', {
             return { status: 204, headers: cors };
         }
 
-        const p1 = process.env.RESALES_P1;
-        const p2 = process.env.RESALES_P2;
-        const defaultFilterId = process.env.RESALES_FILTER_ID || '1';
         const reference = request.params.reference;
-
-        if (!p1 || !p2) {
-            return {
-                status: 503,
-                headers: cors,
-                jsonBody: { error: 'API credentials not configured' }
-            };
-        }
-
         if (!reference) {
             return {
                 status: 400,
@@ -47,51 +109,31 @@ app.http('resales-property', {
             };
         }
 
-        const upstreamUrl = new URL(RESALES_BASE + '/PropertyDetails');
-        upstreamUrl.searchParams.set('p1', p1);
-        upstreamUrl.searchParams.set('p2', p2);
-        upstreamUrl.searchParams.set('p_agency_filterid', defaultFilterId);
-        upstreamUrl.searchParams.set('p_reference', reference);
-
-        const reqUrl = new URL(request.url);
-        for (const key of ['p_lang', 'p_dimensionunit', 'p_sandbox', 'p_agency_filterid']) {
-            const val = reqUrl.searchParams.get(key);
-            if (val) upstreamUrl.searchParams.set(key, val);
-        }
-
         try {
-            const fetchOptions = { headers: { 'Accept': 'application/json' } };
-            let fetchFn = fetch;
-            if (process.env.FIXIE_URL) {
-                fetchOptions.dispatcher = new ProxyAgent(process.env.FIXIE_URL);
-                fetchFn = undiciFetch;
+            const db = getDb();
+            const docSnap = await db.collection('listings').doc(reference).get();
+            if (!docSnap.exists) {
+                return {
+                    status: 404,
+                    headers: cors,
+                    jsonBody: { error: 'Property not found', reference }
+                };
             }
-            const response = await fetchFn(upstreamUrl.toString(), fetchOptions);
-
-            const contentType = response.headers.get('content-type') || '';
-            let body;
-
-            if (contentType.includes('application/json')) {
-                body = await response.json();
-            } else {
-                body = await response.text();
-            }
-
             return {
-                status: response.status,
+                status: 200,
                 headers: {
                     ...cors,
-                    'Content-Type': contentType.includes('json') ? 'application/json' : contentType || 'text/plain',
+                    'Content-Type': 'application/json',
                     'Cache-Control': 'public, max-age=600'
                 },
-                ...(typeof body === 'string' ? { body } : { jsonBody: body })
+                jsonBody: mapToDetail(docSnap.data())
             };
         } catch (err) {
-            context.error('Resales API error:', err.message);
+            context.error('Property lookup error:', err.message);
             return {
-                status: 502,
+                status: 500,
                 headers: cors,
-                jsonBody: { error: 'Upstream API error', detail: err.message }
+                jsonBody: { error: err.message }
             };
         }
     }

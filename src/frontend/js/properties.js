@@ -11,7 +11,8 @@
  *     'https://preos-functions.azurewebsites.net/api/resales';
  */
 
-const RESALES_API_URL     = 'https://preos-resales-proxy.azurewebsites.net/api/resales/listings';
+const RESALES_API_BASE    = 'https://preos-resales-proxy.azurewebsites.net/api/resales';
+const RESALES_API_URL     = RESALES_API_BASE + '/listings';
 const PROPERTIES_JSON_URL = 'data/properties.json';
 
 let _cache       = null;
@@ -178,6 +179,13 @@ async function getAllProperties() {
 /* ── Public API (unchanged) ─────────────────────────────── */
 
 async function getPropertyById(id) {
+  if (!id) return null;
+  try {
+    var res = await fetch(RESALES_API_BASE + '/property/' + encodeURIComponent(id));
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[properties.js] Per-property fetch failed, falling back to listings cache:', err.message);
+  }
   var props = await getAllProperties();
   return props.find(function(p) { return p.id === id; }) || null;
 }
