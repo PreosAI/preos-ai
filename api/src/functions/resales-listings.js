@@ -70,9 +70,7 @@ function mapToFrontend(doc) {
         status: d.status === 'Available' ? null : (d.status || '').toLowerCase().replace(/\s+/g, '_') || null,
         obra_nueva: (d.propertyTypeId || '').charAt(0) === '5',
         has_3d_tour: false,
-        images: d.images || [],
-        description: d.description || '',
-        description_en: '',
+        images: (d.images || []).slice(0, 1),
         features: (d.features || []).map(f => {
             const map = {
                 'Pool': 'pool',
