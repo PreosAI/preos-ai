@@ -14,10 +14,37 @@ function getDb() {
     return db;
 }
 
-async function geocode(query) {
-    const url = 'https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
-        q: query, format: 'json', limit: '1', countrycodes: 'es'
+// Málaga province bounding box (approximate)
+const BBOX = { north: 37.30, south: 36.30, west: -5.55, east: -4.20 };
+
+// Marketing/non-administrative regions Nominatim cannot resolve as a county
+const MARKETING_REGIONS = new Set([
+    'costa del sol', 'costa tropical', 'costa de la luz',
+    'axarquia', 'axarquía', 'serrania de ronda', 'serranía de ronda',
+]);
+
+function inBbox(lat, lng) {
+    return lat >= BBOX.south && lat <= BBOX.north && lng >= BBOX.west && lng <= BBOX.east;
+}
+
+function confidenceFromImportance(importance) {
+    if (importance == null) return 'low';
+    if (importance > 0.5) return 'high';
+    if (importance >= 0.3) return 'medium';
+    return 'low';
+}
+
+async function geocode(loc) {
+    const params = new URLSearchParams({
+        format: 'json', limit: '1', countrycodes: 'es', addressdetails: '0',
     });
+    if (loc.location)  params.set('city', loc.location);
+    const areaLower = (loc.area || '').toLowerCase();
+    if (loc.area && !MARKETING_REGIONS.has(areaLower)) params.set('county', loc.area);
+    if (loc.province)  params.set('state', loc.province);
+    params.set('country', 'Spain');
+
+    const url = 'https://nominatim.openstreetmap.org/search?' + params.toString();
     try {
         const res = await fetch(url, {
             headers: { 'User-Agent': 'PreosAI/1.0 (preos.ai)' }
@@ -25,9 +52,14 @@ async function geocode(query) {
         const ct = res.headers.get('content-type') || '';
         if (!res.ok || !ct.includes('json')) return null;
         const data = await res.json();
-        if (data && data.length > 0) {
-            return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-        }
+        if (!data || data.length === 0) return null;
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        if (!inBbox(lat, lng)) return { rejected: true, lat, lng };
+        return {
+            lat, lng,
+            confidence: confidenceFromImportance(data[0].importance),
+        };
     } catch (e) { /* rate-limit / parse / network — treat as failed geocode */ }
     return null;
 }
@@ -41,25 +73,34 @@ app.http('resales-geocode', {
             const db = getDb();
             const startTime = Date.now();
             const MAX_RUNTIME_MS = 8.5 * 60 * 1000;
+            const mode = request.query.get('mode') || 'fill'; // 'fill' (lat null) or 'refine' (low/medium confidence + null)
 
-            // Step 1: Get all unique location combinations from listings where lat is null
-            context.log('Reading listings without coordinates...');
-            const snapshot = await db.collection('listings')
-                .where('lat', '==', null)
-                .limit(5000)
-                .select('location', 'area', 'province', 'reference')
-                .get();
-
-            if (snapshot.empty) {
-                return { status: 200, jsonBody: { status: 'complete', message: 'All listings already geocoded' } };
+            context.log('Geocode mode:', mode);
+            const baseQuery = db.collection('listings');
+            let snapshot;
+            if (mode === 'refine') {
+                // Refine: anything not 'high' confidence, capped
+                snapshot = await baseQuery
+                    .where('locationConfidence', 'in', ['none', 'area', 'low', 'medium'])
+                    .limit(5000)
+                    .select('location', 'area', 'province', 'reference')
+                    .get();
+            } else {
+                snapshot = await baseQuery
+                    .where('lat', '==', null)
+                    .limit(5000)
+                    .select('location', 'area', 'province', 'reference')
+                    .get();
             }
 
-            context.log('Found', snapshot.size, 'listings without coordinates');
+            if (snapshot.empty) {
+                return { status: 200, jsonBody: { status: 'complete', mode, message: 'Nothing to process' } };
+            }
 
-            // Step 2: Extract unique location keys
+            context.log('Found', snapshot.size, 'docs to process (mode=' + mode + ')');
+
             const locationMap = new Map();
             const docsByLocation = new Map();
-
             snapshot.forEach(doc => {
                 const d = doc.data();
                 const key = [d.location, d.area, d.province].join('|');
@@ -74,11 +115,9 @@ app.http('resales-geocode', {
                 docsByLocation.get(key).push(doc.id);
             });
 
-            context.log('Unique locations to geocode:', locationMap.size);
+            context.log('Unique locations:', locationMap.size);
 
-            // Step 3: Geocode each unique location
-            let geocoded = 0;
-            let updated = 0;
+            let geocoded = 0, updated = 0, rejected = 0, failed = 0;
             const BATCH_SIZE = 450;
 
             for (const [key, loc] of locationMap) {
@@ -87,12 +126,8 @@ app.http('resales-geocode', {
                     break;
                 }
 
-                const query = [loc.location, loc.area, loc.province, 'Spain']
-                    .filter(Boolean).join(', ');
-                const geo = await geocode(query);
-
-                if (geo) {
-                    // Update all listings with this location
+                const geo = await geocode(loc);
+                if (geo && !geo.rejected) {
                     const docIds = docsByLocation.get(key);
                     for (let i = 0; i < docIds.length; i += BATCH_SIZE) {
                         const batch = db.batch();
@@ -101,31 +136,50 @@ app.http('resales-geocode', {
                             batch.update(db.collection('listings').doc(docId), {
                                 lat: geo.lat,
                                 lng: geo.lng,
-                                locationConfidence: 'area'
+                                locationConfidence: geo.confidence,
                             });
                         }
                         await batch.commit();
                         updated += chunk.length;
                     }
-                    context.log('Geocoded:', loc.location, '->', geo.lat, geo.lng,
+                    context.log('OK:', loc.location, '->', geo.lat, geo.lng, geo.confidence,
                         '(', docsByLocation.get(key).length, 'listings)');
+                } else if (geo && geo.rejected) {
+                    rejected++;
+                    // Mark as 'rejected' so refine mode skips next time
+                    const docIds = docsByLocation.get(key);
+                    for (let i = 0; i < docIds.length; i += BATCH_SIZE) {
+                        const batch = db.batch();
+                        const chunk = docIds.slice(i, i + BATCH_SIZE);
+                        for (const docId of chunk) {
+                            batch.update(db.collection('listings').doc(docId), {
+                                lat: null, lng: null,
+                                locationConfidence: 'rejected',
+                            });
+                        }
+                        await batch.commit();
+                    }
+                    context.log('REJECTED (out of bbox):',
+                        loc.location, '->', geo.lat, geo.lng, '(', docsByLocation.get(key).length, 'listings)');
                 } else {
-                    context.log('Failed to geocode:', query);
+                    failed++;
+                    context.log('FAILED:', loc.location);
                 }
 
                 geocoded++;
-                // Nominatim rate limit: 1 req/sec
-                await new Promise(r => setTimeout(r, 1100));
+                await new Promise(r => setTimeout(r, 1100)); // Nominatim 1 req/sec
             }
 
             return {
                 status: 200,
                 jsonBody: {
                     status: geocoded < locationMap.size ? 'partial' : 'complete',
+                    mode,
                     uniqueLocations: locationMap.size,
-                    geocoded,
+                    locationsProcessed: geocoded,
                     listingsUpdated: updated,
-                    remainingWithoutCoords: snapshot.size - updated
+                    locationsRejected: rejected,
+                    locationsFailed: failed,
                 }
             };
         } catch (err) {
