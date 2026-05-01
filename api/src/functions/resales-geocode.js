@@ -43,7 +43,7 @@ async function geocodeOnce(searchText, token) {
         access_token: token,
         country: 'es',
         language: 'es',
-        types: 'place,locality,neighborhood,address',
+        types: 'place,locality,neighborhood',
         proximity: PROXIMITY,
         limit: '1',
     }).toString();
