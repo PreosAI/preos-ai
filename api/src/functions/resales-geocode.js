@@ -24,6 +24,18 @@ function inBbox(lat, lng) {
     return lat >= BBOX.south && lat <= BBOX.north && lng >= BBOX.west && lng <= BBOX.east;
 }
 
+// Full quality_score formula. Mirrors helper in resales-listings.js / resales-property.js.
+// Geocoder is the only writer that has the final locationConfidence, so it writes the full score.
+function computeQualityScore(d, locationConfidence) {
+    const conf = locationConfidence != null ? locationConfidence : d.locationConfidence;
+    const confPts = conf === 'high' ? 40 : conf === 'medium' ? 20 : 0;
+    const imgPts = Math.min(d.imageCount || 0, 10) * 3;
+    const bedPts = (d.bedrooms || 0) > 0 ? 15 : 0;
+    const price = d.price || 0;
+    const pricePts = (price >= 50000 && price <= 5000000) ? 15 : 0;
+    return confPts + imgPts + bedPts + pricePts;
+}
+
 function confidenceFromRelevance(rel) {
     if (rel == null) return 'low';
     if (rel >= 0.8)  return 'high';
@@ -118,19 +130,19 @@ app.http('resales-geocode', {
             if (mode === 'mapbox_refresh') {
                 snapshot = await db.collection('listings')
                     .limit(10000)
-                    .select('location', 'area', 'province', 'reference', 'locationConfidence', 'lat')
+                    .select('location', 'area', 'province', 'reference', 'locationConfidence', 'lat', 'price', 'bedrooms', 'imageCount')
                     .get();
             } else if (mode === 'refine') {
                 snapshot = await db.collection('listings')
                     .where('locationConfidence', 'in', ['none', 'area', 'low', 'medium', 'rejected'])
                     .limit(10000)
-                    .select('location', 'area', 'province', 'reference')
+                    .select('location', 'area', 'province', 'reference', 'price', 'bedrooms', 'imageCount')
                     .get();
             } else {
                 snapshot = await db.collection('listings')
                     .where('lat', '==', null)
                     .limit(10000)
-                    .select('location', 'area', 'province', 'reference')
+                    .select('location', 'area', 'province', 'reference', 'price', 'bedrooms', 'imageCount')
                     .get();
             }
 
@@ -154,7 +166,13 @@ app.http('resales-geocode', {
                     });
                     docsByLocation.set(key, []);
                 }
-                docsByLocation.get(key).push({ id: doc.id, conf: d.locationConfidence });
+                docsByLocation.get(key).push({
+                    id: doc.id,
+                    conf: d.locationConfidence,
+                    price: d.price || 0,
+                    bedrooms: d.bedrooms || 0,
+                    imageCount: d.imageCount || 0,
+                });
             });
 
             // mapbox_refresh re-geocodes everything (no skip) so config changes propagate
@@ -176,33 +194,35 @@ app.http('resales-geocode', {
 
                 mapboxCalls++;
                 const result = await geocode(loc, token, context);
-                const docIds = docsByLocation.get(key).map(d => d.id);
+                const docs = docsByLocation.get(key);
 
                 if (result.status === 'ok') {
                     counts[result.confidence]++;
-                    for (let i = 0; i < docIds.length; i += BATCH_SIZE) {
+                    for (let i = 0; i < docs.length; i += BATCH_SIZE) {
                         const batch = db.batch();
-                        const chunk = docIds.slice(i, i + BATCH_SIZE);
-                        for (const docId of chunk) {
-                            batch.update(db.collection('listings').doc(docId), {
+                        const chunk = docs.slice(i, i + BATCH_SIZE);
+                        for (const doc of chunk) {
+                            batch.update(db.collection('listings').doc(doc.id), {
                                 lat: result.lat, lng: result.lng,
                                 locationConfidence: result.confidence,
+                                quality_score: computeQualityScore(doc, result.confidence),
                             });
                         }
                         await batch.commit();
                         listingsUpdated += chunk.length;
                     }
                     context.log('OK:', loc.location, '->', result.lat.toFixed(4), result.lng.toFixed(4),
-                        result.confidence, '(rel=' + (result.relevance != null ? result.relevance.toFixed(2) : '?') + ',', docIds.length, 'listings)');
+                        result.confidence, '(rel=' + (result.relevance != null ? result.relevance.toFixed(2) : '?') + ',', docs.length, 'listings)');
                 } else if (result.status === 'rejected') {
                     counts.rejected++;
-                    for (let i = 0; i < docIds.length; i += BATCH_SIZE) {
+                    for (let i = 0; i < docs.length; i += BATCH_SIZE) {
                         const batch = db.batch();
-                        const chunk = docIds.slice(i, i + BATCH_SIZE);
-                        for (const docId of chunk) {
-                            batch.update(db.collection('listings').doc(docId), {
+                        const chunk = docs.slice(i, i + BATCH_SIZE);
+                        for (const doc of chunk) {
+                            batch.update(db.collection('listings').doc(doc.id), {
                                 lat: null, lng: null,
                                 locationConfidence: 'rejected',
+                                quality_score: computeQualityScore(doc, 'rejected'),
                             });
                         }
                         await batch.commit();
