@@ -26,6 +26,17 @@ function getCorsHeaders(request) {
     };
 }
 
+// quality_score: 0–100, mirrors helper in resales-listings.js / resales-geocode.js
+function computeQualityScore(d) {
+    const conf = d.locationConfidence;
+    const confPts = conf === 'high' ? 40 : conf === 'medium' ? 20 : 0;
+    const imgPts = Math.min(d.imageCount || (d.images ? d.images.length : 0), 10) * 3;
+    const bedPts = (d.bedrooms || 0) > 0 ? 15 : 0;
+    const price = d.price || 0;
+    const pricePts = (price >= 50000 && price <= 5000000) ? 15 : 0;
+    return confPts + imgPts + bedPts + pricePts;
+}
+
 function mapToDetail(d) {
     const type = d.propertyType || 'Propiedad';
     const sub = d.subtype || '';
@@ -62,6 +73,7 @@ function mapToDetail(d) {
         locationConfidence: d.locationConfidence || 'none',
         type: normalizedType,
         subtype: d.subtype || '',
+        quality_score: typeof d.quality_score === 'number' ? d.quality_score : computeQualityScore(d),
         status: d.status === 'Available' ? null : (d.status || '').toLowerCase().replace(/\s+/g, '_') || null,
         obra_nueva: (d.propertyTypeId || '').charAt(0) === '5',
         has_3d_tour: false,

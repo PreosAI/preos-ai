@@ -32,6 +32,15 @@ async function resalesFetch(endpoint, params) {
     return res.json();
 }
 
+// Partial quality_score (no locationConfidence yet — geocoder recomputes the full score later).
+// Full formula lives in resales-listings.js / resales-property.js / resales-geocode.js.
+function partialQualityScore(imageCount, bedrooms, price) {
+    const imgPts = Math.min(imageCount || 0, 10) * 3;
+    const bedPts = (bedrooms || 0) > 0 ? 15 : 0;
+    const pricePts = (price >= 50000 && price <= 5000000) ? 15 : 0;
+    return imgPts + bedPts + pricePts;
+}
+
 function mapProperty(raw, lang) {
     const descField = lang === 'en' ? 'description_en' : 'description_es';
     const images = [];
@@ -54,6 +63,9 @@ function mapProperty(raw, lang) {
         });
     }
 
+    const bedrooms = parseInt(raw.Bedrooms) || 0;
+    const price = parseFloat(raw.Price) || 0;
+
     return {
         reference: raw.Reference || '',
         agencyRef: raw.AgencyRef || '',
@@ -67,9 +79,9 @@ function mapProperty(raw, lang) {
         propertyTypeId: raw.PropertyType ? raw.PropertyType.TypeId || '' : '',
         subtype: raw.PropertyType ? raw.PropertyType.Subtype1 || '' : '',
         status: raw.Status ? (raw.Status.system || '') : '',
-        bedrooms: parseInt(raw.Bedrooms) || 0,
+        bedrooms: bedrooms,
         bathrooms: parseInt(raw.Bathrooms) || 0,
-        price: parseFloat(raw.Price) || 0,
+        price: price,
         originalPrice: raw.OriginalPrice || 0,
         currency: raw.Currency || 'EUR',
         built: raw.Built || 0,
@@ -84,6 +96,7 @@ function mapProperty(raw, lang) {
         features: features,
         images: images,
         imageCount: images.length,
+        quality_score: partialQualityScore(images.length, bedrooms, price),
         syncedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 }
