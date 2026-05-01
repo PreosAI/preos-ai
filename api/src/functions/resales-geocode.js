@@ -117,19 +117,19 @@ app.http('resales-geocode', {
             let snapshot;
             if (mode === 'mapbox_refresh') {
                 snapshot = await db.collection('listings')
-                    .limit(5000)
+                    .limit(10000)
                     .select('location', 'area', 'province', 'reference', 'locationConfidence', 'lat')
                     .get();
             } else if (mode === 'refine') {
                 snapshot = await db.collection('listings')
                     .where('locationConfidence', 'in', ['none', 'area', 'low', 'medium', 'rejected'])
-                    .limit(5000)
+                    .limit(10000)
                     .select('location', 'area', 'province', 'reference')
                     .get();
             } else {
                 snapshot = await db.collection('listings')
                     .where('lat', '==', null)
-                    .limit(5000)
+                    .limit(10000)
                     .select('location', 'area', 'province', 'reference')
                     .get();
             }
