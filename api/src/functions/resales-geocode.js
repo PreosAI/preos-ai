@@ -14,54 +14,84 @@ function getDb() {
     return db;
 }
 
-// Málaga province bounding box (approximate)
+// Málaga province bounding box (approximate) — safety net regardless of geocoder
 const BBOX = { north: 37.30, south: 36.30, west: -5.55, east: -4.20 };
-
-// Marketing/non-administrative regions Nominatim cannot resolve as a county
-const MARKETING_REGIONS = new Set([
-    'costa del sol', 'costa tropical', 'costa de la luz',
-    'axarquia', 'axarquía', 'serrania de ronda', 'serranía de ronda',
-]);
+// Bias point near centre of Málaga province for ambiguous duplicate place names
+const PROXIMITY = '-4.6,36.5';
+const MAPBOX_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
 
 function inBbox(lat, lng) {
     return lat >= BBOX.south && lat <= BBOX.north && lng >= BBOX.west && lng <= BBOX.east;
 }
 
-function confidenceFromImportance(importance) {
-    if (importance == null) return 'low';
-    if (importance > 0.5) return 'high';
-    if (importance >= 0.3) return 'medium';
+function confidenceFromRelevance(rel) {
+    if (rel == null) return 'low';
+    if (rel >= 0.8)  return 'high';
+    if (rel >= 0.5)  return 'medium';
     return 'low';
 }
 
-async function geocode(loc) {
-    const params = new URLSearchParams({
-        format: 'json', limit: '1', countrycodes: 'es', addressdetails: '0',
-    });
-    if (loc.location)  params.set('city', loc.location);
-    const areaLower = (loc.area || '').toLowerCase();
-    if (loc.area && !MARKETING_REGIONS.has(areaLower)) params.set('county', loc.area);
-    if (loc.province)  params.set('state', loc.province);
-    params.set('country', 'Spain');
+function buildSearchText(loc) {
+    const primary = loc.location || loc.area || '';
+    const province = loc.province || '';
+    if (!primary) return null;
+    return [primary, province, 'Spain'].filter(Boolean).join(', ');
+}
 
-    const url = 'https://nominatim.openstreetmap.org/search?' + params.toString();
+async function geocodeOnce(searchText, token) {
+    const url = MAPBOX_BASE + encodeURIComponent(searchText) + '.json?' + new URLSearchParams({
+        access_token: token,
+        country: 'es',
+        language: 'es',
+        types: 'place,locality,neighborhood,address',
+        proximity: PROXIMITY,
+        limit: '1',
+    }).toString();
+    return fetch(url, { headers: { 'Accept': 'application/json' } });
+}
+
+async function geocode(loc, token, context) {
+    const searchText = buildSearchText(loc);
+    if (!searchText) return { status: 'none', reason: 'no-search-text' };
+
+    let res;
     try {
-        const res = await fetch(url, {
-            headers: { 'User-Agent': 'PreosAI/1.0 (preos.ai)' }
-        });
-        const ct = res.headers.get('content-type') || '';
-        if (!res.ok || !ct.includes('json')) return null;
-        const data = await res.json();
-        if (!data || data.length === 0) return null;
-        const lat = parseFloat(data[0].lat);
-        const lng = parseFloat(data[0].lon);
-        if (!inBbox(lat, lng)) return { rejected: true, lat, lng };
-        return {
-            lat, lng,
-            confidence: confidenceFromImportance(data[0].importance),
-        };
-    } catch (e) { /* rate-limit / parse / network — treat as failed geocode */ }
-    return null;
+        res = await geocodeOnce(searchText, token);
+        if (res.status === 429) {
+            await new Promise(r => setTimeout(r, 5000));
+            res = await geocodeOnce(searchText, token);
+        }
+    } catch (e) {
+        context.log('Mapbox network error for "' + searchText + '":', e.message);
+        return { status: 'error', reason: 'network' };
+    }
+
+    if (res.status === 401 || res.status === 403) {
+        return { status: 'error', reason: 'auth', http: res.status };
+    }
+    if (!res.ok) {
+        return { status: 'error', reason: 'http-' + res.status };
+    }
+
+    let data;
+    try { data = await res.json(); } catch (e) {
+        return { status: 'error', reason: 'parse' };
+    }
+    if (!data.features || data.features.length === 0) {
+        return { status: 'none', reason: 'no-features', searchText };
+    }
+    const f = data.features[0];
+    const lng = f.center && f.center[0];
+    const lat = f.center && f.center[1];
+    if (lat == null || lng == null) return { status: 'none', reason: 'no-center' };
+    if (!inBbox(lat, lng)) return { status: 'rejected', lat, lng, placeName: f.place_name };
+    return {
+        status: 'ok',
+        lat, lng,
+        confidence: confidenceFromRelevance(f.relevance),
+        placeName: f.place_name,
+        relevance: f.relevance,
+    };
 }
 
 app.http('resales-geocode', {
@@ -69,24 +99,35 @@ app.http('resales-geocode', {
     authLevel: 'anonymous',
     route: 'resales/geocode',
     handler: async (request, context) => {
+        const token = process.env.MAPBOX_TOKEN;
+        if (!token) {
+            return { status: 500, jsonBody: { error: 'MAPBOX_TOKEN not configured' } };
+        }
         try {
             const db = getDb();
             const startTime = Date.now();
             const MAX_RUNTIME_MS = 8.5 * 60 * 1000;
-            const mode = request.query.get('mode') || 'fill'; // 'fill' (lat null) or 'refine' (low/medium confidence + null)
+            const mode = request.query.get('mode') || 'fill';
+            // Modes:
+            //   fill            — only docs with lat == null
+            //   refine          — docs with confidence none/area/low/medium/rejected (Nominatim leftovers)
+            //   mapbox_refresh  — re-geocode ALL docs regardless of confidence
 
             context.log('Geocode mode:', mode);
-            const baseQuery = db.collection('listings');
             let snapshot;
-            if (mode === 'refine') {
-                // Refine: anything not 'high' confidence, capped
-                snapshot = await baseQuery
-                    .where('locationConfidence', 'in', ['none', 'area', 'low', 'medium'])
+            if (mode === 'mapbox_refresh') {
+                snapshot = await db.collection('listings')
+                    .limit(5000)
+                    .select('location', 'area', 'province', 'reference', 'locationConfidence', 'lat')
+                    .get();
+            } else if (mode === 'refine') {
+                snapshot = await db.collection('listings')
+                    .where('locationConfidence', 'in', ['none', 'area', 'low', 'medium', 'rejected'])
                     .limit(5000)
                     .select('location', 'area', 'province', 'reference')
                     .get();
             } else {
-                snapshot = await baseQuery
+                snapshot = await db.collection('listings')
                     .where('lat', '==', null)
                     .limit(5000)
                     .select('location', 'area', 'province', 'reference')
@@ -97,10 +138,11 @@ app.http('resales-geocode', {
                 return { status: 200, jsonBody: { status: 'complete', mode, message: 'Nothing to process' } };
             }
 
-            context.log('Found', snapshot.size, 'docs to process (mode=' + mode + ')');
+            context.log('Found', snapshot.size, 'docs (mode=' + mode + ')');
 
             const locationMap = new Map();
             const docsByLocation = new Map();
+            const skipKeys = new Set(); // mapbox_refresh: skip locations whose docs are all already 'high'
             snapshot.forEach(doc => {
                 const d = doc.data();
                 const key = [d.location, d.area, d.province].join('|');
@@ -112,42 +154,53 @@ app.http('resales-geocode', {
                     });
                     docsByLocation.set(key, []);
                 }
-                docsByLocation.get(key).push(doc.id);
+                docsByLocation.get(key).push({ id: doc.id, conf: d.locationConfidence });
             });
 
-            context.log('Unique locations:', locationMap.size);
+            // For mapbox_refresh: a location is "done" only if every doc under it is 'high' AND has lat
+            if (mode === 'mapbox_refresh') {
+                for (const [key, docs] of docsByLocation) {
+                    if (docs.every(d => d.conf === 'high')) skipKeys.add(key);
+                }
+            }
 
-            let geocoded = 0, updated = 0, rejected = 0, failed = 0;
+            context.log('Unique locations:', locationMap.size, '(skipping', skipKeys.size, 'already-high)');
+
+            let processed = 0, mapboxCalls = 0, mapboxErrors = 0;
+            const counts = { high: 0, medium: 0, low: 0, rejected: 0, none: 0 };
+            let listingsUpdated = 0;
             const BATCH_SIZE = 450;
+            const failedExamples = [];
 
             for (const [key, loc] of locationMap) {
                 if (Date.now() - startTime > MAX_RUNTIME_MS) {
-                    context.log('Approaching timeout after', geocoded, 'locations');
+                    context.log('Approaching timeout after', processed, 'locations');
                     break;
                 }
+                if (skipKeys.has(key)) { processed++; continue; }
 
-                const geo = await geocode(loc);
-                if (geo && !geo.rejected) {
-                    const docIds = docsByLocation.get(key);
+                mapboxCalls++;
+                const result = await geocode(loc, token, context);
+                const docIds = docsByLocation.get(key).map(d => d.id);
+
+                if (result.status === 'ok') {
+                    counts[result.confidence]++;
                     for (let i = 0; i < docIds.length; i += BATCH_SIZE) {
                         const batch = db.batch();
                         const chunk = docIds.slice(i, i + BATCH_SIZE);
                         for (const docId of chunk) {
                             batch.update(db.collection('listings').doc(docId), {
-                                lat: geo.lat,
-                                lng: geo.lng,
-                                locationConfidence: geo.confidence,
+                                lat: result.lat, lng: result.lng,
+                                locationConfidence: result.confidence,
                             });
                         }
                         await batch.commit();
-                        updated += chunk.length;
+                        listingsUpdated += chunk.length;
                     }
-                    context.log('OK:', loc.location, '->', geo.lat, geo.lng, geo.confidence,
-                        '(', docsByLocation.get(key).length, 'listings)');
-                } else if (geo && geo.rejected) {
-                    rejected++;
-                    // Mark as 'rejected' so refine mode skips next time
-                    const docIds = docsByLocation.get(key);
+                    context.log('OK:', loc.location, '->', result.lat.toFixed(4), result.lng.toFixed(4),
+                        result.confidence, '(rel=' + (result.relevance != null ? result.relevance.toFixed(2) : '?') + ',', docIds.length, 'listings)');
+                } else if (result.status === 'rejected') {
+                    counts.rejected++;
                     for (let i = 0; i < docIds.length; i += BATCH_SIZE) {
                         const batch = db.batch();
                         const chunk = docIds.slice(i, i + BATCH_SIZE);
@@ -159,27 +212,37 @@ app.http('resales-geocode', {
                         }
                         await batch.commit();
                     }
-                    context.log('REJECTED (out of bbox):',
-                        loc.location, '->', geo.lat, geo.lng, '(', docsByLocation.get(key).length, 'listings)');
+                    context.log('REJECTED (out of bbox):', loc.location, '->', result.lat, result.lng, '(' + result.placeName + ')');
+                } else if (result.status === 'error') {
+                    mapboxErrors++;
+                    if (result.reason === 'auth') {
+                        context.error('Mapbox auth failed — check token. http=', result.http);
+                        return { status: 500, jsonBody: { error: 'Mapbox auth failed', http: result.http } };
+                    }
+                    context.log('ERROR:', loc.location, result.reason);
                 } else {
-                    failed++;
-                    context.log('FAILED:', loc.location);
+                    counts.none++;
+                    if (failedExamples.length < 5) failedExamples.push(result.searchText || loc.location);
+                    context.log('NO MATCH:', result.searchText || loc.location, result.reason);
                 }
 
-                geocoded++;
-                await new Promise(r => setTimeout(r, 1100)); // Nominatim 1 req/sec
+                processed++;
+                await new Promise(r => setTimeout(r, 200));
             }
 
             return {
                 status: 200,
                 jsonBody: {
-                    status: geocoded < locationMap.size ? 'partial' : 'complete',
+                    status: processed < locationMap.size - skipKeys.size ? 'partial' : 'complete',
                     mode,
                     uniqueLocations: locationMap.size,
-                    locationsProcessed: geocoded,
-                    listingsUpdated: updated,
-                    locationsRejected: rejected,
-                    locationsFailed: failed,
+                    locationsSkipped: skipKeys.size,
+                    locationsProcessed: processed - skipKeys.size,
+                    listingsUpdated,
+                    mapboxCalls,
+                    mapboxErrors,
+                    counts,
+                    failedExamples,
                 }
             };
         } catch (err) {
