@@ -4,8 +4,17 @@
       "collectionGroup": "listings",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "quality_score", "order": "DESCENDING" },
+        { "fieldPath": "price", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "location", "order": "ASCENDING" },
-        { "fieldPath": "quality_score", "order": "DESCENDING" }
+        { "fieldPath": "quality_score", "order": "DESCENDING" },
+        { "fieldPath": "price", "order": "ASCENDING" }
       ]
     },
     {
@@ -20,24 +29,6 @@
       "collectionGroup": "listings",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "location", "order": "ASCENDING" },
-        { "fieldPath": "price", "order": "ASCENDING" },
-        { "fieldPath": "quality_score", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "listings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "location", "order": "ASCENDING" },
-        { "fieldPath": "bedrooms", "order": "ASCENDING" },
-        { "fieldPath": "quality_score", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "listings",
-      "queryScope": "COLLECTION",
-      "fields": [
         { "fieldPath": "price", "order": "ASCENDING" },
         { "fieldPath": "quality_score", "order": "DESCENDING" }
       ]
@@ -47,7 +38,8 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "bedrooms", "order": "ASCENDING" },
-        { "fieldPath": "quality_score", "order": "DESCENDING" }
+        { "fieldPath": "quality_score", "order": "DESCENDING" },
+        { "fieldPath": "price", "order": "ASCENDING" }
       ]
     },
     {
