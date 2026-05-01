@@ -65,6 +65,7 @@ function mapToFrontend(doc) {
         province: d.province || 'Málaga',
         lat: d.lat || null,
         lng: d.lng || null,
+        locationConfidence: d.locationConfidence || 'none',
         type: normalizedType,
         subtype: d.subtype || '',
         status: d.status === 'Available' ? null : (d.status || '').toLowerCase().replace(/\s+/g, '_') || null,
