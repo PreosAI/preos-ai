@@ -32,7 +32,8 @@ async function resalesFetch(endpoint, params) {
     return res.json();
 }
 
-function mapProperty(raw) {
+function mapProperty(raw, lang) {
+    const descField = lang === 'en' ? 'description_en' : 'description_es';
     const images = [];
     if (raw.Pictures && raw.Pictures.Picture) {
         const pics = Array.isArray(raw.Pictures.Picture)
@@ -79,7 +80,7 @@ function mapProperty(raw) {
         garden: raw.Garden === 1 || raw.Garden === '1',
         energyRated: raw.EnergyRated || '',
         co2Rated: raw.CO2Rated || '',
-        description: raw.Description || '',
+        [descField]: raw.Description || '',
         features: features,
         images: images,
         imageCount: images.length,
@@ -113,12 +114,16 @@ app.http('resales-sync', {
 
         const startPage = parseInt(request.query.get('startPage') || '1');
         const filterAlias = request.query.get('filter') || process.env.RESALES_FILTER_ID || '1';
+        const langParam = (request.query.get('lang') || 'es').toLowerCase();
+        const lang = langParam === 'en' ? 'en' : 'es';
+        const pLang = lang === 'en' ? '1' : '2';
         const pageSize = 40;
         const startTime = Date.now();
         const MAX_RUNTIME_MS = 150 * 1000; // 2.5 min — stay under 230s Azure gateway timeout
         let page = startPage;
         let totalSynced = 0;
         let totalProperties = 0;
+        let emptyDescCount = 0;
         let stoppedEarly = false;
 
         try {
@@ -137,6 +142,7 @@ app.http('resales-sync', {
                     p_agency_filterid: filterAlias,
                     p_PageSize: String(pageSize),
                     p_PageNo: String(page),
+                    p_lang: pLang,
                 });
 
                 if (data.transaction && data.transaction.status === 'error') {
@@ -155,7 +161,10 @@ app.http('resales-sync', {
                 }
 
                 // Map and write this page immediately
-                const docs = data.Property.map(p => mapProperty(p));
+                const docs = data.Property.map(p => mapProperty(p, lang));
+                for (const p of data.Property) {
+                    if (!p.Description) emptyDescCount++;
+                }
                 await writeBatch(db, docs);
                 totalSynced += docs.length;
                 context.log('Page', page, 'written.', totalSynced, 'total synced');
@@ -164,27 +173,33 @@ app.http('resales-sync', {
                 await new Promise(r => setTimeout(r, 300));
             }
 
-            // Save progress
-            await db.collection('sync_meta').doc('last_sync').set({
+            context.log('Sync (' + lang + ') finished. emptyDescCount=' + emptyDescCount);
+
+            // Save progress per language
+            await db.collection('sync_meta').doc('last_sync_' + lang).set({
                 completedAt: admin.firestore.FieldValue.serverTimestamp(),
                 lastPage: page - 1,
                 totalSynced: totalSynced,
                 totalProperties: totalProperties,
                 stoppedEarly: stoppedEarly,
                 nextPage: stoppedEarly ? page : null,
-                filterAlias: filterAlias
+                filterAlias: filterAlias,
+                lang: lang,
+                emptyDescCount: emptyDescCount
             }, { merge: true });
 
             return {
                 status: 200,
                 jsonBody: {
                     status: stoppedEarly ? 'partial' : 'complete',
+                    lang,
                     totalSynced,
                     totalProperties,
+                    emptyDescCount,
                     lastPage: page - 1,
                     nextPage: stoppedEarly ? page : null,
                     message: stoppedEarly
-                        ? 'Stopped early due to timeout. Run again with ?startPage=' + page
+                        ? 'Stopped early due to timeout. Run again with ?lang=' + lang + '&startPage=' + page
                         : 'Sync complete'
                 }
             };
@@ -192,7 +207,7 @@ app.http('resales-sync', {
             context.error('Sync error:', err.message, err.stack);
             return {
                 status: 500,
-                jsonBody: { error: 'Sync failed', detail: err.message, lastPage: page, totalSynced }
+                jsonBody: { error: 'Sync failed', detail: err.message, lang, lastPage: page, totalSynced }
             };
         }
     }

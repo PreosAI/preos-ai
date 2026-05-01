@@ -66,8 +66,8 @@ function mapToDetail(d) {
         obra_nueva: (d.propertyTypeId || '').charAt(0) === '5',
         has_3d_tour: false,
         images: d.images || [],
-        description: d.description || '',
-        description_en: '',
+        description_es: d.description_es || d.description || '',
+        description_en: d.description_en || '',
         features: (d.features || []).map(f => {
             const map = {
                 'Pool': 'pool',

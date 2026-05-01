@@ -72,6 +72,8 @@ function mapToFrontend(doc) {
         obra_nueva: (d.propertyTypeId || '').charAt(0) === '5',
         has_3d_tour: false,
         images: (d.images || []).slice(0, 1),
+        description_es: d.description_es || d.description || '',
+        description_en: d.description_en || '',
         features: (d.features || []).map(f => {
             const map = {
                 'Pool': 'pool',
