@@ -157,12 +157,7 @@ app.http('resales-geocode', {
                 docsByLocation.get(key).push({ id: doc.id, conf: d.locationConfidence });
             });
 
-            // For mapbox_refresh: a location is "done" only if every doc under it is 'high' AND has lat
-            if (mode === 'mapbox_refresh') {
-                for (const [key, docs] of docsByLocation) {
-                    if (docs.every(d => d.conf === 'high')) skipKeys.add(key);
-                }
-            }
+            // mapbox_refresh re-geocodes everything (no skip) so config changes propagate
 
             context.log('Unique locations:', locationMap.size, '(skipping', skipKeys.size, 'already-high)');
 
