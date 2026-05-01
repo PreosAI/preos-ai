@@ -203,20 +203,18 @@ app.http('resales-listings-paged', {
 
             const hasPriceRange = minPrice != null || maxPrice != null;
             const hasBedroomsRange = minBedrooms != null;
-            // Inequality fields must come first in the orderBy chain.
-            // Order: price (if range) → bedrooms (if range) → primary sort field.
-            if (sort === 'price_asc') {
-                query = query.orderBy('price', 'asc');
-                if (hasBedroomsRange) query = query.orderBy('bedrooms', 'asc');
-            } else if (sort === 'price_desc') {
-                if (hasPriceRange) query = query.orderBy('price', 'asc'); // inequality forces asc on price first
-                if (hasBedroomsRange) query = query.orderBy('bedrooms', 'asc');
-                if (!hasPriceRange) query = query.orderBy('price', 'desc');
-            } else { // quality
-                if (hasPriceRange) query = query.orderBy('price', 'asc');
-                if (hasBedroomsRange) query = query.orderBy('bedrooms', 'asc');
-                query = query.orderBy('quality_score', 'desc').orderBy('price', 'asc');
+            // Inequality fields must appear in the orderBy chain before any other ordering.
+            // We compose the chain explicitly to avoid duplicates (Firestore rejects them).
+            const orderings = [];
+            if (hasPriceRange) orderings.push(['price', sort === 'price_desc' ? 'desc' : 'asc']);
+            if (hasBedroomsRange) orderings.push(['bedrooms', 'asc']);
+            if (sort === 'price_asc' && !hasPriceRange) orderings.push(['price', 'asc']);
+            if (sort === 'price_desc' && !hasPriceRange) orderings.push(['price', 'desc']);
+            if (sort === 'quality') {
+                orderings.push(['quality_score', 'desc']);
+                if (!hasPriceRange) orderings.push(['price', 'asc']); // tie-breaker; skip if price already in chain
             }
+            for (const [field, dir] of orderings) query = query.orderBy(field, dir);
 
             if (cursor) {
                 try {
