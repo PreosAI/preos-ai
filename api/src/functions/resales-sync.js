@@ -51,12 +51,10 @@ function mapProperty(raw, lang) {
         pics.forEach(p => { if (p.PictureURL) images.push(p.PictureURL); });
     }
 
-    const features = parseFeaturesTree(raw.PropertyFeatures);
-
     const bedrooms = parseInt(raw.Bedrooms) || 0;
     const price = parseFloat(raw.Price) || 0;
 
-    return {
+    const out = {
         reference: raw.Reference || '',
         agencyRef: raw.AgencyRef || '',
         country: raw.Country || '',
@@ -83,12 +81,17 @@ function mapProperty(raw, lang) {
         energyRated: raw.EnergyRated || '',
         co2Rated: raw.CO2Rated || '',
         [descField]: raw.Description || '',
-        features: features,
         images: images,
         imageCount: images.length,
         quality_score: partialQualityScore(images.length, bedrooms, price),
         syncedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
+    // Resales translates Category Type/Value names per p_lang, so parsing on a
+    // Spanish run produces "posicion_*" / "aparcamiento_*" prefixes that don't
+    // match the English filter terms the frontend uses. Lock features to the
+    // English sync only — lang=es runs leave the existing features field intact.
+    if (lang === 'en') out.features = parseFeaturesTree(raw.PropertyFeatures);
+    return out;
 }
 
 async function writeBatch(db, properties) {

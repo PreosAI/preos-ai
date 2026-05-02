@@ -50,8 +50,10 @@ app.http('resales-backfill-features', {
 
         const startPage = parseInt(request.query.get('startPage') || '1');
         const filterAlias = request.query.get('filter') || process.env.RESALES_FILTER_ID || '1';
-        const langParam = (request.query.get('lang') || 'es').toLowerCase();
-        const pLang = langParam === 'en' ? '1' : '2';
+        // Always English: Resales translates Category Type/Value names per p_lang.
+        // Parsing on a Spanish run would store "posicion_*"/"aparcamiento_*" prefixes
+        // that don't match the English filter terms the frontend uses.
+        const pLang = '1';
         const pageSize = 40;
         const startTime = Date.now();
         const MAX_RUNTIME_MS = 150 * 1000;
@@ -111,13 +113,12 @@ app.http('resales-backfill-features', {
                 status: 200,
                 jsonBody: {
                     status: stoppedEarly ? 'partial' : 'complete',
-                    lang: langParam,
                     totalUpdated,
                     lastPage: page - 1,
                     nextPage: stoppedEarly ? page : null,
                     samples,
                     message: stoppedEarly
-                        ? 'Stopped early due to timeout. Run again with ?lang=' + langParam + '&startPage=' + page
+                        ? 'Stopped early due to timeout. Run again with ?startPage=' + page
                         : 'Backfill complete'
                 }
             };
