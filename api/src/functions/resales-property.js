@@ -80,20 +80,7 @@ function mapToDetail(d) {
         images: d.images || [],
         description_es: d.description_es || d.description || '',
         description_en: d.description_en || '',
-        features: (d.features || []).map(f => {
-            const map = {
-                'Pool': 'pool',
-                'Garden': 'garden',
-                'Parking': 'garage', 'Garage': 'garage',
-                'Air Conditioning': 'air_conditioning',
-                'Elevator': 'elevator', 'Lift': 'elevator',
-                'Sea': 'sea_views', 'Sea Views': 'sea_views',
-                'Beachfront': 'beachfront', 'Beach': 'beachfront', 'Beachside': 'beachfront',
-                'Home Automation': 'home_automation', 'Domotica': 'home_automation', 'Domótica': 'home_automation',
-                'Terrace': 'terrace', 'Private Terrace': 'terrace', 'Covered Terrace': 'terrace',
-            };
-            return map[f] || f.toLowerCase().replace(/\s+/g, '_');
-        }),
+        features: d.features || [],
         energy_rating: d.energyRated || null,
         agent: '',
         agency_ref: d.agencyRef || '',

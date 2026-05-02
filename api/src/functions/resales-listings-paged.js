@@ -89,18 +89,6 @@ function normalizeType(type, sub) {
     return type || 'Propiedad';
 }
 
-const FEATURE_MAP = {
-    'Pool': 'pool',
-    'Garden': 'garden',
-    'Parking': 'garage', 'Garage': 'garage',
-    'Air Conditioning': 'air_conditioning',
-    'Elevator': 'elevator', 'Lift': 'elevator',
-    'Sea': 'sea_views', 'Sea Views': 'sea_views',
-    'Beachfront': 'beachfront', 'Beach': 'beachfront', 'Beachside': 'beachfront',
-    'Home Automation': 'home_automation', 'Domotica': 'home_automation', 'Domótica': 'home_automation',
-    'Terrace': 'terrace', 'Private Terrace': 'terrace', 'Covered Terrace': 'terrace',
-};
-
 function mapToFrontend(d) {
     const type = d.propertyType || 'Propiedad';
     const sub = d.subtype || '';
@@ -135,7 +123,7 @@ function mapToFrontend(d) {
         images: (d.images || []).slice(0, 1),
         description_es: d.description_es || d.description || '',
         description_en: d.description_en || '',
-        features: (d.features || []).map(f => FEATURE_MAP[f] || f.toLowerCase().replace(/\s+/g, '_')),
+        features: d.features || [],
         energy_rating: d.energyRated || null,
         agent: '',
         agency_ref: d.agencyRef || '',

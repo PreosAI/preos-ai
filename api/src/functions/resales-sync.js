@@ -1,6 +1,7 @@
 const { app } = require('@azure/functions');
 const { fetch: undiciFetch, ProxyAgent } = require('undici');
 const admin = require('firebase-admin');
+const { parseFeaturesTree } = require('../lib/features');
 
 let db;
 function getDb() {
@@ -50,18 +51,7 @@ function mapProperty(raw, lang) {
         pics.forEach(p => { if (p.PictureURL) images.push(p.PictureURL); });
     }
 
-    const features = [];
-    if (raw.PropertyFeatures && raw.PropertyFeatures.Category) {
-        const cats = Array.isArray(raw.PropertyFeatures.Category)
-            ? raw.PropertyFeatures.Category : [raw.PropertyFeatures.Category];
-        cats.forEach(c => {
-            if (c.Type) features.push(c.Type);
-            if (c.Value) {
-                const vals = Array.isArray(c.Value) ? c.Value : [c.Value];
-                vals.forEach(v => features.push(v));
-            }
-        });
-    }
+    const features = parseFeaturesTree(raw.PropertyFeatures);
 
     const bedrooms = parseInt(raw.Bedrooms) || 0;
     const price = parseFloat(raw.Price) || 0;
