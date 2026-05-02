@@ -1,5 +1,18 @@
+// GET /api/resales/listings — LEGACY thin shim.
+//
+// Returns a flat array of every listing for backward compatibility with index.html,
+// favoritos.html, dashboard.html, agente-dashboard.html, mis-ofertas.html, and
+// visitas.html — all of which call getAllProperties() and expect an array.
+//
+// Do NOT extend this endpoint with new features; build them on /listings-paged.
+//
+// Implementation: raw db.collection('listings').get() (no orderBy / no filters)
+// piped through the shared mapToFrontend mapper from ../lib/listings-query so the
+// row shape exactly matches /listings-paged. Same shape, same field set, single
+// source of truth for mapping. Cached in-memory for 30 min to keep this cheap.
 const { app } = require('@azure/functions');
 const admin = require('firebase-admin');
+const { mapToFrontend } = require('../lib/listings-query');
 
 let db;
 function getDb() {
@@ -14,10 +27,9 @@ function getDb() {
     return db;
 }
 
-// In-memory cache
 let listingsCache = null;
 let cacheTimestamp = 0;
-const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+const CACHE_TTL_MS = 30 * 60 * 1000;
 
 function getCorsHeaders(request) {
     const origin = request.headers.get('origin') || '';
@@ -31,92 +43,23 @@ function getCorsHeaders(request) {
     };
 }
 
-// quality_score: 0–100, see resales-sync.js partial formula and resales-geocode.js full formula
-function computeQualityScore(d) {
-    const conf = d.locationConfidence;
-    const confPts = conf === 'high' ? 40 : conf === 'medium' ? 20 : 0;
-    const imgPts = Math.min(d.imageCount || (d.images ? d.images.length : 0), 10) * 3;
-    const bedPts = (d.bedrooms || 0) > 0 ? 15 : 0;
-    const price = d.price || 0;
-    const pricePts = (price >= 50000 && price <= 5000000) ? 15 : 0;
-    return confPts + imgPts + bedPts + pricePts;
-}
-
-function mapToFrontend(doc) {
-    const d = doc;
-    const type = d.propertyType || 'Propiedad';
-    const sub = d.subtype || '';
-    const t = (type + ' ' + sub).toLowerCase();
-
-    let normalizedType = type;
-    if (t.indexOf('apartment') > -1 || t.indexOf('flat') > -1 || t.indexOf('studio') > -1) normalizedType = 'Apartamento';
-    else if (t.indexOf('villa') > -1 || t.indexOf('chalet') > -1 || t.indexOf('house') > -1 || t.indexOf('casa') > -1) normalizedType = 'Villa';
-    else if (t.indexOf('townhouse') > -1 || t.indexOf('semi') > -1) normalizedType = 'Adosado';
-    else if (t.indexOf('penthouse') > -1) normalizedType = 'Ático';
-    else if (t.indexOf('plot') > -1 || t.indexOf('land') > -1) normalizedType = 'Solar';
-    else if (t.indexOf('commercial') > -1) normalizedType = 'Local';
-
-    const beds = d.bedrooms || 0;
-    const loc = d.location || d.area || '';
-
-    return {
-        id: d.reference,
-        title: (beds > 0 ? beds + ' hab. ' : '') + normalizedType + (loc ? ' en ' + loc : ''),
-        title_en: (beds > 0 ? beds + '-bed ' : '') + normalizedType + (loc ? ' in ' + loc : ''),
-        price: d.price || 0,
-        bedrooms: d.bedrooms || 0,
-        bathrooms: d.bathrooms || 0,
-        size_m2: d.built || null,
-        plot_m2: d.gardenPlot || null,
-        terrace_m2: d.terrace || null,
-        location: [d.subLocation, d.location, d.area].filter(Boolean).join(', '),
-        city: d.location || '',
-        area: d.area || '',
-        neighbourhood: d.subLocation || '',
-        province: d.province || 'Málaga',
-        lat: d.lat || null,
-        lng: d.lng || null,
-        locationConfidence: d.locationConfidence || 'none',
-        type: normalizedType,
-        subtype: d.subtype || '',
-        quality_score: typeof d.quality_score === 'number' ? d.quality_score : computeQualityScore(d),
-        status: d.status === 'Available' ? null : (d.status || '').toLowerCase().replace(/\s+/g, '_') || null,
-        obra_nueva: (d.propertyTypeId || '').charAt(0) === '5',
-        has_3d_tour: false,
-        images: (d.images || []).slice(0, 1),
-        description_es: d.description_es || d.description || '',
-        description_en: d.description_en || '',
-        features: d.features || [],
-        energy_rating: d.energyRated || null,
-        agent: '',
-        agency_ref: d.agencyRef || '',
-        listed_date: null,
-        resales_ref: d.reference
-    };
-}
-
 app.http('resales-listings', {
     methods: ['GET', 'OPTIONS'],
     authLevel: 'anonymous',
     route: 'resales/listings',
     handler: async (request, context) => {
         const cors = getCorsHeaders(request);
-
-        if (request.method === 'OPTIONS') {
-            return { status: 204, headers: cors };
-        }
+        if (request.method === 'OPTIONS') return { status: 204, headers: cors };
 
         try {
             const now = Date.now();
 
             if (!listingsCache || (now - cacheTimestamp > CACHE_TTL_MS)) {
                 context.log('Loading listings from Firestore...');
-                const db = getDb();
-                const snapshot = await db.collection('listings').get();
-                listingsCache = [];
-                snapshot.forEach(doc => {
-                    listingsCache.push(mapToFrontend(doc.data()));
-                });
+                const snapshot = await getDb().collection('listings').get();
+                const rows = [];
+                snapshot.forEach(doc => rows.push(mapToFrontend(doc.data())));
+                listingsCache = rows;
                 cacheTimestamp = now;
                 context.log('Cached', listingsCache.length, 'listings');
             } else {
@@ -134,11 +77,7 @@ app.http('resales-listings', {
             };
         } catch (err) {
             context.error('Listings error:', err.message);
-            return {
-                status: 500,
-                headers: cors,
-                jsonBody: { error: err.message }
-            };
+            return { status: 500, headers: cors, jsonBody: { error: err.message } };
         }
     }
 });
