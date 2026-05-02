@@ -576,6 +576,41 @@
       gap: 12px;
     }
 
+    /* ─── List sentinels: loading / no-more / error ───────── */
+    .list-sentinel {
+      padding: 16px 12px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .list-loading::after {
+      content: '';
+      display: inline-block;
+      margin-left: 8px;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #d1d5db;
+      border-top-color: var(--red);
+      border-radius: 50%;
+      vertical-align: -2px;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .list-end { color: var(--muted); font-style: italic; }
+    .list-error { color: #b91c1c; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .list-retry-btn {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+    .list-retry-btn:hover { background: var(--red-hover); }
+
     /* ─── HORIZONTAL CARD ──────────────────────────────────── */
     .h-card {
       background: #fff;
@@ -1562,13 +1597,18 @@
 
   // Re-translate card text in place on lang switch — no re-fetch / re-filter / re-render
   function relabelCards() {
-    if (!_allPropsCache || _allPropsCache.length === 0) return;
+    var src = (window._currentListings && window._currentListings.length)
+      ? window._currentListings
+      : _allPropsCache;
+    if (!src || src.length === 0) return;
     const lang = localStorage.getItem('preos-lang') || 'es';
-    const byId = window._propsById || (window._propsById = (function() {
+    // Rebuild lookup from the current rendered set so it stays in sync with appends.
+    const byId = (function() {
       const m = {};
-      for (let i = 0; i < _allPropsCache.length; i++) m[_allPropsCache[i].id] = _allPropsCache[i];
+      for (let i = 0; i < src.length; i++) m[src[i].id] = src[i];
       return m;
-    })());
+    })();
+    window._propsById = byId;
     const cards = document.querySelectorAll('.listings-list a.h-card');
     cards.forEach(function(card) {
       const href = card.getAttribute('href') || '';
@@ -1599,33 +1639,27 @@
   }
   document.addEventListener('preos:langchange', relabelCards);
 
-  function renderListings(props, query, sortValOverride) {
-    const sortVal = sortValOverride || document.getElementById('sort-select').value;
-    const sorted = [...props].sort((a, b) => {
-      if (sortVal === 'asc')  return a.price - b.price;
-      if (sortVal === 'desc') return b.price - a.price;
-      // default / sort_recommended: quality-aware sort
-      var qa = window.ListingQuality && window.ListingQuality.cache[a.id];
-      var qb = window.ListingQuality && window.ListingQuality.cache[b.id];
-      if (qa && qb) return qb.score - qa.score;
-      if (qa) return -1;
-      if (qb) return 1;
-      return new Date(b.listed_date || 0) - new Date(a.listed_date || 0);
-    });
-
+  // Render a card array. mode: 'replace' (default) or 'append'.
+  // Items arrive pre-sorted by the API; we never re-sort here, otherwise we'd
+  // break cursor pagination ordering across pages.
+  function renderListings(props, query, mode) {
+    mode = mode || 'replace';
     const list    = document.querySelector('.listings-list');
     const countEl = document.querySelector('.listings-count');
+    const lang    = localStorage.getItem('preos-lang') || 'es';
 
-    const lang = localStorage.getItem('preos-lang') || 'es';
-
-    if (sorted.length === 0) {
-      list.innerHTML = renderEmptyState(query || '', _allPropsCache || []);
+    if (mode === 'replace' && (!props || props.length === 0)) {
+      const chipsSrc = (window._locationIndex && window._locationIndex.cities)
+        ? window._locationIndex.cities.slice(0, 3).map(function(c) { return { city: c.name }; })
+        : (_allPropsCache || []);
+      list.innerHTML = renderEmptyState(query || '', chipsSrc);
       _lastResultsState = { count: 0, area: '' };
       if (countEl) countEl.textContent = lang === 'en' ? '0 results' : '0 resultados';
       return;
     }
 
-    list.innerHTML = sorted.map(p => {
+    const sorted = props || [];
+    const cardsHtml = sorted.map(p => {
       const cardLang = localStorage.getItem('preos-lang') || 'es';
       const cardTitle = cardLang === 'en' ? (p.title_en || p.title) : p.title;
       const bedLabel = cardLang === 'en' ? 'bed' : 'hab.';
@@ -1663,24 +1697,69 @@
       </a>`;
     }).join('');
 
-    // Add market badges after cards are rendered
+    // Strip any sentinel rows (loading / no-more / retry) before mutating the list.
+    const sentinel = list.querySelector('.list-sentinel');
+    if (sentinel) sentinel.remove();
+
+    if (mode === 'append') {
+      list.insertAdjacentHTML('beforeend', cardsHtml);
+    } else {
+      list.innerHTML = cardsHtml;
+    }
+
+    // Add market badges to the newly rendered cards only.
     if (typeof addMarketBadge === 'function') {
       const cards = list.querySelectorAll('a.h-card');
-      cards.forEach(function(card, i) {
-        if (sorted[i]) addMarketBadge(card, sorted[i]);
+      const startIdx = mode === 'append' ? cards.length - sorted.length : 0;
+      sorted.forEach(function(p, i) {
+        var card = cards[startIdx + i];
+        if (card) addMarketBadge(card, p);
       });
     }
 
-    const rawArea = query ? (sorted[0].city || query) : 'Málaga';
-    const areaName = rawArea.charAt(0).toUpperCase() + rawArea.slice(1);
-    _lastResultsState = { count: sorted.length, area: areaName };
+    const totalRendered = (window._currentListings && window._currentListings.length)
+      || sorted.length;
+    var areaName;
+    if (pagedState && pagedState.appliedCity) {
+      areaName = pagedState.appliedCity;
+    } else if (query && sorted[0] && sorted[0].city) {
+      areaName = sorted[0].city;
+    } else {
+      areaName = 'Málaga';
+    }
+    areaName = areaName.charAt(0).toUpperCase() + areaName.slice(1);
+    _lastResultsState = { count: totalRendered, area: areaName };
     updateResultsCount();
   }
 
-  // ── Render map markers ────────────────────────────────────────
+  function renderSentinel(kind) {
+    const list = document.querySelector('.listings-list');
+    if (!list) return;
+    const old = list.querySelector('.list-sentinel');
+    if (old) old.remove();
+    const lang = localStorage.getItem('preos-lang') || 'es';
+    let html = '';
+    if (kind === 'loading') {
+      const txt = lang === 'en' ? 'Loading…' : 'Cargando…';
+      html = '<div class="list-sentinel list-loading" data-i18n="results_loading">' + txt + '</div>';
+    } else if (kind === 'no-more') {
+      const txt = lang === 'en' ? 'No more results' : 'No hay más resultados';
+      html = '<div class="list-sentinel list-end" data-i18n="results_no_more">' + txt + '</div>';
+    } else if (kind === 'error') {
+      const msg = lang === 'en' ? "Couldn't load more results." : 'No pudimos cargar más resultados.';
+      const btn = lang === 'en' ? 'Retry' : 'Reintentar';
+      html = '<div class="list-sentinel list-error">'
+           +   '<div data-i18n="results_error">' + msg + '</div>'
+           +   '<button type="button" class="list-retry-btn" onclick="loadMoreListings(true)" data-i18n="results_retry">' + btn + '</button>'
+           + '</div>';
+    }
+    if (html) list.insertAdjacentHTML('beforeend', html);
+  }
+
+  // ── Render map markers (append-aware) ─────────────────────────
   let mapClusterGroup = null;
 
-  function renderMapMarkers(props) {
+  function ensureClusterGroup() {
     if (!mapClusterGroup) {
       mapClusterGroup = L.markerClusterGroup({
         maxClusterRadius: 60,
@@ -1688,13 +1767,15 @@
         showCoverageOnHover: false,
       });
       map.addLayer(mapClusterGroup);
-    } else {
-      mapClusterGroup.clearLayers();
     }
+    return mapClusterGroup;
+  }
+
+  function buildMarkers(props) {
     const validProps = props.filter(p =>
       p.lat != null && p.lng != null && !isNaN(p.lat) && !isNaN(p.lng)
     );
-    const markers = validProps.map(p => {
+    return validProps.map(p => {
       const popup = `
         <div class="map-popup">
           <div class="map-popup-price">${formatPrice(p.price)}</div>
@@ -1703,13 +1784,18 @@
         </div>`;
       return L.marker([p.lat, p.lng], { icon: redIcon }).bindPopup(popup, { maxWidth: 220 });
     });
-    mapClusterGroup.addLayers(markers);
+  }
+
+  function renderMapMarkers(props, mode) {
+    const group = ensureClusterGroup();
+    if (mode !== 'append') group.clearLayers();
+    group.addLayers(buildMarkers(props));
   }
 
   // ── Apply filters + sort ──────────────────────────────────────
   function applyFilters() {
     const query = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
-    runSearch(query);
+    debouncedRunSearch(query);
   }
 
   // ── Leaflet map ───────────────────────────────────────────────
@@ -1830,38 +1916,91 @@
     runSearch(query);
   }
 
-  function runSearch(query) {
-    const sortVal = document.getElementById('sort-select').value;
-    let priceMin, priceMax;
+  // ── Paginated state ───────────────────────────────────────────
+  // pagedState tracks the current search session. Every new fetch bumps
+  // requestId; in-flight responses with a stale id are discarded so a slow
+  // first page can't clobber a fresh filter change.
+  const PAGE_SIZE = 50;
+  const pagedState = {
+    requestId:    0,
+    listings:     [],
+    nextCursor:   null,
+    loading:      false,
+    activeFilters: null, // last query params used (for cursor follow-up)
+    appliedCity:  '',    // resolved city used in the request, for the count label
+    lastQuery:    '',
+  };
+
+  function _sortApi() {
+    var v = document.getElementById('sort-select').value;
+    if (v === 'asc')  return 'price_asc';
+    if (v === 'desc') return 'price_desc';
+    return 'quality';
+  }
+
+  function _buildFilters(query) {
+    let priceMin = 0, priceMax = 0;
     if (state.priceCustomMin > 0 || state.priceCustomMax > 0) {
       priceMin = state.priceCustomMin || 0;
       priceMax = state.priceCustomMax || 0;
     } else {
       const band = priceBands[state.precioBand] || [0, Infinity];
-      priceMin = band[0];
+      priceMin = band[0] || 0;
       priceMax = band[1] === Infinity ? 0 : band[1];
     }
-    const filters = {
-      query:        query || '',
-      type:         state.tipo !== 'todos' ? (tipoMap[state.tipo] || state.tipo) : 'todos',
-      minPrice:     priceMin,
-      maxPrice:     priceMax,
-      minBedrooms:  state.beds,
-      bathrooms:    state.bathrooms,
-      minSize:      state.minSize,
-      maxSize:      state.maxSize,
-      features:     state.features,
-      status:       state.status,
+    // Try to interpret the query as a known city. If we can, server-filter; if
+    // not (province/area/neighbourhood/free-text), fall back to no city filter
+    // — matching how the old in-memory scoring would have surfaced results
+    // outside the city collection.
+    const resolvedCity = (typeof resolveCityFromQuery === 'function')
+      ? resolveCityFromQuery(query) : null;
+    return {
+      city:         resolvedCity || '',
+      propertyType: state.tipo !== 'todos' ? (tipoMap[state.tipo] || '') : '',
+      minPrice:     priceMin || null,
+      maxPrice:     priceMax || null,
+      minBedrooms:  state.beds || null,
+      features:     state.features || [],
+      sort:         _sortApi(),
+      lang:         localStorage.getItem('preos-lang') || 'es',
     };
-    searchProperties(filters).then(function(results) {
-      window._currentResults = results;
-      renderListings(results, query, sortVal);
-      renderMapMarkers(results);
-      if (window.PreosAnalytics) PreosAnalytics.trackSearch(query || '', results.length, filters);
-      allProps = results.length ? results : _allPropsCache;
-      if (results.length > 1) {
-        const lats = results.map(p => p.lat).filter(Boolean);
-        const lngs = results.map(p => p.lng).filter(Boolean);
+  }
+
+  function runSearch(query) {
+    const reqId = ++pagedState.requestId;
+    const filters = _buildFilters(query);
+    pagedState.activeFilters = filters;
+    pagedState.appliedCity   = filters.city || '';
+    pagedState.lastQuery     = query || '';
+    pagedState.listings      = [];
+    pagedState.nextCursor    = null;
+    pagedState.loading       = true;
+
+    renderSentinel('loading');
+
+    fetchListings(Object.assign({ limit: PAGE_SIZE }, filters)).then(function(res) {
+      if (reqId !== pagedState.requestId) return; // stale
+      pagedState.loading    = false;
+      pagedState.listings   = res.listings || [];
+      pagedState.nextCursor = res.nextCursor || null;
+      window._currentListings = pagedState.listings;
+      window._currentResults  = pagedState.listings; // legacy alias for map-cards-strip
+      window._propsById       = null;                // force relabel rebuild
+
+      renderListings(pagedState.listings, query, 'replace');
+      renderMapMarkers(pagedState.listings, 'replace');
+
+      if (pagedState.nextCursor === null && pagedState.listings.length > 0) {
+        renderSentinel('no-more');
+      }
+      if (window.PreosAnalytics) {
+        PreosAnalytics.trackSearch(query || '', pagedState.listings.length, filters);
+      }
+
+      // Fit map bounds on initial replace
+      if (pagedState.listings.length > 1) {
+        const lats = pagedState.listings.map(p => p.lat).filter(Boolean);
+        const lngs = pagedState.listings.map(p => p.lng).filter(Boolean);
         if (lats.length) {
           const bounds = [
             [Math.min(...lats) - 0.02, Math.min(...lngs) - 0.02],
@@ -1869,14 +2008,54 @@
           ];
           map.fitBounds(bounds, { padding: [40, 40] });
         }
-      } else if (results.length === 1 && results[0].lat) {
-        map.setView([results[0].lat, results[0].lng], 14);
+      } else if (pagedState.listings.length === 1 && pagedState.listings[0].lat) {
+        map.setView([pagedState.listings[0].lat, pagedState.listings[0].lng], 14);
       }
+    }).catch(function(err) {
+      if (reqId !== pagedState.requestId) return;
+      pagedState.loading = false;
+      console.error('[buscar] fetchListings failed:', err);
+      renderSentinel('error');
     });
+  }
+
+  function loadMoreListings(forceRetry) {
+    if (pagedState.loading) return;
+    if (!forceRetry && pagedState.nextCursor === null) return;
+    if (!pagedState.activeFilters) return;
+    const reqId = pagedState.requestId; // tied to current session
+    pagedState.loading = true;
+    renderSentinel('loading');
+    fetchListings(Object.assign({ limit: PAGE_SIZE, cursor: pagedState.nextCursor },
+                                pagedState.activeFilters)).then(function(res) {
+      if (reqId !== pagedState.requestId) return; // user changed filters mid-flight
+      pagedState.loading = false;
+      const incoming = res.listings || [];
+      pagedState.listings = pagedState.listings.concat(incoming);
+      pagedState.nextCursor = res.nextCursor || null;
+      window._currentListings = pagedState.listings;
+      window._currentResults  = pagedState.listings;
+      renderListings(incoming, pagedState.lastQuery, 'append');
+      renderMapMarkers(incoming, 'append');
+      if (pagedState.nextCursor === null) renderSentinel('no-more');
+    }).catch(function(err) {
+      if (reqId !== pagedState.requestId) return;
+      pagedState.loading = false;
+      console.error('[buscar] loadMoreListings failed:', err);
+      renderSentinel('error');
+    });
+  }
+
+  // 300ms debounce wrapper used by filter changes (per Section B spec).
+  let _searchDebounceTimer = null;
+  function debouncedRunSearch(query) {
+    clearTimeout(_searchDebounceTimer);
+    _searchDebounceTimer = setTimeout(function() { runSearch(query); }, 300);
   }
 
   // Expose globally so inline handlers and iOS touchend can reach it
   window.runSearch = runSearch;
+  window.loadMoreListings = loadMoreListings;
 
   // ── No-results empty state ────────────────────────────────────
   function renderEmptyState(query, allPropsForChips) {
@@ -1902,7 +2081,7 @@
       <div class="empty-title">${noTitle}</div>
       <div class="empty-sub">${noSub}</div>
       ${chips ? `<div class="empty-chips">${chips}</div>` : ''}
-      <button class="empty-all-btn" onclick="document.getElementById('searchInput').value='';document.getElementById('searchClear').style.display='none';runSearch('')">${allBtn}</button>
+      <button class="empty-all-btn" onclick="document.getElementById('searchInput').value='';document.getElementById('searchClear').style.display='none';if(typeof runSearch==='function')runSearch('')">${allBtn}</button>
     </div>`;
   }
 
@@ -1948,25 +2127,33 @@
   }
 
   // ── Initial load ──────────────────────────────────────────────
+  // Legacy aliases — kept so other helpers that reference _allPropsCache /
+  // allProps (e.g. relabelCards fallback, mobile cards strip) don't crash.
   var allProps = [];
   var _allPropsCache = [];
 
-  getAllProperties().then(function(props) {
-    _allPropsCache = props;
-    allProps = props;
+  // Warm the locations index in parallel with the first listings page so
+  // city-resolution on the very first user keystroke / chip click works.
+  if (typeof getLocationIndex === 'function') {
+    try { getLocationIndex().catch(function(){}); } catch (_) {}
+  }
 
+  (function initialLoad() {
     const _qParam = new URLSearchParams(window.location.search).get('q');
     if (_qParam) {
       const inp = document.getElementById('searchInput');
       if (inp) inp.value = _qParam;
       const clr = document.getElementById('searchClear');
       if (clr) clr.style.display = 'block';
-      triggerSearch(_qParam);
+      // Wait for the location index so city resolution works on first call.
+      const ready = (typeof getLocationIndex === 'function')
+        ? getLocationIndex().catch(function(){ return null; })
+        : Promise.resolve(null);
+      ready.then(function() { triggerSearch(_qParam); });
     } else {
-      renderListings(props, '', document.getElementById('sort-select').value);
-      renderMapMarkers(props);
+      runSearch('');
     }
-  });
+  })();
 
   // ── Search input event wiring ──────────────────────────────────
   var _searchInput = document.getElementById('searchInput');
@@ -2039,21 +2226,28 @@
     }
   });
 
-  // ── Map bounds filter (debounced) ────────────────────────────
-  var _moveendTimer = null;
-  map.on('moveend', function() {
-    clearTimeout(_moveendTimer);
-    _moveendTimer = setTimeout(function() {
-      if (!allProps.length) return;
-      var bounds = map.getBounds();
-      var inView = allProps.filter(function(p) {
-        return p.lat != null && p.lng != null && bounds.contains([p.lat, p.lng]);
-      });
-      if (inView.length > 0 && inView.length < allProps.length) {
-        renderListings(inView, document.getElementById('searchInput').value, document.getElementById('sort-select').value);
+  // ── Infinite scroll ──────────────────────────────────────────
+  // Fires loadMoreListings() when the user scrolls within 200px of the
+  // bottom of the listings panel. Works for the desktop split-layout
+  // (panel scrolls) and the mobile stack (window scrolls).
+  (function attachInfiniteScroll() {
+    var panel = document.querySelector('.listings-panel');
+    var threshold = 200;
+    function onScroll(target) {
+      if (pagedState.loading) return;
+      if (pagedState.nextCursor === null) return;
+      var distanceFromBottom;
+      if (target === window) {
+        distanceFromBottom = document.documentElement.scrollHeight
+          - (window.innerHeight + window.scrollY);
+      } else {
+        distanceFromBottom = target.scrollHeight - (target.clientHeight + target.scrollTop);
       }
-    }, 250);
-  });
+      if (distanceFromBottom <= threshold) loadMoreListings();
+    }
+    if (panel) panel.addEventListener('scroll', function() { onScroll(panel); }, { passive: true });
+    window.addEventListener('scroll', function() { onScroll(window); }, { passive: true });
+  })();
 </script>
 
   <script src="js/logo-path.js"></script>
