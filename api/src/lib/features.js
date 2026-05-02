@@ -25,6 +25,13 @@ function normalizeSlug(s) {
         .replace(/^_+|_+$/g, '');
 }
 
+// Category-level aliases — emitted whenever the category has any value, so a
+// filter like ?features=garage matches any listing with any Parking entry,
+// preserving the previous mapper's "Parking → garage" semantics.
+const CATEGORY_ALIASES = {
+    'parking': ['garage'],
+};
+
 // Conventional filter terms users expect to work, mapped from the prefixed parse.
 // Emitting both keeps frontend filters stable while the granular ${cat}_${val} path
 // remains available for future granular filtering.
@@ -70,9 +77,13 @@ function parseFeaturesTree(rawPropertyFeatures) {
             if (aliases) for (const a of aliases) out.add(a);
             pushedAny = true;
         }
-        if (pushedAny) out.add(catSlug);
+        if (pushedAny) {
+            out.add(catSlug);
+            const catAliases = CATEGORY_ALIASES[catSlug];
+            if (catAliases) for (const a of catAliases) out.add(a);
+        }
     }
     return Array.from(out);
 }
 
-module.exports = { parseFeaturesTree, normalizeSlug, FEATURE_ALIASES };
+module.exports = { parseFeaturesTree, normalizeSlug, FEATURE_ALIASES, CATEGORY_ALIASES };
