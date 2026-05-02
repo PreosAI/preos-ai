@@ -279,6 +279,12 @@ window.PreosLang = (function () {
       mobile_map_toggle_map:    'Ver mapa',
       mobile_map_toggle_list:   'Ver lista',
 
+      // Paginated listings sentinels (Section B)
+      results_loading:          'Cargando…',
+      results_no_more:          'No hay más resultados',
+      results_error:            'No pudimos cargar más resultados.',
+      results_retry:            'Reintentar',
+
       bookingName:              'Nombre completo',
       bookingPhone:             'Teléfono',
       bookingMessage:           'Mensaje al agente (opcional)',
@@ -1144,6 +1150,12 @@ window.PreosLang = (function () {
       filter_clear:             'Clear',
       mobile_map_toggle_map:    'Map view',
       mobile_map_toggle_list:   'List view',
+
+      // Paginated listings sentinels (Section B)
+      results_loading:          'Loading…',
+      results_no_more:          'No more results',
+      results_error:            "Couldn't load more results.",
+      results_retry:            'Retry',
 
       bookingName:              'Full name',
       bookingPhone:             'Phone',

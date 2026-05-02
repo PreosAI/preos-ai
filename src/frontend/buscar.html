@@ -1514,7 +1514,9 @@
     state.priceCustomMin = cMin;
     state.priceCustomMax = cMax;
     updateMoreBadge();
-    applyFilters();
+    // Explicit Apply click → fire immediately, skip the change-debounce.
+    var q = document.getElementById('searchInput') ? document.getElementById('searchInput').value : '';
+    runSearch(q);
     closeExpandedPanel();
   });
 
