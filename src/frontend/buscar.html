@@ -1601,8 +1601,8 @@
   function relabelCards() {
     var src = (window._currentListings && window._currentListings.length)
       ? window._currentListings
-      : _allPropsCache;
-    if (!src || src.length === 0) return;
+      : [];
+    if (!src.length) return;
     const lang = localStorage.getItem('preos-lang') || 'es';
     // Rebuild lookup from the current rendered set so it stays in sync with appends.
     const byId = (function() {
@@ -1653,7 +1653,7 @@
     if (mode === 'replace' && (!props || props.length === 0)) {
       const chipsSrc = (window._locationIndex && window._locationIndex.cities)
         ? window._locationIndex.cities.slice(0, 3).map(function(c) { return { city: c.name }; })
-        : (_allPropsCache || []);
+        : [];
       list.innerHTML = renderEmptyState(query || '', chipsSrc);
       _lastResultsState = { count: 0, area: '' };
       if (countEl) countEl.textContent = lang === 'en' ? '0 results' : '0 resultados';
@@ -2129,11 +2129,6 @@
   }
 
   // ── Initial load ──────────────────────────────────────────────
-  // Legacy aliases — kept so other helpers that reference _allPropsCache /
-  // allProps (e.g. relabelCards fallback, mobile cards strip) don't crash.
-  var allProps = [];
-  var _allPropsCache = [];
-
   // Warm the locations index in parallel with the first listings page so
   // city-resolution on the very first user keystroke / chip click works.
   if (typeof getLocationIndex === 'function') {
