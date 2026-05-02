@@ -1,24 +1,24 @@
 /**
  * properties.js — Property data access layer
  *
- * Data source:
- *   1. Resales Online API via Azure Function (when RESALES_API_URL is set)
- *   2. Fallback: data/properties.json (dummy data)
- *
- * ACTION REQUIRED after Azure Function is deployed:
- * Replace the empty string below with your Function URL:
- *   const RESALES_API_URL =
- *     'https://preos-functions.azurewebsites.net/api/resales';
+ * Endpoints:
+ *   /api/resales/listings-paged   — server-side filter + cursor pagination (NEW, used by buscar.html)
+ *   /api/resales/locations        — aggregated city/area/etc. index for autocomplete
+ *   /api/resales/property/<ref>   — single-listing detail
+ *   /api/resales/listings         — legacy full dump, still used by index/favoritos/dashboard
+ *                                   pages until those are migrated in Section C.
  */
 
-const RESALES_API_BASE    = 'https://preos-resales-proxy.azurewebsites.net/api/resales';
-const RESALES_API_URL     = RESALES_API_BASE + '/listings';
-const PROPERTIES_JSON_URL = 'data/properties.json';
+const RESALES_API_BASE      = 'https://preos-resales-proxy.azurewebsites.net/api/resales';
+const RESALES_API_URL       = RESALES_API_BASE + '/listings';
+const RESALES_PAGED_URL     = RESALES_API_BASE + '/listings-paged';
+const RESALES_LOCATIONS_URL = RESALES_API_BASE + '/locations';
+const PROPERTIES_JSON_URL   = 'data/properties.json';
 
 let _cache       = null;
 let _cacheSource = null;
 
-/* ── Field mapper: Resales API → normalized schema ─────── */
+/* ── Field mapper: Resales API → normalized schema (legacy /listings path) ─── */
 
 function mapResalesFeatures(categories) {
   if (!categories || !Array.isArray(categories)) return [];
@@ -139,7 +139,77 @@ function mapResalesProperty(p, index) {
   };
 }
 
-/* ── Data loading ───────────────────────────────────────── */
+/* ── Paginated listings (Section B) ──────────────────────────── */
+
+/**
+ * Call /api/resales/listings-paged with non-empty filters.
+ * Returns { listings, nextCursor, count }.
+ *
+ * `query` is intentionally NOT a parameter — the backend filters by
+ * exact city only. The caller resolves a free-text query to a city
+ * via resolveCityFromQuery() before calling this.
+ */
+async function fetchListings(opts) {
+  opts = opts || {};
+  var params = new URLSearchParams();
+  if (opts.city)         params.set('city', opts.city);
+  if (opts.propertyType) params.set('propertyType', opts.propertyType);
+  if (opts.minPrice)     params.set('minPrice', String(opts.minPrice));
+  if (opts.maxPrice)     params.set('maxPrice', String(opts.maxPrice));
+  if (opts.minBedrooms)  params.set('minBedrooms', String(opts.minBedrooms));
+  if (opts.features && opts.features.length)
+    params.set('features', opts.features.join(','));
+  if (opts.cursor)       params.set('cursor', opts.cursor);
+  if (opts.limit)        params.set('limit', String(opts.limit));
+  if (opts.sort)         params.set('sort', opts.sort);
+  if (opts.lang)         params.set('lang', opts.lang);
+
+  var url = RESALES_PAGED_URL + (params.toString() ? '?' + params.toString() : '');
+  var res = await fetch(url);
+  if (!res.ok) {
+    var text = '';
+    try { text = await res.text(); } catch (_) {}
+    throw new Error('listings-paged ' + res.status + ' ' + text.slice(0, 200));
+  }
+  var data = await res.json();
+  if (data.error) throw new Error('listings-paged: ' + data.error);
+  return data;
+}
+
+/* ── Location index for autocomplete (Section B) ────────────── */
+
+let _locationIndexPromise = null;
+
+async function getLocationIndex() {
+  if (window._locationIndex) return window._locationIndex;
+  if (_locationIndexPromise) return _locationIndexPromise;
+  _locationIndexPromise = (async function() {
+    var res = await fetch(RESALES_LOCATIONS_URL);
+    if (!res.ok) throw new Error('locations ' + res.status);
+    var data = await res.json();
+    window._locationIndex = data;
+    // Pre-build normName → canonical name lookup for cities — used to map a
+    // typed query into the `city` filter for /listings-paged.
+    var byNorm = {};
+    (data.cities || []).forEach(function(c) { byNorm[c.normName] = c.name; });
+    window._cityByNormName = byNorm;
+    return data;
+  })();
+  try {
+    return await _locationIndexPromise;
+  } catch (err) {
+    _locationIndexPromise = null; // allow retry
+    throw err;
+  }
+}
+
+function resolveCityFromQuery(query) {
+  if (!query || !window._cityByNormName) return null;
+  var nq = norm(query.trim());
+  return window._cityByNormName[nq] || null;
+}
+
+/* ── Data loading (legacy /listings path — used by index/favs/dashboard) ── */
 
 async function fetchFromAPI() {
     var res = await fetch(RESALES_API_URL);
@@ -176,7 +246,7 @@ async function getAllProperties() {
   return _cache;
 }
 
-/* ── Public API (unchanged) ─────────────────────────────── */
+/* ── Public API ──────────────────────────────────────────────── */
 
 async function getPropertyById(id) {
   if (!id) return null;
@@ -196,7 +266,7 @@ function formatPrice(price) {
 
 function norm(s) {
   return (s || '').toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
 function scoreProperty(p, query) {
@@ -222,6 +292,8 @@ function scoreProperty(p, query) {
   return 0;
 }
 
+// Legacy in-memory search — kept so other pages (favoritos, dashboard, etc.)
+// keep working until Section C migrates them. Not used by buscar.html anymore.
 async function searchProperties(filters) {
   filters = filters || {};
   var props        = await getAllProperties();
@@ -286,39 +358,37 @@ async function searchProperties(filters) {
   return results;
 }
 
-function _buildSuggestIndex(props) {
-  var provinces = new Map();         // name → count
-  var cities = new Map();            // name → province
-  var areas = new Map();             // name → city
-  var neighbourhoods = new Map();    // name → city
-  for (var i = 0; i < props.length; i++) {
-    var p = props[i];
-    if (p.province) provinces.set(p.province, (provinces.get(p.province) || 0) + 1);
-    if (p.city) cities.set(p.city, p.province || '');
-    if (p.area) areas.set(p.area, p.city || '');
-    if (p.neighbourhood && p.neighbourhood !== p.city)
-      neighbourhoods.set(p.neighbourhood, p.city || '');
-  }
-  function toEntries(map, secondaryFn) {
-    var arr = [];
-    map.forEach(function(secondary, name) {
-      arr.push({ name: name, normName: norm(name), secondary: secondary });
-    });
-    return arr;
-  }
-  return {
-    provinces:      toEntries(provinces),
-    cities:         toEntries(cities),
-    areas:          toEntries(areas),
-    neighbourhoods: toEntries(neighbourhoods),
-  };
+/* ── Suggestions (now backed by /api/resales/locations) ─────── */
+
+function _sLang() {
+  try {
+    return (typeof localStorage !== 'undefined' &&
+            localStorage.getItem('preos-lang')) || 'es';
+  } catch (_) { return 'es'; }
+}
+
+function _propsLabel(n) {
+  if (_sLang() === 'en') return n === 1 ? '1 property' : n + ' properties';
+  return n === 1 ? '1 propiedad' : n + ' propiedades';
+}
+
+function _typeLabel(kind) {
+  var es = { province: 'Provincia', city: 'Ciudad', area: 'Zona', neighbourhood: 'Barrio' };
+  var en = { province: 'Province',  city: 'City',   area: 'Area', neighbourhood: 'Neighbourhood' };
+  return (_sLang() === 'en' ? en : es)[kind] || '';
 }
 
 async function getSuggestions(query) {
   if (!query || query.trim().length < 1) return [];
-  var props = await getAllProperties();
-  if (!window._suggestIndex) window._suggestIndex = _buildSuggestIndex(props);
-  var idx = window._suggestIndex;
+
+  var idx;
+  try {
+    idx = await getLocationIndex();
+  } catch (err) {
+    console.warn('[properties.js] locations index failed:', err.message);
+    return [{ type: 'all', text: query.trim(), secondary: '', searchValue: query.trim() }];
+  }
+
   var q = norm(query.trim());
 
   function pickPrefix(entries, limit) {
@@ -330,48 +400,48 @@ async function getSuggestions(query) {
   }
   function pickContains(entries, limit, exclude) {
     var out = [];
-    var seen = new Set(exclude.map(function(e) { return e.name; }));
-    for (var i = 0; i < entries.length && out.length < limit; i++) {
-      if (seen.has(entries[i].name)) continue;
-      if (entries[i].normName.indexOf(q) > -1) out.push(entries[i]);
+    var seen = {};
+    for (var i = 0; i < exclude.length; i++) seen[exclude[i].name] = true;
+    for (var j = 0; j < entries.length && out.length < limit; j++) {
+      if (seen[entries[j].name]) continue;
+      if (entries[j].normName.indexOf(q) > -1) out.push(entries[j]);
     }
     return out;
   }
 
-  var provinceMatches = pickPrefix(idx.provinces, 5);
-  var cityMatches = pickPrefix(idx.cities, 5);
-  var areaPrefix = pickPrefix(idx.areas, 5);
-  var areaContains = pickContains(idx.areas, 5 - areaPrefix.length, areaPrefix);
-  var areaMatches = areaPrefix.concat(areaContains);
-  var nbhdMatches = pickPrefix(idx.neighbourhoods, 5);
+  var provinceMatches = pickPrefix(idx.provinces || [], 3);
+  var cityMatches     = pickPrefix(idx.cities    || [], 5);
+  var areaPrefix      = pickPrefix(idx.areas     || [], 5);
+  var areaContains    = pickContains(idx.areas   || [], 5 - areaPrefix.length, areaPrefix);
+  var areaMatches     = areaPrefix.concat(areaContains);
+  var nbhdMatches     = pickPrefix(idx.neighbourhoods || [], 5);
 
   var suggestions = [];
   provinceMatches.forEach(function(e) {
     suggestions.push({
       type: 'province', text: e.name,
-      secondary: 'Provincia · ' + e.secondary + ' ' +
-        (e.secondary === 1 ? 'propiedad' : 'propiedades'),
+      secondary: _typeLabel('province') + ' · ' + _propsLabel(e.count),
       searchValue: e.name + ' provincia'
     });
   });
   cityMatches.forEach(function(e) {
     suggestions.push({
       type: 'city', text: e.name,
-      secondary: e.secondary ? 'Ciudad · ' + e.secondary : 'Ciudad',
+      secondary: _typeLabel('city') + ' · ' + _propsLabel(e.count),
       searchValue: e.name
     });
   });
   areaMatches.forEach(function(e) {
     suggestions.push({
       type: 'area', text: e.name,
-      secondary: e.secondary ? 'Zona · ' + e.secondary : 'Zona',
+      secondary: _typeLabel('area') + ' · ' + _propsLabel(e.count),
       searchValue: e.name
     });
   });
   nbhdMatches.forEach(function(e) {
     suggestions.push({
       type: 'neighbourhood', text: e.name,
-      secondary: e.secondary ? 'Barrio · ' + e.secondary : 'Barrio',
+      secondary: _typeLabel('neighbourhood') + ' · ' + _propsLabel(e.count),
       searchValue: e.name
     });
   });
