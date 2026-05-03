@@ -1,17 +1,17 @@
 {
-  "run_at": "2026-05-03T22:24:18.537Z",
-  "elapsed_sec": 439,
+  "run_at": "2026-05-03T22:05:44.966Z",
+  "elapsed_sec": 321,
   "total_properties": 50,
   "total_input_tokens": 93810,
-  "total_output_tokens": 14538,
+  "total_output_tokens": 14602,
   "total_cache_read_tokens": 0,
-  "total_cost_usd_estimate": 0.1665,
+  "total_cost_usd_estimate": 0.1668,
   "confidence_distribution": {
-    "low": 22,
-    "rejected": 4,
-    "medium": 15,
-    "exact": 3,
-    "high": 6
+    "rejected": 21,
+    "low": 7,
+    "medium": 14,
+    "high": 6,
+    "exact": 2
   },
   "results": [
     {
@@ -32,12 +32,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -67,10 +67,10 @@
           "other_signals": [
             "Beachfront property",
             "Beachside location",
-            "Steps from the sea",
+            "A few steps from the sea",
             "Private pool with pool house (chiringuito)",
             "Large plot (1960 m²)",
-            "Marbesa area, Marbella"
+            "Spacious terraces (176 m²)"
           ]
         },
         "municipality_resolution": {
@@ -89,85 +89,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 0.666667
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 746,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "carib playa"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [
-          "Carib Playa"
-        ],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1295,
@@ -177,7 +119,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 245,
+        "output_tokens": 247,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -200,12 +142,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-municipality-centroid"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 46349,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -253,96 +195,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.721832,
-                "lng": -4.439948,
-                "place_name": "Las Chapas, Málaga, provincia de Málaga, España",
-                "relevance": 0.637037
-              },
-              "parcels_returned": 2,
-              "closest_address": "CL DOCTOR ESCASSI 1 MALAGA (MÁLAGA)",
-              "matched": false
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             },
             {
               "strike": 3,
-              "source": "mapbox-municipality-centroid",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Solar",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "hacienda las chapas"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1224,
@@ -375,12 +248,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -403,15 +276,13 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Located in Marbesa, Marbella",
-            "50 meters from the beach",
+            "50 meters from beach",
             "Second-line beach villa",
             "Beachfront/front-line beach complex setting",
-            "Close to beach restaurants",
-            "Coastal community setting",
             "Private pool",
             "Parking for 3 cars",
-            "Ready to move in or renovation potential",
-            "Rental investment potential"
+            "Coastal community with beachside restaurants",
+            "Area with proven capital growth"
           ]
         },
         "municipality_resolution": {
@@ -430,81 +301,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 0.666667
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 296,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [],
-            "matched": [],
-            "result": "no-tokens"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 2140,
@@ -514,7 +331,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 260,
+        "output_tokens": 245,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -569,7 +386,8 @@
             "Close to forest (no named forest specified)",
             "Country setting",
             "Plot size: 1754 m²",
-            "Excellent condition"
+            "Condition: Excellent",
+            "Type: Residential plot (solar)"
           ]
         },
         "municipality_resolution": {
@@ -661,7 +479,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 201,
+        "output_tokens": 214,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -715,9 +533,11 @@
             "1913 m² plot size",
             "Building permission for 421 m² villa plus basement, garage, and pool",
             "Protected environment",
-            "Off Plan category",
-            "Utilities: Electricity, Drinkable Water, Telephone",
-            "Private garden with landscaping potential"
+            "Suburban, country, mountain pueblo setting",
+            "Close to golf, close to sea, close to town, close to schools, close to forest",
+            "Off plan / new construction",
+            "Private garden",
+            "Utilities: electricity, drinkable water, telephone"
           ]
         },
         "municipality_resolution": {
@@ -809,7 +629,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 239,
+        "output_tokens": 269,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -832,12 +652,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-municipality-centroid"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 46349,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -885,9 +705,6 @@
             "underground garage parking",
             "lift/elevator access",
             "newly fitted kitchen",
-            "air conditioning throughout",
-            "electric window shutters",
-            "double glazing",
             "fully furnished"
           ]
         },
@@ -907,108 +724,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.721832,
-                "lng": -4.439948,
-                "place_name": "Las Chapas, Málaga, provincia de Málaga, España",
-                "relevance": 0.703704
-              },
-              "parcels_returned": 2,
-              "closest_address": "CL DOCTOR ESCASSI 1 MALAGA (MÁLAGA)",
-              "matched": false
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             },
             {
               "strike": 3,
-              "source": "mapbox-municipality-centroid",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 126,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "carib playa",
-              "fairways",
-              "carib playa",
-              "cabopino marina",
-              "malaga airport"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [
-          "Carib Playa"
-        ],
-        "landmarks_rejected_far": [
-          "Cabopino Marina",
-          "Málaga Airport",
-          "Cabopino",
-          "Elviria",
-          "Marbella"
-        ]
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 2022,
@@ -1018,7 +754,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 374,
+        "output_tokens": 352,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1077,7 +813,7 @@
             "Protected National Park adjacent (no future construction permitted)",
             "Approved swimming pool project for the urbanization scheduled for current year",
             "Premium residential environment",
-            "Low community fees noted"
+            "Low community fees"
           ]
         },
         "municipality_resolution": {
@@ -1169,7 +905,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 224,
+        "output_tokens": 223,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1230,8 +966,8 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Close to golf",
-            "Nine hole golf course at El Soto de Marbella",
-            "Communal facilities: gym, sauna, spa, tennis, padel tennis, boules courts, restaurant, bar",
+            "Nine hole golf course on-site at El Soto de Marbella",
+            "Communal facilities: gym, sauna, spa, tennis courts, padel tennis courts, boules courts, restaurant, bar",
             "Recently renovated bathroom",
             "Three terraces",
             "Underground parking with storeroom",
@@ -1339,7 +1075,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 293,
+        "output_tokens": 298,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1362,12 +1098,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -1390,7 +1126,7 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Located in Marbesa, beachside community",
-            "Short stroll from the beach (distance not specified)",
+            "Short stroll from beach (distance not specified)",
             "Close to all amenities (non-specific)",
             "Two-level villa construction",
             "Private well with 12,000 liter water deposit",
@@ -1414,81 +1150,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 0.666667
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 388,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [],
-            "matched": [],
-            "result": "no-tokens"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1973,
@@ -1498,7 +1180,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 230,
+        "output_tokens": 229,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1521,12 +1203,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-municipality-centroid"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 46349,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -1540,23 +1222,22 @@
           "street_fragments": [],
           "directional_cues": {
             "orientation": "Frontage on A7 motorway",
-            "views": null,
+            "views": "Panoramic views (from features list)",
             "elevation": null
           },
-          "adjacent_landmarks": [
-            "A7 motorway"
-          ],
+          "adjacent_landmarks": [],
           "developer_or_project": null,
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Large commercial plot (93,770 sqm) zoned for private parks and gardens",
-            "117 linear meters of frontage on A7 motorway",
-            "Current office building: 5 offices, 2 meeting rooms, reception, 1 bathroom",
-            "Marble flooring and air conditioning",
-            "Allowed uses: sports (outdoor), cultural, religious, hospitality, parking",
-            "Maximum occupancy 20% of total surface (1,944 sqm) except hospitality",
-            "Located in Las Chapas, Costa del Sol"
+            "A7 motorway frontage: 117 linear meters",
+            "Plot size: 93,770 sqm (exceptionally large)",
+            "Zoning: Private Parks and Gardens",
+            "Compatible uses: Sports (outdoor), Cultural, Religious, Hospitality, Parking",
+            "Maximum occupancy: 20% of total surface (1,944 sqm) except hospitality",
+            "Building: 5 offices, 2 meeting rooms, reception with waiting room, 1 bathroom",
+            "Marble flooring, air conditioning throughout",
+            "Commercial/office property with significant development potential"
           ]
         },
         "municipality_resolution": {
@@ -1575,96 +1256,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.721832,
-                "lng": -4.439948,
-                "place_name": "Las Chapas, Málaga, provincia de Málaga, España",
-                "relevance": 0.703704
-              },
-              "parcels_returned": 2,
-              "closest_address": "CL DOCTOR ESCASSI 1 MALAGA (MÁLAGA)",
-              "matched": false
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             },
             {
               "strike": 3,
-              "source": "mapbox-municipality-centroid",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Solar",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 220,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [],
-            "matched": [],
-            "result": "no-tokens"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "A7 motorway"
-        ]
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1490,
@@ -1674,7 +1286,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 287,
+        "output_tokens": 293,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1697,12 +1309,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -1731,24 +1343,18 @@
             "elevation": null
           },
           "adjacent_landmarks": [
-            "The Golden Mile beaches"
+            "Golden Mile beaches"
           ],
           "developer_or_project": null,
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Gated community (urbanización cerrada)",
-            "Ground floor with private garden",
-            "Mature landscaped gardens in community",
-            "Large communal pool",
-            "Two underground parking spaces",
-            "Storage room included",
-            "Marble flooring",
-            "Underfloor heating",
-            "Electric blinds",
-            "Fireplace in living area",
-            "Separate utility area",
-            "Master suite with en-suite bathroom"
+            "gated community",
+            "ground-floor apartment with private garden",
+            "beachfront location on Golden Mile",
+            "mature landscaped gardens in urbanization",
+            "communal pool",
+            "minutes from Marbella key destinations"
           ]
         },
         "municipality_resolution": {
@@ -1767,90 +1373,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Apartamento",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 244,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "lomas del virrey",
-              "puente romano resort",
-              "puerto banus"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [
-          "The Golden Mile beaches"
-        ],
-        "landmarks_rejected_far": [
-          "Puente Romano Resort",
-          "Puerto Banús"
-        ]
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1904,
@@ -1860,7 +1403,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 331,
+        "output_tokens": 280,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1883,12 +1426,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -1907,8 +1450,8 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": "south facing",
-            "views": "sea views from roof terrace",
+            "orientation": "South facing",
+            "views": "Sea views from roof terrace",
             "elevation": null
           },
           "adjacent_landmarks": [
@@ -1919,9 +1462,9 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "300 meters to the sea",
-            "recently built / new construction",
-            "within walking distance to luxury hotels",
-            "few minutes drive to city center"
+            "Recently built / new construction",
+            "Within walking distance to luxury hotels",
+            "A few minutes drive to city center"
           ]
         },
         "municipality_resolution": {
@@ -1940,86 +1483,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 1038,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "puerto banus"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "Puerto Banús",
-          "The Golden Mile"
-        ]
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1524,
@@ -2029,7 +1513,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 223,
+        "output_tokens": 224,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2052,12 +1536,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -2082,9 +1566,7 @@
             "Located on The Golden Mile, Marbella",
             "Gated complex with 24-hour security",
             "Communal pool and garden",
-            "Andalucian style architecture",
-            "Mediterranean design",
-            "Tropical gardens",
+            "Tropical gardens mentioned",
             "Polo areas nearby",
             "Close to port, shops, sea, town, schools"
           ]
@@ -2105,81 +1587,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 431,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [],
-            "matched": [],
-            "result": "no-tokens"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1775,
@@ -2189,7 +1617,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 224,
+        "output_tokens": 209,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2256,8 +1684,8 @@
           "other_signals": [
             "Located in historic building",
             "500 m from beach",
-            "Surrounded by traditional restaurants and boutique shops",
-            "Town center location with high rental potential"
+            "Sunny terrace",
+            "Town center location with traditional restaurants and boutique shops nearby"
           ]
         },
         "municipality_resolution": {
@@ -2378,7 +1806,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 293,
+        "output_tokens": 292,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2630,6 +2058,14 @@
             "claimed_direction": null
           },
           {
+            "name": "Puerto Banús",
+            "lat": 36.498745,
+            "lng": -4.963372,
+            "place_name": "Nueva Andalucía, Marbella, provincia de Málaga, España",
+            "claimed_distance_m": 5,
+            "claimed_direction": null
+          },
+          {
             "name": "Mercadona",
             "lat": 36.498745,
             "lng": -4.963372,
@@ -2651,9 +2087,10 @@
             "lat": 36.498745,
             "lng": -4.963372,
             "source": "landmark_centroid",
-            "score": 85,
+            "score": 90,
             "inputs": [
               "Aloha College",
+              "Puerto Banús",
               "Mercadona",
               "Golf Valley"
             ]
@@ -2710,12 +2147,10 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 65,
-        "final_decision_reason": "candidate=landmark_centroid base=85 · cadastre-address-tokens-mismatch -20",
+        "final_confidence_score": 70,
+        "final_decision_reason": "candidate=landmark_centroid base=90 · cadastre-address-tokens-mismatch -20",
         "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "Puerto Banús"
-        ]
+        "landmarks_rejected_far": []
       },
       "usage": {
         "input_tokens": 1928,
@@ -2772,8 +2207,8 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": "North, South",
-            "views": "Garden views, pool views, surrounding greenery",
+            "orientation": "North and South facing",
+            "views": "Garden views, pool views, views of surrounding greenery",
             "elevation": null
           },
           "adjacent_landmarks": [
@@ -2786,9 +2221,11 @@
             "Tree-lined street location",
             "Walking distance to Puerto Banús",
             "Walking distance to Nueva Andalucía restaurants",
-            "Private garden with full sun exposure",
+            "Private garden with fruit trees",
+            "Large swimming pool",
             "Mediterranean lifestyle setting",
-            "Quiet, well-connected area"
+            "Quiet, well-connected area",
+            "Andalusian-style architecture"
           ]
         },
         "municipality_resolution": {
@@ -2809,6 +2246,14 @@
         },
         "landmarks_resolved": [
           {
+            "name": "Puerto Banús",
+            "lat": 36.498745,
+            "lng": -4.963372,
+            "place_name": "Nueva Andalucía, Marbella, provincia de Málaga, España",
+            "claimed_distance_m": null,
+            "claimed_direction": null
+          },
+          {
             "name": "Nueva Andalucía",
             "lat": 36.498745,
             "lng": -4.963372,
@@ -2821,9 +2266,10 @@
           {
             "lat": 36.498745,
             "lng": -4.963372,
-            "source": "single_landmark",
-            "score": 75,
+            "source": "landmark_centroid",
+            "score": 80,
             "inputs": [
+              "Puerto Banús",
               "Nueva Andalucía"
             ]
           }
@@ -2877,12 +2323,10 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 55,
-        "final_decision_reason": "candidate=single_landmark base=75 · cadastre-address-tokens-mismatch -20",
+        "final_confidence_score": 60,
+        "final_decision_reason": "candidate=landmark_centroid base=80 · cadastre-address-tokens-mismatch -20",
         "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "Puerto Banús"
-        ]
+        "landmarks_rejected_far": []
       },
       "usage": {
         "input_tokens": 2087,
@@ -2892,7 +2336,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 258,
+        "output_tokens": 278,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2915,12 +2359,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -2945,13 +2389,13 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Paired villa (pareada)",
-            "Gated complex with security",
-            "Communal pool and garden",
+            "Gated complex security",
+            "Communal pool",
             "Private garage",
+            "Communal garden",
+            "Top floor sea views",
             "Walking distance to amenities",
-            "Close proximity to fine dining and luxury boutiques",
-            "Top floor with sea views"
+            "Close proximity to fine dining and luxury boutiques"
           ]
         },
         "municipality_resolution": {
@@ -2970,86 +2414,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 263,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "jardines de las lomas"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "The Golden Mile",
-          "Marbella"
-        ]
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1483,
@@ -3059,7 +2444,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 232,
+        "output_tokens": 226,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3112,7 +2497,7 @@
           "directional_cues": {
             "orientation": "South, East-to-West",
             "views": "Panoramic sea views, mountain of Marbella to Gibraltar, African coast",
-            "elevation": "Corner penthouse, single-level, high-rise position"
+            "elevation": "Corner penthouse, single-level, elevated position"
           },
           "adjacent_landmarks": [],
           "developer_or_project": null,
@@ -3127,13 +2512,7 @@
             "Port nearby",
             "Gated complex with entry phone",
             "Underground private garage",
-            "Fiber optic available",
-            "Corner position with 360° wrap-around terrace",
-            "Open-plan kitchen/living area",
-            "Fully fitted kitchen",
-            "Ensuite bathrooms",
-            "Fireplace",
-            "Hot and cold air conditioning"
+            "Fiber optic available"
           ]
         },
         "municipality_resolution": {
@@ -3234,7 +2613,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 345,
+        "output_tokens": 284,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3257,12 +2636,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -3290,7 +2669,9 @@
             "views": "marina views, sea views, Mediterranean Sea views, port views",
             "elevation": null
           },
-          "adjacent_landmarks": [],
+          "adjacent_landmarks": [
+            "Puerto Banús marina"
+          ],
           "developer_or_project": null,
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
@@ -3299,9 +2680,7 @@
             "marina setting",
             "fully renovated",
             "tourist license in place",
-            "private terrace with lounge furniture and eco-friendly fireplace",
-            "underfloor heating throughout",
-            "high-end Italian finishes"
+            "high-end rental investment potential"
           ]
         },
         "municipality_resolution": {
@@ -3320,88 +2699,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.50932,
-                "lng": -4.886694,
-                "place_name": "Marbella, provincia de Málaga, España",
-                "relevance": 0.592593
-              },
-              "parcels_returned": 5,
-              "closest_address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.50932,
-            "lng": -4.886694,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.50932,
-            "lng": -4.886694
-          },
-          "parcels_returned": 5,
-          "closest_parcel": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "1122103UF3412S",
-            "distance": 5.83,
-            "address": "AV RICARDO SORIANO 1 CAPITOL EDF MARBELLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Apartamento",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 296,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "puerto banus",
-              "mediterranean sea"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [
-          "Mediterranean Sea"
-        ],
-        "landmarks_rejected_far": [
-          "Puerto Banús"
-        ]
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 2152,
@@ -3411,7 +2729,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 272,
+        "output_tokens": 258,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3434,20 +2752,16 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.426193,
-        "lng": -5.145435,
-        "confidence": "exact",
-        "source": "cadastre_verified"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 73173,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
-        "cadastre_seed": {
-          "year": 1955,
-          "refcat": "7735607UF0373N",
-          "source": "cadastre"
-        }
+        "cadastre_seed": null
       },
       "reasoning_trace": {
         "signals_extracted": {
@@ -3492,81 +2806,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.426193,
-                "lng": -5.145435,
-                "place_name": "Estepona, provincia de Málaga, España",
-                "relevance": 0.548148
-              },
-              "parcels_returned": 17,
-              "closest_address": "PZ FLORES DE LAS 1 ESTEPONA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.426193,
-            "lng": -5.145435,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.426193,
-            "lng": -5.145435
-          },
-          "parcels_returned": 17,
-          "closest_parcel": {
-            "refcat": "7735607UF0373N",
-            "distance": 2.69,
-            "address": "PZ FLORES DE LAS 1 ESTEPONA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "7735607UF0373N",
-            "distance": 2.69,
-            "address": "PZ FLORES DE LAS 1 29680 ESTEPONA (MÁLAGA)",
-            "m2": 122,
-            "year": 1955,
-            "useType": "Residencial",
-            "score": 56,
-            "breakdown": {
-              "useType": {
-                "parcel": "Residencial",
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": 122,
-                "listing": 128,
-                "pctDiff": 0.046875,
-                "pts": 41
-              },
-              "year": {
-                "parcel": 1955,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [],
-            "matched": [],
-            "result": "no-tokens"
-          }
-        },
-        "final_confidence_score": 65,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre metadata match score=56 · refcat=7735607UF0373N · tier_floor overridden by cadastre verification",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1586,
@@ -3637,12 +2897,15 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "beachfront location",
-            "close to Estepona's beaches",
+            "close to marina",
+            "close to beaches",
             "close to golf courses",
             "close to waterfront restaurants",
-            "new construction / move-in ready",
-            "community pool and gym",
-            "underground parking"
+            "community pool",
+            "modern gym",
+            "underground parking",
+            "new construction condition",
+            "open-plan design"
           ]
         },
         "municipality_resolution": {
@@ -3744,7 +3007,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 244,
+        "output_tokens": 254,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3807,24 +3070,25 @@
           "adjacent_landmarks": [
             "historic center of Estepona",
             "marina",
-            "promenade",
-            "old town"
+            "paseo marítimo",
+            "casco antiguo"
           ],
           "developer_or_project": null,
           "year_built_extracted": 2020,
           "year_built_extracted_confidence": "explicit",
           "other_signals": [
-            "elevated ground-floor position",
-            "private garden",
+            "elevated ground-floor position provides privacy and security",
+            "private garden in urban setting",
+            "short walk to historic center",
+            "short walk to marina",
+            "short walk to beaches",
             "communal pool",
             "gym",
             "coworking space",
-            "short-term rental permitted",
             "two underground parking spaces",
             "two storage rooms",
-            "underfloor heating in bathrooms",
-            "individual climate control per room",
-            "Siemens kitchen appliances"
+            "short-term rental permitted",
+            "contemporary architectural standards"
           ]
         },
         "municipality_resolution": {
@@ -3869,7 +3133,7 @@
             "claimed_direction": null
           },
           {
-            "name": "promenade",
+            "name": "paseo marítimo",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -3877,7 +3141,7 @@
             "claimed_direction": null
           },
           {
-            "name": "old town",
+            "name": "casco antiguo",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -3895,8 +3159,8 @@
               "Playa del Cristo",
               "historic center of Estepona",
               "marina",
-              "promenade",
-              "old town"
+              "paseo marítimo",
+              "casco antiguo"
             ]
           }
         ],
@@ -3967,7 +3231,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 348,
+        "output_tokens": 360,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4029,7 +3293,7 @@
               "direction": null
             },
             {
-              "name": "Mediterranean Highway A-7/AP-7",
+              "name": "Mediterranean Highway (A-7/AP-7)",
               "distance": null,
               "direction": null
             }
@@ -4051,11 +3315,11 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "semi-detached villa in prestigious area",
-            "surrounded by modern residential complexes and golf courses",
-            "immediate access to golf greens",
-            "private pool",
-            "excellent condition"
+            "Located in prestigious area surrounded by modern residential complexes",
+            "Immediate access to golf greens",
+            "Private pool",
+            "5 bedrooms, 5 bathrooms",
+            "Semi-detached villa (villa adosada)"
           ]
         },
         "municipality_resolution": {
@@ -4084,6 +3348,14 @@
             "claimed_direction": "nearby"
           },
           {
+            "name": "Málaga Airport",
+            "lat": 36.426193,
+            "lng": -5.145435,
+            "place_name": "Estepona, provincia de Málaga, España",
+            "claimed_distance_m": null,
+            "claimed_direction": null
+          },
+          {
             "name": "Gibraltar Airport",
             "lat": 36.426193,
             "lng": -5.145435,
@@ -4092,7 +3364,7 @@
             "claimed_direction": null
           },
           {
-            "name": "Mediterranean Highway A-7/AP-7",
+            "name": "Mediterranean Highway (A-7/AP-7)",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -4105,11 +3377,12 @@
             "lat": 36.426193,
             "lng": -5.145435,
             "source": "landmark_centroid",
-            "score": 85,
+            "score": 90,
             "inputs": [
               "Valle Romano Golf Academy",
+              "Málaga Airport",
               "Gibraltar Airport",
-              "Mediterranean Highway A-7/AP-7"
+              "Mediterranean Highway (A-7/AP-7)"
             ]
           }
         ],
@@ -4165,17 +3438,15 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 65,
-        "final_decision_reason": "candidate=landmark_centroid base=85 · cadastre-address-tokens-mismatch -20",
+        "final_confidence_score": 70,
+        "final_decision_reason": "candidate=landmark_centroid base=90 · cadastre-address-tokens-mismatch -20",
         "landmarks_rejected_generic": [
           "Columela restaurant",
           "Valle Romano Golf",
           "international schools",
           "Blue Flag beaches"
         ],
-        "landmarks_rejected_far": [
-          "Málaga Airport"
-        ]
+        "landmarks_rejected_far": []
       },
       "usage": {
         "input_tokens": 1452,
@@ -4185,7 +3456,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 381,
+        "output_tokens": 394,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4236,8 +3507,8 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": null,
-            "views": "4th floor, open panoramic views of marina and Mediterranean Sea, direct views of port and sea",
+            "orientation": "4th floor",
+            "views": "open panoramic views of marina and Mediterranean Sea, direct views of port and sea",
             "elevation": "4th floor"
           },
           "adjacent_landmarks": [],
@@ -4245,15 +3516,13 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": "renovated",
           "other_signals": [
-            "Beachfront location at marina",
+            "Directly at the marina (Puerto Paraíso)",
             "Walking distance to restaurants, cafés, shops, and beach",
-            "Two communal outdoor swimming pools",
-            "Building has two elevators",
-            "Private parking in interior courtyard with remote access",
-            "Complete renovation scheduled for completion 20 March 2026",
-            "High-quality materials and finishes throughout",
-            "Triple-glazed windows",
-            "Open-plan modern design"
+            "Two outdoor swimming pools in complex",
+            "Two elevators in building",
+            "Private parking in interior courtyard",
+            "Renovation completion scheduled March 20, 2026",
+            "High demand area for holiday rentals and long-term investment"
           ]
         },
         "municipality_resolution": {
@@ -4354,7 +3623,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 298,
+        "output_tokens": 283,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4426,11 +3695,11 @@
           "other_signals": [
             "7 minutes by car to the beach via paved road",
             "Located in La Alberdina zone, Estepona",
-            "Peaceful and natural environment",
+            "Finca/Cortijo property type",
+            "Large plot of 3708 m2",
             "Fully fenced property",
             "Fruit tree area present",
-            "Electric gate access",
-            "Single-level construction"
+            "Completely flat terrain suitable for walking"
           ]
         },
         "municipality_resolution": {
@@ -4547,7 +3816,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 335,
+        "output_tokens": 348,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4619,7 +3888,7 @@
           "street_fragments": [],
           "directional_cues": {
             "orientation": "South",
-            "views": "Sea views, Urban views, partial view of sea and Rock of Gibraltar from roof terrace",
+            "views": "Sea views, Urban views, partial view of Rock of Gibraltar from roof terrace",
             "elevation": "Three-level property with roof terrace on second floor"
           },
           "adjacent_landmarks": [
@@ -4631,15 +3900,16 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "End-of-row/corner townhouse position",
-            "Roof terrace newly floored in 2022",
-            "Electrical panel upgraded in 2020",
+            "End-of-row/corner townhouse (pareada en esquina)",
+            "Roof terrace floored in 2022",
+            "Electrical panel replaced in 2020",
             "Central, walkable location in Estepona town",
             "No community fees",
+            "5kW solar panel system with battery storage",
+            "300-litre solar water heater",
             "Private garden 118m²",
             "Two private parking spaces on plot",
-            "Solar panel system (5kW, 12 panels) with battery storage",
-            "300-litre solar water heater"
+            "Quiet residential area"
           ]
         },
         "municipality_resolution": {
@@ -4793,7 +4063,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 476,
+        "output_tokens": 479,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4862,16 +4132,15 @@
           ],
           "urbanization_phase": null,
           "building_name": null,
-          "street_fragments": [
-            "pedestrian street (calle peatonal)"
-          ],
+          "street_fragments": [],
           "directional_cues": {
             "orientation": "south-facing",
             "views": "panoramic, courtyard, urban, street",
-            "elevation": "second floor exterior-facing"
+            "elevation": "second floor exterior"
           },
           "adjacent_landmarks": [
             "historic old town (casco antiguo)",
+            "pedestrian street",
             "cobbled streets",
             "boutique shops",
             "traditional tapas bars",
@@ -4881,12 +4150,12 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Located in Estepona's historic centre (centro histórico)",
-            "Described as 'Jardín de la Costa del Sol' (Garden of the Costa del Sol)",
+            "Located in Estepona's historic centre (casco antiguo)",
             "Second-hand property in good condition",
-            "Building without lift (sin ascensor)",
+            "Building without lift/elevator",
+            "Inner patio for light and privacy",
             "Attic converted to home office",
-            "Inner patio for light and privacy"
+            "Described as 'Jardín de la Costa del Sol' (Garden of the Costa del Sol)"
           ]
         },
         "municipality_resolution": {
@@ -4931,7 +4200,7 @@
             "claimed_direction": null
           },
           {
-            "name": "Paseo Marítimo",
+            "name": "paseo marítimo",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -4940,6 +4209,14 @@
           },
           {
             "name": "historic old town (casco antiguo)",
+            "lat": 36.426193,
+            "lng": -5.145435,
+            "place_name": "Estepona, provincia de Málaga, España",
+            "claimed_distance_m": null,
+            "claimed_direction": null
+          },
+          {
+            "name": "pedestrian street",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -4973,8 +4250,9 @@
               "Playa de la Rada",
               "Museo de Arte Provincial (MAD)",
               "Orquidario",
-              "Paseo Marítimo",
+              "paseo marítimo",
               "historic old town (casco antiguo)",
+              "pedestrian street",
               "cobbled streets",
               "traditional tapas bars"
             ]
@@ -5022,7 +4300,6 @@
           "candidates_inspected": 3,
           "address_check": {
             "tokens": [
-              "pedestrian street calle peatonal",
               "playa de la rada",
               "plaza de las flores",
               "museo de arte provincial mad",
@@ -5051,7 +4328,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 466,
+        "output_tokens": 454,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5074,20 +4351,16 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.426193,
-        "lng": -5.145435,
-        "confidence": "medium",
-        "source": "landmark_triangulation · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 73173,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
-        "cadastre_seed": {
-          "year": 1955,
-          "refcat": "7735607UF0373N",
-          "source": "cadastre"
-        }
+        "cadastre_seed": null
       },
       "reasoning_trace": {
         "signals_extracted": {
@@ -5112,8 +4385,8 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": "south-facing",
-            "views": "open views, mountain views, garden views, pool views",
+            "orientation": "South",
+            "views": "Open views, mountain views, garden views, pool views",
             "elevation": null
           },
           "adjacent_landmarks": [],
@@ -5121,11 +4394,12 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "50 metres from beach",
-            "New Golden Mile location",
-            "beachfront property",
-            "newly built seaside promenade nearby",
-            "El Presidente community amenities: five swimming pools (one heated year-round), tennis courts, paddle courts"
+            "Beachfront location, 50 metres from beach",
+            "New Golden Mile area",
+            "Recently built seaside promenade nearby",
+            "El Presidente urbanization amenities: five swimming pools (one heated year-round), tennis courts, paddle courts",
+            "Traditional architectural style",
+            "Excellent condition"
           ]
         },
         "municipality_resolution": {
@@ -5144,100 +4418,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.426193,
-                "lng": -5.145435,
-                "place_name": "Estepona, provincia de Málaga, España",
-                "relevance": 0.548148
-              },
-              "parcels_returned": 17,
-              "closest_address": "PZ FLORES DE LAS 1 ESTEPONA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
-        "landmarks_resolved": [
-          {
-            "name": "Estepona",
-            "lat": 36.426193,
-            "lng": -5.145435,
-            "place_name": "Estepona, provincia de Málaga, España",
-            "claimed_distance_m": 10,
-            "claimed_direction": null
-          }
-        ],
-        "candidates_considered": [
-          {
-            "lat": 36.426193,
-            "lng": -5.145435,
-            "source": "single_landmark",
-            "score": 75,
-            "inputs": [
-              "Estepona"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.426193,
-            "lng": -5.145435
-          },
-          "parcels_returned": 17,
-          "closest_parcel": {
-            "refcat": "7735607UF0373N",
-            "distance": 2.69,
-            "address": "PZ FLORES DE LAS 1 ESTEPONA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "7735607UF0373N",
-            "distance": 2.69,
-            "address": "PZ FLORES DE LAS 1 29680 ESTEPONA (MÁLAGA)",
-            "m2": 122,
-            "year": 1955,
-            "useType": "Residencial",
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": "Residencial",
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": 122,
-                "listing": 539,
-                "pctDiff": 0.7736549165120594,
-                "pts": 0
-              },
-              "year": {
-                "parcel": 1955,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "el presidente",
-              "puerto banus",
-              "marbella",
-              "estepona"
-            ],
-            "matched": [
-              "estepona"
-            ],
-            "result": "match"
-          }
-        },
-        "final_confidence_score": 90,
-        "final_decision_reason": "candidate=single_landmark base=75 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-match +15 · capped to medium by tier_floor",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "Puerto Banús",
-          "Marbella"
-        ]
+        "landmarks_resolved": [],
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 2104,
@@ -5247,7 +4448,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 318,
+        "output_tokens": 330,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5300,14 +4501,15 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
+            "Commercial local in town commercial area",
             "New construction",
-            "Commercial area location",
+            "85 m² built, 4.5 m high",
             "Close to sea",
             "Close to schools",
             "Near transport",
-            "85 m² built area",
-            "4.5 m ceiling height",
-            "Adjacent to shops and restaurants"
+            "Adjacent to shops and restaurants",
+            "Electricity and drinkable water utilities available",
+            "Investment/rental property (600€/month rent, 2 months deposit)"
           ]
         },
         "municipality_resolution": {
@@ -5400,7 +4602,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 224,
+        "output_tokens": 256,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5462,9 +4664,9 @@
             "3000 m² urban plot",
             "Located between Mijas and Fuengirola",
             "Mediterranean natural surroundings",
-            "Development potential: 6 independent villas (500 m² plots) or 5 independent villas (600 m² plots)",
+            "Development potential: 6 independent villas (500 m² plots, 175-350 m² built) or 5 independent villas (600 m² plots, 210-420 m² built)",
             "Technical study confirms buildability",
-            "Country setting with excellent accessibility to coastal services"
+            "Peaceful setting with proximity to coastal services"
           ]
         },
         "municipality_resolution": {
@@ -5568,7 +4770,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 284,
+        "output_tokens": 302,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5591,12 +4793,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.59442,
-        "lng": -4.638297,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 21718,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -5630,7 +4832,8 @@
             "Communal gardens and pools",
             "Close to shops",
             "Tourist rental license",
-            "Fully renovated and furnished"
+            "Fully renovated",
+            "Fully furnished"
           ]
         },
         "municipality_resolution": {
@@ -5649,86 +4852,32 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
+              "source": "mapbox-city-centroid",
               "coord": {
-                "lat": 36.59442,
-                "lng": -4.638297,
-                "place_name": "Mijas, provincia de Málaga, España",
-                "relevance": 0.548148
+                "lat": 36.776543,
+                "lng": -4.726286,
+                "place_name": "Rivera, Pizarra, provincia de Málaga, España",
+                "relevance": 0.479592
               },
-              "parcels_returned": 9,
-              "closest_address": "PZ CONSTITUCION DE LA 6 LA ALCAZABA DE MIJAS MIJAS (MÁLAGA)",
-              "matched": true
+              "parcels_returned": 1,
+              "closest_address": "DS DISEMINADO  Polígono 4 Parcela 40 VEGA RIBERA. PIZARRA (MÁLAGA)",
+              "matched": false
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.59442,
-            "lng": -4.638297,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.59442,
-            "lng": -4.638297
-          },
-          "parcels_returned": 9,
-          "closest_parcel": {
-            "refcat": "3513104UF5531S",
-            "distance": 0,
-            "address": "PZ CONSTITUCION DE LA 6 LA ALCAZABA DE MIJAS MIJAS (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "3513104UF5531S",
-            "distance": 0,
-            "address": "PZ CONSTITUCION DE LA 6 LA ALCAZABA DE MIJAS MIJAS (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Apartamento",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 100,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "boheme chic",
-              "max beach"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [
-          "Max Beach"
-        ],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1860,
@@ -5738,7 +4887,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 235,
+        "output_tokens": 240,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5801,9 +4950,9 @@
             "Community office adjacent, open Thursday mornings only",
             "Access from lower level communal parking",
             "One toilet facility",
-            "Related property reference R4608412 same owner, same building",
+            "Related property R4608412 same owner, same building",
             "Suitable for logistics store, small shop, or business office",
-            "Located in area zoned for commercial use within Mijas La Nueva urbanization"
+            "Located in area zoned for commercial use"
           ]
         },
         "municipality_resolution": {
@@ -5907,7 +5056,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 315,
+        "output_tokens": 306,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5967,12 +5116,22 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Urbanization with 24-hour security surveillance",
-            "2500 meters to beach (walking distance stated)",
-            "Private pool in garden",
-            "Basement with parking for two cars",
-            "Mature trees in landscaping",
-            "Community fees €185/month"
+            "24-hour security/vigilance in urbanization",
+            "Private pool",
+            "Landscaped garden with mature trees",
+            "Basement with parking for 2 cars",
+            "Underfloor heating (calefacción por suelo radiante)",
+            "Water deposit tank",
+            "Automated irrigation system",
+            "Community fees €185/month",
+            "Alarm system",
+            "Laundry room",
+            "Pantry/despensa",
+            "Covered terrace",
+            "High ceilings",
+            "Fully fitted kitchen",
+            "Part furnished",
+            "Fair condition stated in metadata; description claims excellent state"
           ]
         },
         "municipality_resolution": {
@@ -6073,7 +5232,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 251,
+        "output_tokens": 343,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -6096,12 +5255,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.59442,
-        "lng": -4.638297,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 21718,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -6124,7 +5283,7 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Close to golf courses (distance not specified)",
-            "Excellent transport links",
+            "Excellent transport links mentioned",
             "Community with maintained gardens",
             "Private garden 139 m²",
             "Barbecue area in outdoor space"
@@ -6146,83 +5305,32 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
+              "source": "mapbox-city-centroid",
               "coord": {
-                "lat": 36.59442,
-                "lng": -4.638297,
-                "place_name": "Mijas, provincia de Málaga, España",
-                "relevance": 0.548148
+                "lat": 36.776543,
+                "lng": -4.726286,
+                "place_name": "Rivera, Pizarra, provincia de Málaga, España",
+                "relevance": 0.479592
               },
-              "parcels_returned": 9,
-              "closest_address": "PZ CONSTITUCION DE LA 6 LA ALCAZABA DE MIJAS MIJAS (MÁLAGA)",
-              "matched": true
+              "parcels_returned": 1,
+              "closest_address": "DS DISEMINADO  Polígono 4 Parcela 40 VEGA RIBERA. PIZARRA (MÁLAGA)",
+              "matched": false
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.59442,
-            "lng": -4.638297,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.59442,
-            "lng": -4.638297
-          },
-          "parcels_returned": 9,
-          "closest_parcel": {
-            "refcat": "3513104UF5531S",
-            "distance": 0,
-            "address": "PZ CONSTITUCION DE LA 6 LA ALCAZABA DE MIJAS MIJAS (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "3513104UF5531S",
-            "distance": 0,
-            "address": "PZ CONSTITUCION DE LA 6 LA ALCAZABA DE MIJAS MIJAS (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 154,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "riviera del sol"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 1794,
@@ -6232,7 +5340,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 206,
+        "output_tokens": 207,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -6747,9 +5855,9 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": "South-facing terrace",
+            "orientation": "South-facing terrace on upper level",
             "views": null,
-            "elevation": null
+            "elevation": "Three-level property with lower level opening to garden"
           },
           "adjacent_landmarks": [],
           "developer_or_project": null,
@@ -6757,14 +5865,14 @@
           "year_built_extracted_confidence": "renovated",
           "other_signals": [
             "Lower Calahonda location",
-            "Small community of 4 villas",
-            "Last house in community",
             "Shops and restaurants 15-minute walk away",
             "Beach approximately 20 minutes on foot or 2-minute drive",
-            "Private detached villa",
+            "Small community of 4 villas",
+            "Last house in community",
             "Communal garden and swimming pool",
             "Recently renovated and refurbished",
-            "Valid and transferable tourist license"
+            "Valid and transferable tourist license",
+            "Private detached villa with maximum privacy"
           ]
         },
         "municipality_resolution": {
@@ -6895,7 +6003,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 379,
+        "output_tokens": 396,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -6957,7 +6065,7 @@
             "private plunge pool on terrace (2x2 m)",
             "fully furnished and move-in ready",
             "communal facilities: large pool, children's pool, gym, Turkish bath, sauna",
-            "easy access to beach, city, and golf courses mentioned but no specific courses named"
+            "easy access to beach, city, and golf courses mentioned"
           ]
         },
         "municipality_resolution": {
@@ -7059,7 +6167,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 285,
+        "output_tokens": 280,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7082,12 +6190,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.54078,
-        "lng": -4.623052,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 27426,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -7115,7 +6223,7 @@
             "Private terrace on first floor",
             "Rooftop terrace with laundry area",
             "Original condition (estado original)",
-            "Generic proximity mentions: schools, parks, supermarkets, medical centre, train station (no specific named landmarks provided)"
+            "Proximity to schools, parks, supermarkets, medical centre, and train station mentioned but no specific names or distances given"
           ]
         },
         "municipality_resolution": {
@@ -7134,81 +6242,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.54078,
-                "lng": -4.623052,
-                "place_name": "Fuengirola, provincia de Málaga, España",
-                "relevance": 1
-              },
-              "parcels_returned": 6,
-              "closest_address": "AV CONDE SAN ISIDRO 1 ED OVIEDO FUENGIROLA (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.54078,
-            "lng": -4.623052,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.54078,
-            "lng": -4.623052
-          },
-          "parcels_returned": 6,
-          "closest_parcel": {
-            "refcat": "4853302UF5445S",
-            "distance": 7.29,
-            "address": "AV CONDE SAN ISIDRO 1 ED OVIEDO FUENGIROLA (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "4853302UF5445S",
-            "distance": 7.29,
-            "address": "AV CONDE SAN ISIDRO 1 ED OVIEDO FUENGIROLA (MÁLAGA)",
-            "m2": null,
-            "year": null,
-            "useType": null,
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": null,
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": null,
-                "listing": 160,
-                "pts": 0,
-                "reason": "missing"
-              },
-              "year": {
-                "parcel": null,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [],
-            "matched": [],
-            "result": "no-tokens"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback)",
-        "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 2051,
@@ -7218,7 +6272,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 252,
+        "output_tokens": 254,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7241,20 +6295,16 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.44514,
-        "lng": -5.273296,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 79961,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
-        "cadastre_seed": {
-          "year": 1999,
-          "refcat": "6359904TF9365N",
-          "source": "cadastre"
-        }
+        "cadastre_seed": null
       },
       "reasoning_trace": {
         "signals_extracted": {
@@ -7308,88 +6358,27 @@
             },
             {
               "strike": 2,
-              "source": "mapbox-city-in-muni",
-              "coord": {
-                "lat": 36.44514,
-                "lng": -5.273296,
-                "place_name": "Casares, provincia de Málaga, España",
-                "relevance": 0.592593
-              },
-              "parcels_returned": 37,
-              "closest_address": "CL CARRERA 29(D) CASARES (MÁLAGA)",
-              "matched": true
+              "source": "mapbox-city-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
+            },
+            {
+              "strike": 3,
+              "source": "mapbox-city-area-centroid",
+              "coord": null,
+              "parcels_returned": 0,
+              "matched": false,
+              "reason": "no-coord"
             }
           ]
         },
         "landmarks_resolved": [],
-        "candidates_considered": [
-          {
-            "lat": 36.44514,
-            "lng": -5.273296,
-            "source": "anchor_preserved",
-            "score": 40,
-            "inputs": [
-              "anchor"
-            ]
-          }
-        ],
-        "cadastre_check": {
-          "coords_queried": {
-            "lat": 36.44514,
-            "lng": -5.273296
-          },
-          "parcels_returned": 37,
-          "closest_parcel": {
-            "refcat": "6358401TF9365N",
-            "distance": 4.51,
-            "address": "CL CARRERA 29(D) CASARES (MÁLAGA)"
-          },
-          "best_match": {
-            "refcat": "6359904TF9365N",
-            "distance": 4.53,
-            "address": "CL CARRERA 47 29690 CASARES (MÁLAGA)",
-            "m2": 340,
-            "year": 1999,
-            "useType": "Residencial",
-            "score": 15,
-            "breakdown": {
-              "useType": {
-                "parcel": "Residencial",
-                "listing": "Villa",
-                "ok": true
-              },
-              "m2": {
-                "parcel": 340,
-                "listing": 201,
-                "pctDiff": 0.4088235294117647,
-                "pts": 0
-              },
-              "year": {
-                "parcel": 1999,
-                "listing": null,
-                "pts": 0,
-                "reason": "missing"
-              }
-            }
-          },
-          "candidates_inspected": 3,
-          "address_check": {
-            "tokens": [
-              "dona julia",
-              "golf course",
-              "beach"
-            ],
-            "matched": [],
-            "result": "no-match"
-          }
-        },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
-        "landmarks_rejected_generic": [
-          "Golf course",
-          "Beach"
-        ],
-        "landmarks_rejected_far": []
+        "candidates_considered": [],
+        "cadastre_check": null,
+        "final_confidence_score": 0,
+        "final_decision_reason": "all 3 strikes failed to land in expected municipality"
       },
       "usage": {
         "input_tokens": 2603,
@@ -7687,15 +6676,12 @@
           "other_signals": [
             "Exclusive gated community with 3 swimming pools",
             "24-hour security and controlled access",
-            "Close to beach (distance not specified)",
-            "Close to golf courses (distance not specified)",
-            "Close to schools (distance not specified)",
-            "Recently renovated/refurbished",
+            "Fully renovated/recently refurbished",
+            "Private parking space and storage room",
+            "Lift access",
             "Home automation system",
             "Double glazing",
-            "Private parking space included",
-            "Storage room included",
-            "Lift access to property"
+            "Located in La Cala de Mijas, one of the most sought-after areas of Costa del Sol"
           ]
         },
         "municipality_resolution": {
@@ -7785,7 +6771,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 253,
+        "output_tokens": 241,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7856,14 +6842,18 @@
           "year_built_extracted_confidence": "explicit",
           "other_signals": [
             "New construction (newly built)",
-            "Supermarket, pharmacy, restaurants within 3 km",
-            "Private parking at side of house",
-            "Rooftop terrace with panoramic views",
             "Private pool",
-            "Open-plan kitchen and dining area",
-            "Three bedrooms, three bathrooms",
-            "TV room on lower floor",
-            "Balcony on upper level"
+            "Rooftop terrace",
+            "Private parking",
+            "Supermarket, pharmacy, restaurants within 3 km",
+            "Fully furnished",
+            "Guest apartment",
+            "Basement",
+            "Elevator/lift",
+            "Air conditioning",
+            "Covered terrace",
+            "Ensuite bathrooms",
+            "Barbecue"
           ]
         },
         "municipality_resolution": {
@@ -7978,7 +6968,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 355,
+        "output_tokens": 363,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8051,11 +7041,10 @@
             "Recently renovated apartment",
             "Communal gardens and two swimming pools (one children's pool)",
             "Communal parking",
-            "Lift access",
-            "Private terrace with south orientation",
-            "Walking distance to shops, restaurants, bars, local amenities, main bus route",
-            "Close to beach and pasarela coastal boardwalk",
-            "Mediterranean coastline access"
+            "Direct access to private terrace",
+            "Pasarela coastal boardwalk nearby",
+            "Main bus route accessible",
+            "Walking distance to shops, restaurants, bars, local amenities"
           ]
         },
         "municipality_resolution": {
@@ -8162,7 +7151,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 336,
+        "output_tokens": 323,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8208,7 +7197,7 @@
           "street_fragments": [],
           "directional_cues": {
             "orientation": "South",
-            "views": "Sea views from ground floor and upper terrace; mountain views",
+            "views": "Sea views from ground floor and upper terrace; mountain views; country views",
             "elevation": null
           },
           "adjacent_landmarks": [
@@ -8221,10 +7210,11 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Western Estepona location",
-            "Quiet residential street with private villas",
-            "Walking distance to beach and seafront",
+            "Quiet residential street",
+            "Surrounded by private villas",
             "Private garden with mature vegetation and fruit trees",
-            "Private pool and BBQ area",
+            "Large private swimming pool",
+            "BBQ area",
             "Renovation potential noted"
           ]
         },
@@ -8342,7 +7332,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 241,
+        "output_tokens": 244,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8399,10 +7389,10 @@
             "Located in Calahonda, Mijas Costa",
             "Close to golf (generic reference, no named course)",
             "Close to shops (generic reference)",
-            "Close to sea/beach (generic reference, no named beach)",
+            "Close to sea/beach (generic reference)",
             "Close to town",
-            "Close to schools (generic reference)",
-            "Close to children's playground (generic reference)",
+            "Close to schools",
+            "Close to children's playground",
             "Close to transport",
             "Private swimming pool",
             "Private garage (2 parking spaces)",
@@ -8412,7 +7402,7 @@
             "Excellent condition",
             "Fully furnished and equipped",
             "Guest apartment/separate apartment",
-            "Basement, solarium, office room",
+            "Basement, solarium, study room, office room",
             "Pets allowed"
           ]
         },
@@ -8503,7 +7493,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 338,
+        "output_tokens": 331,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8749,11 +7739,13 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Located in town of Estación de Cártama",
+            "Located in Estación de Cártama town",
             "Excellent road and rail connections to central Málaga",
+            "Close to shops",
+            "Close to schools",
+            "Near transport",
             "Quiet location",
-            "4-storey property",
-            "900 m² plot with room for pool"
+            "4-storey property"
           ]
         },
         "municipality_resolution": {
@@ -8843,7 +7835,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 193,
+        "output_tokens": 199,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }

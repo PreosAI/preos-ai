@@ -1,14 +1,14 @@
 {
-  "run_at": "2026-05-03T22:24:18.537Z",
-  "elapsed_sec": 439,
+  "run_at": "2026-05-03T22:15:34.458Z",
+  "elapsed_sec": 445,
   "total_properties": 50,
   "total_input_tokens": 93810,
-  "total_output_tokens": 14538,
+  "total_output_tokens": 14394,
   "total_cache_read_tokens": 0,
-  "total_cost_usd_estimate": 0.1665,
+  "total_cost_usd_estimate": 0.1658,
   "confidence_distribution": {
-    "low": 22,
-    "rejected": 4,
+    "rejected": 14,
+    "low": 12,
     "medium": 15,
     "exact": 3,
     "high": 6
@@ -32,12 +32,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -66,11 +66,10 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Beachfront property",
-            "Beachside location",
             "Steps from the sea",
             "Private pool with pool house (chiringuito)",
             "Large plot (1960 m²)",
-            "Marbesa area, Marbella"
+            "Landscaped garden"
           ]
         },
         "municipality_resolution": {
@@ -162,8 +161,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [
           "Carib Playa"
         ],
@@ -177,7 +176,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 245,
+        "output_tokens": 231,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -200,12 +199,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-municipality-centroid"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 46349,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -339,8 +338,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [],
         "landmarks_rejected_far": []
       },
@@ -395,7 +394,7 @@
           "directional_cues": {
             "orientation": "South",
             "views": "Panoramic sea views, sea views, beach views, mountain views",
-            "elevation": "Second-line beach (50 meters from beach)"
+            "elevation": "Second-line beach"
           },
           "adjacent_landmarks": [],
           "developer_or_project": null,
@@ -404,14 +403,15 @@
           "other_signals": [
             "Located in Marbesa, Marbella",
             "50 meters from the beach",
-            "Second-line beach villa",
             "Beachfront/front-line beach complex setting",
             "Close to beach restaurants",
             "Coastal community setting",
             "Private pool",
             "Parking for 3 cars",
+            "5 bedrooms, 5 bathrooms",
+            "296 m² built, 755 m² plot",
             "Ready to move in or renovation potential",
-            "Rental investment potential"
+            "Strong rental investment potential"
           ]
         },
         "municipality_resolution": {
@@ -514,7 +514,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 260,
+        "output_tokens": 275,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -565,7 +565,7 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Close to golf (no named course specified)",
-            "Close to schools (no named schools specified)",
+            "Close to schools (no named school specified)",
             "Close to forest (no named forest specified)",
             "Country setting",
             "Plot size: 1754 m²",
@@ -715,9 +715,11 @@
             "1913 m² plot size",
             "Building permission for 421 m² villa plus basement, garage, and pool",
             "Protected environment",
-            "Off Plan category",
-            "Utilities: Electricity, Drinkable Water, Telephone",
-            "Private garden with landscaping potential"
+            "Suburban, country, mountain pueblo setting",
+            "Close to golf, close to sea, close to town, close to schools, close to forest",
+            "Off plan / new construction",
+            "Private garden",
+            "Utilities: electricity, drinkable water, telephone"
           ]
         },
         "municipality_resolution": {
@@ -809,7 +811,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 239,
+        "output_tokens": 269,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -832,12 +834,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-municipality-centroid"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 46349,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -867,8 +869,8 @@
           "street_fragments": [],
           "directional_cues": {
             "orientation": "south-facing",
-            "views": "communal gardens, pool area",
-            "elevation": "duplex penthouse, split-level lounge/dining, top floor bedroom"
+            "views": "communal gardens and pool area",
+            "elevation": "duplex penthouse with split-level lounge"
           },
           "adjacent_landmarks": [
             "Cabopino",
@@ -881,14 +883,10 @@
           "other_signals": [
             "beachside location",
             "walking distance to beach",
-            "close to numerous golf courses",
+            "close to golf courses (unnamed)",
+            "close to shops, bars, public transport",
             "underground garage parking",
-            "lift/elevator access",
-            "newly fitted kitchen",
-            "air conditioning throughout",
-            "electric window shutters",
-            "double glazing",
-            "fully furnished"
+            "communal pool area"
           ]
         },
         "municipality_resolution": {
@@ -997,8 +995,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [
           "Carib Playa"
         ],
@@ -1018,7 +1016,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 374,
+        "output_tokens": 346,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1077,7 +1075,7 @@
             "Protected National Park adjacent (no future construction permitted)",
             "Approved swimming pool project for the urbanization scheduled for current year",
             "Premium residential environment",
-            "Low community fees noted"
+            "Low community fees"
           ]
         },
         "municipality_resolution": {
@@ -1169,7 +1167,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 224,
+        "output_tokens": 223,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1230,8 +1228,8 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Close to golf",
-            "Nine hole golf course at El Soto de Marbella",
-            "Communal facilities: gym, sauna, spa, tennis, padel tennis, boules courts, restaurant, bar",
+            "Nine hole golf course on-site at El Soto de Marbella",
+            "Communal facilities: gym, sauna, spa, tennis courts, padel tennis courts, boules courts, restaurant, bar",
             "Recently renovated bathroom",
             "Three terraces",
             "Underground parking with storeroom",
@@ -1339,7 +1337,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 293,
+        "output_tokens": 298,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1390,7 +1388,7 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Located in Marbesa, beachside community",
-            "Short stroll from the beach (distance not specified)",
+            "Short stroll from beach (distance not specified)",
             "Close to all amenities (non-specific)",
             "Two-level villa construction",
             "Private well with 12,000 liter water deposit",
@@ -1498,7 +1496,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 230,
+        "output_tokens": 229,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1543,20 +1541,17 @@
             "views": null,
             "elevation": null
           },
-          "adjacent_landmarks": [
-            "A7 motorway"
-          ],
+          "adjacent_landmarks": [],
           "developer_or_project": null,
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Large commercial plot (93,770 sqm) zoned for private parks and gardens",
-            "117 linear meters of frontage on A7 motorway",
-            "Current office building: 5 offices, 2 meeting rooms, reception, 1 bathroom",
-            "Marble flooring and air conditioning",
-            "Allowed uses: sports (outdoor), cultural, religious, hospitality, parking",
-            "Maximum occupancy 20% of total surface (1,944 sqm) except hospitality",
-            "Located in Las Chapas, Costa del Sol"
+            "A7 motorway frontage: 117 linear meters",
+            "Zoning: Private Parks and Gardens",
+            "Compatible uses: sports, cultural, religious, hospitality, parking",
+            "Maximum occupancy: 20% of total surface (1,944 sqm) except hospitality",
+            "Building contains: 5 offices, 2 meeting rooms, reception with waiting room, 1 bathroom",
+            "Features: marble floors, air conditioning"
           ]
         },
         "municipality_resolution": {
@@ -1662,9 +1657,7 @@
         "final_confidence_score": 40,
         "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=low (from strike fallback)",
         "landmarks_rejected_generic": [],
-        "landmarks_rejected_far": [
-          "A7 motorway"
-        ]
+        "landmarks_rejected_far": []
       },
       "usage": {
         "input_tokens": 1490,
@@ -1674,7 +1667,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 287,
+        "output_tokens": 251,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -1697,12 +1690,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -1842,8 +1835,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [
           "The Golden Mile beaches"
         ],
@@ -1883,12 +1876,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -2013,8 +2006,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [],
         "landmarks_rejected_far": [
           "Puerto Banús",
@@ -2082,11 +2075,10 @@
             "Located on The Golden Mile, Marbella",
             "Gated complex with 24-hour security",
             "Communal pool and garden",
-            "Andalucian style architecture",
-            "Mediterranean design",
-            "Tropical gardens",
-            "Polo areas nearby",
-            "Close to port, shops, sea, town, schools"
+            "Tropical gardens mentioned",
+            "Polo areas nearby (mentioned in description)",
+            "Fully furnished, fully fitted kitchen",
+            "Holiday home / investment property category"
           ]
         },
         "municipality_resolution": {
@@ -2189,7 +2181,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 224,
+        "output_tokens": 219,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2244,7 +2236,7 @@
           ],
           "directional_cues": {
             "orientation": "south-west",
-            "views": "panoramic views over the Old Town",
+            "views": "panoramic views over the Old Town (Casco Antiguo)",
             "elevation": null
           },
           "adjacent_landmarks": [
@@ -2254,10 +2246,10 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Located in historic building",
-            "500 m from beach",
-            "Surrounded by traditional restaurants and boutique shops",
-            "Town center location with high rental potential"
+            "Located in historic building with charm",
+            "500 m from the beach",
+            "Heart of Old Town (Casco Antiguo)",
+            "Surrounded by traditional restaurants and boutique shops"
           ]
         },
         "municipality_resolution": {
@@ -2378,7 +2370,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 293,
+        "output_tokens": 307,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2596,12 +2588,11 @@
             "Close to sea",
             "Fireplace in living-dining area",
             "Two private terraces totaling 40 m²",
-            "Covered terrace",
-            "Lift/elevator in building",
             "Air conditioning",
+            "Lift/elevator in building",
             "Fully fitted kitchen",
-            "Good condition",
-            "Near transport"
+            "Covered terrace",
+            "Good condition"
           ]
         },
         "municipality_resolution": {
@@ -2725,7 +2716,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 365,
+        "output_tokens": 359,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2786,9 +2777,10 @@
             "Tree-lined street location",
             "Walking distance to Puerto Banús",
             "Walking distance to Nueva Andalucía restaurants",
-            "Private garden with full sun exposure",
-            "Mediterranean lifestyle setting",
-            "Quiet, well-connected area"
+            "Private garden with fruit trees",
+            "Three-level villa structure",
+            "Andalusian architectural style",
+            "Mediterranean lifestyle setting"
           ]
         },
         "municipality_resolution": {
@@ -2892,7 +2884,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 258,
+        "output_tokens": 265,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -2915,12 +2907,12 @@
         "confidence": "high"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -2946,12 +2938,11 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Paired villa (pareada)",
-            "Gated complex with security",
+            "Gated complex security",
             "Communal pool and garden",
             "Private garage",
             "Walking distance to amenities",
-            "Close proximity to fine dining and luxury boutiques",
-            "Top floor with sea views"
+            "Close to golf, shops, sea, and town center"
           ]
         },
         "municipality_resolution": {
@@ -3043,8 +3034,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [],
         "landmarks_rejected_far": [
           "The Golden Mile",
@@ -3059,7 +3050,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 232,
+        "output_tokens": 224,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3112,7 +3103,7 @@
           "directional_cues": {
             "orientation": "South, East-to-West",
             "views": "Panoramic sea views, mountain of Marbella to Gibraltar, African coast",
-            "elevation": "Corner penthouse, single-level, high-rise position"
+            "elevation": "Corner penthouse, single-level, elevated position"
           },
           "adjacent_landmarks": [],
           "developer_or_project": null,
@@ -3121,19 +3112,15 @@
           "other_signals": [
             "800 metres walk to beach and promenade",
             "Commercial area location",
-            "International schools nearby",
-            "Tennis and padel clubs nearby",
-            "Marina nearby",
-            "Port nearby",
-            "Gated complex with entry phone",
+            "Walking distance to international schools",
+            "Walking distance to tennis and padel clubs",
+            "Walking distance to restaurants, bars, supermarkets, pharmacies",
+            "Near marina",
+            "Near port",
+            "Near mosque",
+            "Gated complex with entry phone security",
             "Underground private garage",
-            "Fiber optic available",
-            "Corner position with 360° wrap-around terrace",
-            "Open-plan kitchen/living area",
-            "Fully fitted kitchen",
-            "Ensuite bathrooms",
-            "Fireplace",
-            "Hot and cold air conditioning"
+            "Fiber optic available"
           ]
         },
         "municipality_resolution": {
@@ -3234,7 +3221,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 345,
+        "output_tokens": 312,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3257,12 +3244,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.50932,
-        "lng": -4.886694,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 48397,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -3290,7 +3277,9 @@
             "views": "marina views, sea views, Mediterranean Sea views, port views",
             "elevation": null
           },
-          "adjacent_landmarks": [],
+          "adjacent_landmarks": [
+            "Puerto Banús marina"
+          ],
           "developer_or_project": null,
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
@@ -3299,9 +3288,7 @@
             "marina setting",
             "fully renovated",
             "tourist license in place",
-            "private terrace with lounge furniture and eco-friendly fireplace",
-            "underfloor heating throughout",
-            "high-end Italian finishes"
+            "high-end rental investment potential"
           ]
         },
         "municipality_resolution": {
@@ -3394,13 +3381,14 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [
           "Mediterranean Sea"
         ],
         "landmarks_rejected_far": [
-          "Puerto Banús"
+          "Puerto Banús",
+          "Puerto Banús marina"
         ]
       },
       "usage": {
@@ -3411,7 +3399,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 272,
+        "output_tokens": 258,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3465,15 +3453,17 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Costalita area mentioned",
+            "Costalita area",
             "New Golden Mile location",
             "Beachfront/beachside position",
-            "Close to golf (unspecified)",
-            "Close to schools (unspecified)",
+            "Close to golf",
+            "Close to schools",
             "Gated urbanisation",
-            "Few minutes walk from beach promenade",
-            "Rooftop terrace on upper level",
-            "Recently renovated kitchen"
+            "Mature landscaped gardens",
+            "Recently renovated kitchen",
+            "Rooftop terrace",
+            "Underground parking",
+            "Private storage room"
           ]
         },
         "municipality_resolution": {
@@ -3576,7 +3566,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 242,
+        "output_tokens": 241,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3640,7 +3630,7 @@
             "close to Estepona's beaches",
             "close to golf courses",
             "close to waterfront restaurants",
-            "new construction / move-in ready",
+            "new construction condition",
             "community pool and gym",
             "underground parking"
           ]
@@ -3744,7 +3734,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 244,
+        "output_tokens": 240,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -3807,24 +3797,25 @@
           "adjacent_landmarks": [
             "historic center of Estepona",
             "marina",
-            "promenade",
-            "old town"
+            "paseo marítimo",
+            "casco antiguo"
           ],
           "developer_or_project": null,
           "year_built_extracted": 2020,
           "year_built_extracted_confidence": "explicit",
           "other_signals": [
-            "elevated ground-floor position",
-            "private garden",
+            "elevated ground-floor position provides privacy and security",
+            "private garden in urban setting",
+            "short walk to historic center",
+            "short walk to marina",
+            "short walk to beaches",
             "communal pool",
             "gym",
             "coworking space",
-            "short-term rental permitted",
             "two underground parking spaces",
             "two storage rooms",
-            "underfloor heating in bathrooms",
-            "individual climate control per room",
-            "Siemens kitchen appliances"
+            "short-term rental permitted",
+            "contemporary architectural standards"
           ]
         },
         "municipality_resolution": {
@@ -3869,7 +3860,7 @@
             "claimed_direction": null
           },
           {
-            "name": "promenade",
+            "name": "paseo marítimo",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -3877,7 +3868,7 @@
             "claimed_direction": null
           },
           {
-            "name": "old town",
+            "name": "casco antiguo",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -3895,8 +3886,8 @@
               "Playa del Cristo",
               "historic center of Estepona",
               "marina",
-              "promenade",
-              "old town"
+              "paseo marítimo",
+              "casco antiguo"
             ]
           }
         ],
@@ -3967,7 +3958,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 348,
+        "output_tokens": 360,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4029,7 +4020,7 @@
               "direction": null
             },
             {
-              "name": "Mediterranean Highway A-7/AP-7",
+              "name": "Mediterranean Highway (A-7/AP-7)",
               "distance": null,
               "direction": null
             }
@@ -4051,11 +4042,11 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "semi-detached villa in prestigious area",
-            "surrounded by modern residential complexes and golf courses",
-            "immediate access to golf greens",
-            "private pool",
-            "excellent condition"
+            "Located in prestigious area surrounded by modern residential complexes",
+            "Immediate access to golf greens",
+            "Private pool",
+            "5 bedrooms, 5 bathrooms",
+            "Semi-detached villa (villa adosada)"
           ]
         },
         "municipality_resolution": {
@@ -4092,7 +4083,7 @@
             "claimed_direction": null
           },
           {
-            "name": "Mediterranean Highway A-7/AP-7",
+            "name": "Mediterranean Highway (A-7/AP-7)",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -4109,7 +4100,7 @@
             "inputs": [
               "Valle Romano Golf Academy",
               "Gibraltar Airport",
-              "Mediterranean Highway A-7/AP-7"
+              "Mediterranean Highway (A-7/AP-7)"
             ]
           }
         ],
@@ -4185,7 +4176,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 381,
+        "output_tokens": 394,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4236,8 +4227,8 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": null,
-            "views": "4th floor, open panoramic views of marina and Mediterranean Sea, direct views of port and sea",
+            "orientation": "4th floor",
+            "views": "open panoramic views of marina and Mediterranean Sea, direct views of port and sea",
             "elevation": "4th floor"
           },
           "adjacent_landmarks": [],
@@ -4248,12 +4239,10 @@
             "Beachfront location at marina",
             "Walking distance to restaurants, cafés, shops, and beach",
             "Two communal outdoor swimming pools",
-            "Building has two elevators",
+            "Building with two elevators",
             "Private parking in interior courtyard with remote access",
             "Complete renovation scheduled for completion 20 March 2026",
-            "High-quality materials and finishes throughout",
-            "Triple-glazed windows",
-            "Open-plan modern design"
+            "High rental potential area for holiday and long-term lets"
           ]
         },
         "municipality_resolution": {
@@ -4354,7 +4343,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 298,
+        "output_tokens": 282,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -4881,10 +4870,11 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Located in Estepona's historic centre (centro histórico)",
-            "Described as 'Jardín de la Costa del Sol' (Garden of the Costa del Sol)",
+            "Located in Estepona's historic centre",
+            "Beachfront/beachside setting",
+            "Close to port and marina",
+            "No lift in building",
             "Second-hand property in good condition",
-            "Building without lift (sin ascensor)",
             "Attic converted to home office",
             "Inner patio for light and privacy"
           ]
@@ -4931,7 +4921,7 @@
             "claimed_direction": null
           },
           {
-            "name": "Paseo Marítimo",
+            "name": "paseo marítimo",
             "lat": 36.426193,
             "lng": -5.145435,
             "place_name": "Estepona, provincia de Málaga, España",
@@ -4973,7 +4963,7 @@
               "Playa de la Rada",
               "Museo de Arte Provincial (MAD)",
               "Orquidario",
-              "Paseo Marítimo",
+              "paseo marítimo",
               "historic old town (casco antiguo)",
               "cobbled streets",
               "traditional tapas bars"
@@ -5051,7 +5041,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 466,
+        "output_tokens": 456,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5112,20 +5102,23 @@
           "building_name": null,
           "street_fragments": [],
           "directional_cues": {
-            "orientation": "south-facing",
-            "views": "open views, mountain views, garden views, pool views",
+            "orientation": "South-facing",
+            "views": "Open views, mountain views, garden views, pool views",
             "elevation": null
           },
-          "adjacent_landmarks": [],
+          "adjacent_landmarks": [
+            "El Presidente residential complex"
+          ],
           "developer_or_project": null,
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "50 metres from beach",
-            "New Golden Mile location",
-            "beachfront property",
-            "newly built seaside promenade nearby",
-            "El Presidente community amenities: five swimming pools (one heated year-round), tennis courts, paddle courts"
+            "Beachfront location, 50 metres from beach",
+            "Newly built seaside promenade adjacent",
+            "New Golden Mile area",
+            "Urbanization amenities: five swimming pools (one heated year-round), tennis courts, paddle courts",
+            "Traditional architectural style",
+            "Excellent condition"
           ]
         },
         "municipality_resolution": {
@@ -5236,7 +5229,8 @@
         "landmarks_rejected_generic": [],
         "landmarks_rejected_far": [
           "Puerto Banús",
-          "Marbella"
+          "Marbella",
+          "El Presidente residential complex"
         ]
       },
       "usage": {
@@ -5247,7 +5241,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 318,
+        "output_tokens": 343,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5591,12 +5585,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.59442,
-        "lng": -4.638297,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 21718,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -5630,7 +5624,8 @@
             "Communal gardens and pools",
             "Close to shops",
             "Tourist rental license",
-            "Fully renovated and furnished"
+            "Fully renovated",
+            "Fully furnished"
           ]
         },
         "municipality_resolution": {
@@ -5723,8 +5718,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [
           "Max Beach"
         ],
@@ -5738,7 +5733,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 235,
+        "output_tokens": 240,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5801,9 +5796,9 @@
             "Community office adjacent, open Thursday mornings only",
             "Access from lower level communal parking",
             "One toilet facility",
-            "Related property reference R4608412 same owner, same building",
+            "Related property R4608412 same owner, same building",
             "Suitable for logistics store, small shop, or business office",
-            "Located in area zoned for commercial use within Mijas La Nueva urbanization"
+            "Located in area zoned commercial within Mijas La Nueva urbanization"
           ]
         },
         "municipality_resolution": {
@@ -5907,7 +5902,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 315,
+        "output_tokens": 312,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -5967,12 +5962,14 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Urbanization with 24-hour security surveillance",
-            "2500 meters to beach (walking distance stated)",
-            "Private pool in garden",
+            "24-hour security/vigilance in urbanization",
+            "Private pool",
+            "Landscaped garden with mature trees",
             "Basement with parking for two cars",
-            "Mature trees in landscaping",
-            "Community fees €185/month"
+            "Water deposit tank",
+            "Automated irrigation system",
+            "Community fees €185/month",
+            "Andalusian architectural style"
           ]
         },
         "municipality_resolution": {
@@ -6073,7 +6070,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 251,
+        "output_tokens": 262,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -6096,12 +6093,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.59442,
-        "lng": -4.638297,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 21718,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -6124,7 +6121,7 @@
           "year_built_extracted_confidence": null,
           "other_signals": [
             "Close to golf courses (distance not specified)",
-            "Excellent transport links",
+            "Excellent transport links mentioned",
             "Community with maintained gardens",
             "Private garden 139 m²",
             "Barbecue area in outdoor space"
@@ -6219,8 +6216,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [],
         "landmarks_rejected_far": []
       },
@@ -6232,7 +6229,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 206,
+        "output_tokens": 207,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -6584,13 +6581,9 @@
             "Short walk from the beach",
             "Close to shops, bars, and supermarkets",
             "Close to golf",
-            "Townhouse (casa adosada) with 4 bedrooms, 2 bathrooms, 1 toilet",
-            "170 m² built, 60 m² terrace",
-            "Double garage",
-            "Ground floor terrace, first floor terrace, private roof terrace (azotea)",
+            "Townhouse with double garage",
+            "Multiple terraces including private roof terrace",
             "Communal pool",
-            "Air conditioning (hot and cold)",
-            "Fitted wardrobes, utility room, ensuite bathroom",
             "Excellent condition"
           ]
         },
@@ -6681,7 +6674,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 308,
+        "output_tokens": 229,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -6957,7 +6950,7 @@
             "private plunge pool on terrace (2x2 m)",
             "fully furnished and move-in ready",
             "communal facilities: large pool, children's pool, gym, Turkish bath, sauna",
-            "easy access to beach, city, and golf courses mentioned but no specific courses named"
+            "easy access to beach, city, and golf courses mentioned"
           ]
         },
         "municipality_resolution": {
@@ -7059,7 +7052,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 285,
+        "output_tokens": 280,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7112,10 +7105,8 @@
             "Located in quiet and exclusive upper zone of Los Boliches",
             "Three-storey townhouse (adosado)",
             "Communal garden and communal swimming pool",
-            "Private terrace on first floor",
-            "Rooftop terrace with laundry area",
-            "Original condition (estado original)",
-            "Generic proximity mentions: schools, parks, supermarkets, medical centre, train station (no specific named landmarks provided)"
+            "Proximity to schools, parks, supermarkets, medical centre, and train station mentioned but not named",
+            "Original condition (estado original)"
           ]
         },
         "municipality_resolution": {
@@ -7218,7 +7209,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 252,
+        "output_tokens": 225,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7241,12 +7232,12 @@
         "confidence": "medium"
       },
       "new_coords": {
-        "lat": 36.44514,
-        "lng": -5.273296,
-        "confidence": "low",
-        "source": "mapbox_fallback · mapbox-city-in-muni"
+        "lat": null,
+        "lng": null,
+        "confidence": "rejected",
+        "source": "rejected"
       },
-      "moved_m": 79961,
+      "moved_m": null,
       "year": {
         "extracted": null,
         "extracted_confidence": null,
@@ -7383,8 +7374,8 @@
             "result": "no-match"
           }
         },
-        "final_confidence_score": 40,
-        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)",
+        "final_confidence_score": 20,
+        "final_decision_reason": "candidate=anchor_preserved base=40 · tier_floor=medium (from strike fallback) · cadastre-address-tokens-mismatch -20 · final score below 30, rejecting",
         "landmarks_rejected_generic": [
           "Golf course",
           "Beach"
@@ -7451,17 +7442,12 @@
               "direction": null
             },
             {
-              "name": "Cercanías Málaga C-2 line",
-              "distance": "20 minutes",
-              "direction": null
-            },
-            {
-              "name": "Coín",
+              "name": "Sunland International School",
               "distance": "30 minutes",
               "direction": null
             },
             {
-              "name": "Sunland International School",
+              "name": "Coín",
               "distance": "30 minutes",
               "direction": null
             },
@@ -7491,12 +7477,12 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "6,000m² plot with tiered flat areas and mixed terrain",
             "300-metre dirt track access in excellent condition",
-            "Private water supply via two 3,000-litre tanks; no mains water or well",
-            "Mains electricity connection",
-            "Suitable for equestrian use or small holding",
-            "Single-storey whitewashed finca"
+            "6,000m² plot with tiered flat areas and mixed terrain",
+            "Water supplied by tanker, stored in two 3,000-litre tanks",
+            "No mains water connection or private well",
+            "Mains electricity connected",
+            "Cercanías Málaga C-2 railway line accessible via Pizarra"
           ]
         },
         "municipality_resolution": {
@@ -7599,9 +7585,8 @@
               "las lomas",
               "casarabonela",
               "pizarra",
-              "cercanias malaga c 2 line",
-              "coin",
               "sunland international school",
+              "coin",
               "malaga city centre",
               "malaga airport"
             ],
@@ -7619,7 +7604,6 @@
         ],
         "landmarks_rejected_far": [
           "Pizarra",
-          "Cercanías Málaga C-2 line",
           "Málaga airport"
         ]
       },
@@ -7631,7 +7615,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 501,
+        "output_tokens": 465,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7687,15 +7671,16 @@
           "other_signals": [
             "Exclusive gated community with 3 swimming pools",
             "24-hour security and controlled access",
-            "Close to beach (distance not specified)",
-            "Close to golf courses (distance not specified)",
-            "Close to schools (distance not specified)",
+            "Proximity to beach (distance not specified)",
+            "Proximity to golf courses (distance not specified)",
+            "Proximity to schools (distance not specified)",
             "Recently renovated/refurbished",
-            "Home automation system",
-            "Double glazing",
             "Private parking space included",
             "Storage room included",
-            "Lift access to property"
+            "Lift/elevator access",
+            "Home automation system",
+            "Double glazing",
+            "Fully furnished"
           ]
         },
         "municipality_resolution": {
@@ -7785,7 +7770,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 253,
+        "output_tokens": 263,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -7856,14 +7841,18 @@
           "year_built_extracted_confidence": "explicit",
           "other_signals": [
             "New construction (newly built)",
-            "Supermarket, pharmacy, restaurants within 3 km",
-            "Private parking at side of house",
-            "Rooftop terrace with panoramic views",
             "Private pool",
-            "Open-plan kitchen and dining area",
-            "Three bedrooms, three bathrooms",
-            "TV room on lower floor",
-            "Balcony on upper level"
+            "Rooftop terrace",
+            "Private parking",
+            "Supermarket, pharmacy, restaurants within 3 km",
+            "Fully furnished",
+            "Guest apartment",
+            "Basement",
+            "Elevator/lift",
+            "Air conditioning",
+            "Covered terrace",
+            "Ensuite bathrooms",
+            "Barbecue"
           ]
         },
         "municipality_resolution": {
@@ -7978,7 +7967,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 355,
+        "output_tokens": 363,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8051,8 +8040,7 @@
             "Recently renovated apartment",
             "Communal gardens and two swimming pools (one children's pool)",
             "Communal parking",
-            "Lift access",
-            "Private terrace with south orientation",
+            "Direct access to private terrace",
             "Walking distance to shops, restaurants, bars, local amenities, main bus route",
             "Close to beach and pasarela coastal boardwalk",
             "Mediterranean coastline access"
@@ -8162,7 +8150,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 336,
+        "output_tokens": 329,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8399,10 +8387,10 @@
             "Located in Calahonda, Mijas Costa",
             "Close to golf (generic reference, no named course)",
             "Close to shops (generic reference)",
-            "Close to sea/beach (generic reference, no named beach)",
+            "Close to sea/beach (generic reference)",
             "Close to town",
-            "Close to schools (generic reference)",
-            "Close to children's playground (generic reference)",
+            "Close to schools",
+            "Close to children's playground",
             "Close to transport",
             "Private swimming pool",
             "Private garage (2 parking spaces)",
@@ -8410,9 +8398,15 @@
             "210 m² built, 140 m² terrace",
             "5 bedrooms, 4 bathrooms",
             "Excellent condition",
-            "Fully furnished and equipped",
+            "Fully furnished",
             "Guest apartment/separate apartment",
-            "Basement, solarium, office room",
+            "Basement",
+            "Solarium",
+            "Barbecue",
+            "Double glazing",
+            "Air conditioning and ceiling cooling system",
+            "Fireplace",
+            "Wi-Fi",
             "Pets allowed"
           ]
         },
@@ -8503,7 +8497,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 338,
+        "output_tokens": 366,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
@@ -8749,11 +8743,13 @@
           "year_built_extracted": null,
           "year_built_extracted_confidence": null,
           "other_signals": [
-            "Located in town of Estación de Cártama",
+            "Located in Estación de Cártama town",
             "Excellent road and rail connections to central Málaga",
+            "Close to shops",
+            "Close to schools",
+            "Near transport",
             "Quiet location",
-            "4-storey property",
-            "900 m² plot with room for pool"
+            "4-storey property"
           ]
         },
         "municipality_resolution": {
@@ -8843,7 +8839,7 @@
           "ephemeral_5m_input_tokens": 0,
           "ephemeral_1h_input_tokens": 0
         },
-        "output_tokens": 193,
+        "output_tokens": 199,
         "service_tier": "standard",
         "inference_geo": "not_available"
       }
