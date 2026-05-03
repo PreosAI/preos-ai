@@ -172,11 +172,19 @@ async function lookupParcelDetails(refcat) {
  *
  * Returns 0-100. The m² match dominates (60 pts) because it's the most
  * stable signal across cadastre vs agent listings; year is a softer signal
- * (25 pts, 5-year window); use-type compatibility is a hard gate (15 pts,
- * residential-vs-commercial mismatch zeroes the score).
+ * (25 pts) with confidence-aware tolerance; use-type compatibility is a
+ * hard gate (15 pts).
+ *
+ * Year-built handling (Phase A Option D):
+ *   listing.year_built may come from LLM extraction over the description.
+ *   Listings with explicit "built in YEAR" phrasing get the tight ±5 year
+ *   window. "Inferred" / "renovated" signals widen the tolerance to ±10 yrs
+ *   because the year cited may be a renovation year rather than the build.
+ *   No year provided → year component is 0 (cap stays at 75).
  *
  * @param {object} parcel  result of lookupParcelDetails
- * @param {object} listing { m2_built, year_built, type }
+ * @param {object} listing { m2_built, year_built, year_built_confidence?, type }
+ *                 year_built_confidence ∈ {'explicit','inferred','renovated', null}
  * @returns {{ score: number, breakdown: object }}
  */
 function scoreParcelMatch(parcel, listing) {
@@ -205,15 +213,17 @@ function scoreParcelMatch(parcel, listing) {
         breakdown.m2 = { parcel: parcel.m2, listing: listing.m2_built, pts: 0, reason: 'missing' };
     }
 
-    // Year built within 5 years — full 25 pts at exact, 0 at 5+ years off.
+    // Year built — tolerance widens for non-explicit confidence sources.
     if (parcel.year != null && listing.year_built != null && parcel.year > 0 && listing.year_built > 0) {
+        const conf = listing.year_built_confidence || 'explicit';
+        const tolerance = (conf === 'explicit') ? 5 : 10;
         const yearDiff = Math.abs(parcel.year - listing.year_built);
-        if (yearDiff <= 5) {
-            const yearPts = Math.round(25 * (1 - yearDiff / 5));
+        if (yearDiff <= tolerance) {
+            const yearPts = Math.round(25 * (1 - yearDiff / tolerance));
             score += yearPts;
-            breakdown.year = { parcel: parcel.year, listing: listing.year_built, diff: yearDiff, pts: yearPts };
+            breakdown.year = { parcel: parcel.year, listing: listing.year_built, confidence: conf, tolerance, diff: yearDiff, pts: yearPts };
         } else {
-            breakdown.year = { parcel: parcel.year, listing: listing.year_built, diff: yearDiff, pts: 0 };
+            breakdown.year = { parcel: parcel.year, listing: listing.year_built, confidence: conf, tolerance, diff: yearDiff, pts: 0 };
         }
     } else {
         breakdown.year = { parcel: parcel.year, listing: listing.year_built, pts: 0, reason: 'missing' };
