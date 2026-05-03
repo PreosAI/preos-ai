@@ -1,33 +1,32 @@
-// Location triangulation pipeline (Phase A, Checkpoint 2).
+// Location triangulation pipeline (Phase A, Checkpoint 2 — v3).
 //
 // Pipeline:
 //   1. LLM signal extraction (Claude Haiku 4.5) over the listing description
-//      and metadata. Returns landmarks, urbanization name, building name,
-//      directional cues, and (Option D) the year-built signal.
-//   2. Resolve named landmarks to coordinates via Mapbox geocoding, biased
-//      to the property's city and rejected if outside the Málaga bbox.
-//   3. Compute a candidate coordinate from the resolved landmarks. With ≥2
-//      landmarks we use the centroid; with 1 we use the landmark coord; with
-//      0 we fall back to the listing's existing Mapbox lat/lng.
-//   4. Cadastre cross-validation: lookupByCoords on the candidate, then
-//      cross-check the returned address against LLM-extracted urbanization /
-//      building / street fragments. Reward if the address contains those
-//      tokens; penalise if it points to a clearly different urbanization.
-//   5. Cadastre metadata match: matchParcelToListing → exact tier when
-//      m² + use-type (and optionally year) score ≥ 50.
-//   6. Assign final confidence tier per the rubric.
+//      and metadata.
+//   2. Three-strike municipality verification (the v3 fix). Find a coord
+//      that lands in the cadastre's expected municipality:
+//        Strike 1: cadastre at the existing Mapbox coord.
+//        Strike 2: cadastre at "{city}, Costa del Sol, Spain" centroid.
+//        Strike 3: cadastre at "{city}, {area}, Costa del Sol, Spain" centroid.
+//      Each strike has a tier_floor cap — strike 2 capped at 'medium', strike
+//      3 capped at 'low'. All three failed → 'rejected'. Cadastre metadata
+//      match score ≥ 50 still promotes to 'exact' regardless of strike.
+//   3. LLM landmark resolution with the verified anchor (5 km gate). The
+//      gate now operates against a known-correct municipality coord, so it
+//      filters bad Mapbox same-named-place misresolutions without locking
+//      us to a wrong starting position (the v2 failure mode).
+//   4. Compute candidate from validated landmarks (centroid for ≥2, else
+//      preserve the verified anchor).
+//   5. Final cadastre check at the candidate (re-using strike 1 parcels
+//      when the candidate equals the strike-1 anchor).
+//   6. Assign tier with tier_floor enforcement.
 //
-// Apartment buildings: we explicitly do NOT drill into <lcons> for unit-level
-// m²/year today. Multi-unit listings whose 14-char parcel exposes only
-// building-aggregate data will land in 'high' or 'medium' rather than 'exact'.
-// Tracked as a Phase B improvement.
-//
-// OSM polygon constraint from the spec is also deferred. Without polygons we
-// can't reject a candidate that's "outside the urbanization but in the same
-// city"; that's accepted as a Checkpoint 2 simplification.
+// Apartment buildings: still no <lcons> drill-down for unit-level m²/year.
+// OSM polygon constraint still deferred. Both tracked as Phase B work.
 
 const { lookupByCoords, matchParcelToListing } = require('./cadastre');
 const { callMessagesText, stripJsonFence } = require('./anthropic');
+const { getExpectedMunicipality, municipalityMatches } = require('./city-municipality-map');
 
 const MAPBOX_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
 const MALAGA_BBOX = { north: 37.30, south: 36.30, west: -5.55, east: -4.20 };
@@ -258,6 +257,122 @@ async function resolveLandmark(name, biasCity, mapboxToken, anchor) {
     return out;
 }
 
+// ── City centroid resolver (used by strike 2 and 3) ───────────
+
+const _cityCentroidCache = new Map();
+
+async function resolveCityCentroid(searchText, mapboxToken, types) {
+    if (!searchText) return null;
+    const cacheKey = searchText + '|' + (types || '');
+    if (_cityCentroidCache.has(cacheKey)) return _cityCentroidCache.get(cacheKey);
+
+    const url = MAPBOX_BASE + encodeURIComponent(searchText) + '.json?' + new URLSearchParams({
+        access_token: mapboxToken,
+        country: 'es',
+        language: 'es',
+        types: types || 'place,locality,neighborhood',
+        proximity: '-4.7,36.5',
+        bbox: [MALAGA_BBOX.west, MALAGA_BBOX.south, MALAGA_BBOX.east, MALAGA_BBOX.north].join(','),
+        limit: '1'
+    }).toString();
+
+    await mapboxThrottle();
+    let res;
+    try {
+        res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    } catch (e) {
+        _cityCentroidCache.set(searchText, null);
+        return null;
+    }
+    if (!res.ok) { _cityCentroidCache.set(cacheKey, null); return null; }
+    const data = await res.json();
+    if (!data.features || data.features.length === 0) {
+        _cityCentroidCache.set(cacheKey, null);
+        return null;
+    }
+    const f = data.features[0];
+    const [lng, lat] = f.center || [];
+    if (!inBbox(lat, lng)) { _cityCentroidCache.set(cacheKey, null); return null; }
+    const out = { lat, lng, place_name: f.place_name, relevance: f.relevance };
+    _cityCentroidCache.set(cacheKey, out);
+    return out;
+}
+
+// ── Three-strike municipality resolution ──────────────────────
+
+/**
+ * Walk strikes 1 → 3 to find a coord that lands in the listing's expected
+ * cadastre municipality. Returns:
+ *   {
+ *     anchor: { lat, lng } | null,
+ *     parcels: [...] from the cadastre call at anchor (so we don't re-call later),
+ *     strike: 1 | 2 | 3 | null,
+ *     tier_floor: null | 'medium' | 'low' | 'rejected',
+ *     trace: { expected_municipality, strikes: [...] }
+ *   }
+ *
+ * tier_floor caps the maximum tier the rest of the pipeline can assign,
+ * EXCEPT that a cadastre metadata match (score ≥ 50) at the chosen anchor
+ * still promotes to 'exact' regardless of which strike won.
+ */
+async function resolveValidMunicipalityAnchor(listing, mapboxToken) {
+    const expectedMuni = getExpectedMunicipality(listing.city);
+    const trace = { expected_municipality: expectedMuni, strikes: [] };
+
+    async function tryStrike(label, coord, source, tierFloor) {
+        if (!coord || !Number.isFinite(coord.lat) || !Number.isFinite(coord.lng) || !inBbox(coord.lat, coord.lng)) {
+            trace.strikes.push({ strike: label, source, coord: coord || null, parcels_returned: 0, matched: false, reason: 'no-coord' });
+            return null;
+        }
+        let parcels = [];
+        try { parcels = await lookupByCoords(coord.lat, coord.lng); } catch (e) {
+            trace.strikes.push({ strike: label, source, coord, parcels_returned: 0, matched: false, error: e.message });
+            return null;
+        }
+        const closestAddr = parcels[0] ? parcels[0].address : '';
+        const matched = municipalityMatches(closestAddr, expectedMuni);
+        trace.strikes.push({
+            strike: label, source, coord,
+            parcels_returned: parcels.length,
+            closest_address: closestAddr,
+            matched
+        });
+        if (matched) {
+            return { anchor: coord, parcels, strike: label, tier_floor: tierFloor, source };
+        }
+        return null;
+    }
+
+    // Strike 1: existing Mapbox coord.
+    const s1coord = (Number.isFinite(listing.lat) && Number.isFinite(listing.lng))
+        ? { lat: listing.lat, lng: listing.lng } : null;
+    const s1 = await tryStrike(1, s1coord, 'existing-mapbox', null);
+    if (s1) return { ...s1, trace };
+
+    // Strike 2: re-geocode "{city}, {expected_municipality}, Spain". Adding the
+    // municipality disambiguates urbanizations whose Mapbox entry is wrongly
+    // tagged to Málaga city (Marbesa, The Golden Mile, Carib Playa, etc.).
+    if (expectedMuni) {
+        const s2search = (listing.city || '').trim() + ', ' + expectedMuni + ', Spain';
+        const s2coord = await resolveCityCentroid(s2search, mapboxToken);
+        const s2 = await tryStrike(2, s2coord, 'mapbox-city-in-muni', 'medium');
+        if (s2) return { ...s2, trace };
+    }
+
+    // Strike 3: pure municipality centroid — "{expected_municipality}, Spain".
+    // Guaranteed-correct fallback for stubborn urbanizations (e.g. "Las Chapas"
+    // which Mapbox insists on placing in Málaga city even when "Marbella" is
+    // in the search text). Coord lands at the municipality centre.
+    if (expectedMuni) {
+        const s3search = expectedMuni + ', Spain';
+        const s3coord = await resolveCityCentroid(s3search, mapboxToken, 'place,locality');
+        const s3 = await tryStrike(3, s3coord, 'mapbox-municipality-centroid', 'low');
+        if (s3) return { ...s3, trace };
+    }
+
+    return { anchor: null, parcels: [], strike: null, tier_floor: 'rejected', source: 'rejected', trace };
+}
+
 // ── Distance parsing ──────────────────────────────────────────
 
 function parseDistanceMeters(s) {
@@ -284,9 +399,9 @@ function haversineMeters(lat1, lng1, lat2, lng2) {
 
 // ── Candidate coord computation ──────────────────────────────
 
-function computeCandidate(listing, signals, resolved) {
+function computeCandidate(anchor, signals, resolved) {
     const valid = (resolved || []).filter(r => r && Number.isFinite(r.lat) && Number.isFinite(r.lng));
-    const hasExistingCoord = Number.isFinite(listing.lat) && Number.isFinite(listing.lng) && inBbox(listing.lat, listing.lng);
+    const hasAnchor = anchor && Number.isFinite(anchor.lat) && Number.isFinite(anchor.lng) && inBbox(anchor.lat, anchor.lng);
 
     if (valid.length >= 2) {
         const lat = valid.reduce((s, r) => s + r.lat, 0) / valid.length;
@@ -299,15 +414,8 @@ function computeCandidate(listing, signals, resolved) {
         };
     }
     if (valid.length === 1) {
-        // Single-landmark triangulation is not strong enough on its own —
-        // blend it with the existing coord if we have one, otherwise use it
-        // alone with reduced confidence.
-        if (hasExistingCoord) {
-            const dist = haversineMeters(listing.lat, listing.lng, valid[0].lat, valid[0].lng);
-            // If the landmark is very close to the existing coord, we can use
-            // either; prefer the landmark coord since it's more specific.
-            // Otherwise keep the existing coord — single-landmark moves are
-            // not trustworthy enough to override Mapbox.
+        if (hasAnchor) {
+            const dist = haversineMeters(anchor.lat, anchor.lng, valid[0].lat, valid[0].lng);
             if (dist < 1000) {
                 return {
                     lat: valid[0].lat, lng: valid[0].lng,
@@ -317,10 +425,10 @@ function computeCandidate(listing, signals, resolved) {
                 };
             }
             return {
-                lat: listing.lat, lng: listing.lng,
-                source: 'mapbox_preserved_with_landmark',
+                lat: anchor.lat, lng: anchor.lng,
+                source: 'anchor_preserved_with_landmark',
                 score: 60,
-                inputs: ['existing-mapbox', valid[0].name + ' (too-far-to-trust)']
+                inputs: ['anchor', valid[0].name + ' (too-far-to-trust)']
             };
         }
         return {
@@ -330,13 +438,12 @@ function computeCandidate(listing, signals, resolved) {
             inputs: [valid[0].name]
         };
     }
-    // No usable landmarks — keep the existing coord rather than relocating.
-    if (hasExistingCoord) {
+    if (hasAnchor) {
         return {
-            lat: listing.lat, lng: listing.lng,
-            source: 'mapbox_preserved',
+            lat: anchor.lat, lng: anchor.lng,
+            source: 'anchor_preserved',
             score: 40,
-            inputs: ['existing-mapbox']
+            inputs: ['anchor']
         };
     }
     return null;
@@ -353,13 +460,15 @@ function buildCrossValidationTokens(signals) {
     return tokens.filter(t => t && t.length >= 4);
 }
 
-async function cadastreVerify(candidate, listing, signals) {
+async function cadastreVerify(candidate, listing, signals, prefetchedParcels) {
     if (!candidate) return null;
-    let parcels = [];
-    try {
-        parcels = await lookupByCoords(candidate.lat, candidate.lng);
-    } catch (e) {
-        return { error: 'cadastre lookup failed: ' + e.message };
+    let parcels = prefetchedParcels;
+    if (!parcels) {
+        try {
+            parcels = await lookupByCoords(candidate.lat, candidate.lng);
+        } catch (e) {
+            return { error: 'cadastre lookup failed: ' + e.message };
+        }
     }
     if (!parcels || parcels.length === 0) {
         return { coords_queried: { lat: candidate.lat, lng: candidate.lng }, parcels_returned: 0 };
@@ -394,45 +503,72 @@ async function cadastreVerify(candidate, listing, signals) {
 
 // ── Tier assignment ──────────────────────────────────────────
 
-function assignTier(candidate, cadastreResult, signals, resolved, listing) {
+const TIER_RANK = { rejected: 0, low: 1, medium: 2, high: 3, exact: 4 };
+
+function capTier(tier, floor) {
+    if (!floor) return tier;
+    return TIER_RANK[tier] <= TIER_RANK[floor] ? tier : floor;
+}
+
+function assignTier(candidate, cadastreResult, signals, resolved, listing, tierFloor, muniSource) {
     if (!candidate) {
         return {
             lat: null, lng: null,
             tier: 'rejected', source: 'rejected',
             score: 0,
-            reason: 'No candidate coord — no landmarks resolved and no usable Mapbox fallback.'
+            reason: 'No candidate coord — municipality verification failed (3 strikes).'
         };
     }
 
     let score = candidate.score || 0;
     const reasons = ['candidate=' + candidate.source + ' base=' + score];
+    if (tierFloor) reasons.push('tier_floor=' + tierFloor + ' (from strike fallback)');
 
     if (cadastreResult && !cadastreResult.error) {
-        // Address-token cross-check: ±15.
+        // Address-token cross-check. The +15 bonus always applies. The -20
+        // mismatch penalty is suppressed when tier_floor is set: strike 2/3
+        // anchors are municipality centroids by design — they're city-centre
+        // addresses, not urbanization addresses, so a token mismatch there
+        // is expected and shouldn't be punished.
         if (cadastreResult.address_check && cadastreResult.address_check.result === 'match') {
             score += 15;
             reasons.push('cadastre-address-tokens-match +15');
-        } else if (cadastreResult.address_check && cadastreResult.address_check.result === 'no-match') {
+        } else if (cadastreResult.address_check && cadastreResult.address_check.result === 'no-match' && !tierFloor) {
             score -= 20;
             reasons.push('cadastre-address-tokens-mismatch -20');
+        } else if (cadastreResult.address_check && cadastreResult.address_check.result === 'no-match' && tierFloor) {
+            reasons.push('cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)');
         }
 
-        // Cadastre metadata match → exact tier when score ≥ 50.
+        // Cadastre metadata match → exact tier promotion. Restricted to
+        // strike-1 anchors because strike-2/3 centroids are city/municipality
+        // centres; a metadata match THERE is most likely coincidental (lots
+        // of parcels at any city centre, one of them is bound to share a m²
+        // value with the listing). For strike-2/3 anchors the cadastre match
+        // still bumps to 'medium' but not 'exact'.
         if (cadastreResult.best_match && (cadastreResult.best_match.score || 0) >= 50) {
-            return {
-                lat: candidate.lat, lng: candidate.lng,
-                tier: 'exact',
-                source: 'cadastre_verified',
-                score: Math.min(100, score + 25),
-                reason: reasons.concat([
-                    'cadastre metadata match score=' + cadastreResult.best_match.score,
-                    'refcat=' + cadastreResult.best_match.refcat
-                ]).join(' · ')
-            };
+            if (!tierFloor) {
+                return {
+                    lat: candidate.lat, lng: candidate.lng,
+                    tier: 'exact',
+                    source: 'cadastre_verified',
+                    score: Math.min(100, score + 25),
+                    reason: reasons.concat([
+                        'cadastre metadata match score=' + cadastreResult.best_match.score,
+                        'refcat=' + cadastreResult.best_match.refcat,
+                        'strike-1 anchor → exact'
+                    ]).join(' · ')
+                };
+            }
+            // Strike-2/3 anchor: bump score but cap to tier_floor below.
+            score += 15;
+            reasons.push('cadastre metadata match score=' + cadastreResult.best_match.score +
+                ' on strike-' + (tierFloor === 'medium' ? '2' : '3') +
+                ' anchor — coincidental match risk, no exact promotion');
         }
     }
 
-    // Tier from final confidence score.
+    // Tier from confidence score.
     let tier, source;
     if (score >= 75) {
         tier = 'high';
@@ -446,6 +582,18 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing) {
     } else {
         tier = 'rejected';
         source = 'rejected';
+    }
+
+    // Apply tier_floor cap (strike 2 → max medium, strike 3 → max low).
+    const cappedTier = capTier(tier, tierFloor);
+    if (cappedTier !== tier) {
+        reasons.push('capped to ' + cappedTier + ' by tier_floor');
+        tier = cappedTier;
+    }
+
+    // Surface the strike source so we can audit which path each property took.
+    if (muniSource && tier !== 'rejected') {
+        source = source + ' · ' + muniSource;
     }
 
     if (tier === 'rejected') {
@@ -501,6 +649,7 @@ async function triangulateLocation(listing, opts) {
 
     const trace = {
         signals_extracted: null,
+        municipality_resolution: null,
         landmarks_resolved: [],
         candidates_considered: [],
         cadastre_check: null,
@@ -512,10 +661,26 @@ async function triangulateLocation(listing, opts) {
     const { signals, usage } = await extractSignals(listing);
     trace.signals_extracted = signals;
 
-    // 2. Resolve landmarks (de-duped by normalized name; generic filtered).
-    const anchor = (Number.isFinite(listing.lat) && Number.isFinite(listing.lng))
-        ? { lat: listing.lat, lng: listing.lng }
-        : null;
+    // 2. Three-strike municipality resolution. Find a coord that lands in
+    // the cadastre's expected municipality before we trust any landmark
+    // refinement.
+    const muniResult = await resolveValidMunicipalityAnchor(listing, mapboxToken);
+    trace.municipality_resolution = muniResult.trace;
+    if (!muniResult.anchor) {
+        trace.final_confidence_score = 0;
+        trace.final_decision_reason = 'all 3 strikes failed to land in expected municipality';
+        return {
+            lat: null, lng: null,
+            locationConfidence: 'rejected',
+            locationSource: 'rejected',
+            reasoning_trace: trace,
+            year_built_seed: null,
+            year_built_extracted: signals.year_built_extracted || null,
+            year_built_extracted_confidence: signals.year_built_extracted_confidence || null,
+            usage
+        };
+    }
+    const anchor = muniResult.anchor;
 
     const landmarkRefs = [];
     for (const l of (signals.landmarks_mentioned || [])) {
@@ -557,18 +722,29 @@ async function triangulateLocation(listing, opts) {
     trace.landmarks_rejected_generic = rejected_generic;
     trace.landmarks_rejected_far = rejected_far;
 
-    // 3. Compute candidate.
-    const candidate = computeCandidate(listing, signals, resolved);
+    // 3. Compute candidate from validated landmarks anchored to the verified
+    // municipality coord.
+    const candidate = computeCandidate(anchor, signals, resolved);
     if (candidate) {
         trace.candidates_considered = [{ ...candidate }];
     }
 
-    // 4. Cadastre verification.
-    const cadastreResult = await cadastreVerify(candidate, listing, signals);
+    // 4. Cadastre verification at candidate. If the candidate equals the
+    // strike-1 anchor exactly, reuse the parcels we already fetched.
+    let prefetched = null;
+    if (candidate && muniResult.parcels && muniResult.parcels.length &&
+        Math.abs(candidate.lat - anchor.lat) < 1e-9 &&
+        Math.abs(candidate.lng - anchor.lng) < 1e-9) {
+        prefetched = muniResult.parcels;
+    }
+    const cadastreResult = await cadastreVerify(candidate, listing, signals, prefetched);
     trace.cadastre_check = cadastreResult;
 
-    // 5. Tier assignment.
-    const decision = assignTier(candidate, cadastreResult, signals, resolved, listing);
+    // 5. Tier assignment, with tier_floor cap from strike outcome.
+    const decision = assignTier(
+        candidate, cadastreResult, signals, resolved, listing,
+        muniResult.tier_floor, muniResult.source
+    );
     trace.final_confidence_score = decision.score;
     trace.final_decision_reason = decision.reason;
 
