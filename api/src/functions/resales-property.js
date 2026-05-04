@@ -71,6 +71,11 @@ function mapToDetail(d) {
         lat: d.lat || null,
         lng: d.lng || null,
         locationConfidence: d.locationConfidence || 'none',
+        // Phase A audit fields — surface the triangulation provenance so we
+        // can inspect placement decisions without going through Firestore admin.
+        locationSource: d.locationSource || null,
+        location_reasoning: d.location_reasoning || null,
+        previous_geocoding: d.previous_geocoding || null,
         type: normalizedType,
         subtype: d.subtype || '',
         quality_score: typeof d.quality_score === 'number' ? d.quality_score : computeQualityScore(d),
