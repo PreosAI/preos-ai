@@ -98,24 +98,39 @@ async function queryListings(db, opts, context) {
     let query = db.collection('listings');
 
     if (city) query = query.where('location', '==', city);
-    if (minPrice != null) query = query.where('price', '>=', minPrice);
-    if (maxPrice != null) query = query.where('price', '<=', maxPrice);
-    if (minBedrooms != null) query = query.where('bedrooms', '>=', minBedrooms);
-    // confidence filter — used by the internal QA tooling to inspect properties
-    // by Phase A triangulation tier. Single-field where, no extra index needed.
-    if (confidence) query = query.where('locationConfidence', '==', confidence);
+
+    // The QA-tool confidence path uses ONLY equality wheres (location +
+    // locationConfidence) and document-id order — that combination doesn't
+    // need a composite index for any (confidence × city) pair. Range
+    // filters (price/bedrooms) and feature filters get applied in-memory
+    // after fetch instead. Trade-off: a page may return fewer than `limit`
+    // post-filter rows; cursor still tracks Firestore-page position.
+    let inMemoryRanges = false;
+    if (confidence) {
+        query = query.where('locationConfidence', '==', confidence);
+        inMemoryRanges = true;
+    } else {
+        if (minPrice != null) query = query.where('price', '>=', minPrice);
+        if (maxPrice != null) query = query.where('price', '<=', maxPrice);
+        if (minBedrooms != null) query = query.where('bedrooms', '>=', minBedrooms);
+    }
 
     const hasPriceRange = minPrice != null || maxPrice != null;
     const hasBedroomsRange = minBedrooms != null;
     // Inequality fields must appear in orderBy first; compose explicitly to avoid duplicates.
     const orderings = [];
-    if (hasPriceRange) orderings.push(['price', sort === 'price_desc' ? 'desc' : 'asc']);
-    if (hasBedroomsRange) orderings.push(['bedrooms', 'asc']);
-    if (sort === 'price_asc' && !hasPriceRange) orderings.push(['price', 'asc']);
-    if (sort === 'price_desc' && !hasPriceRange) orderings.push(['price', 'desc']);
-    if (sort === 'quality') {
-        orderings.push(['quality_score', 'desc']);
-        if (!hasPriceRange) orderings.push(['price', 'asc']);
+    if (!confidence) {
+        // Only build the orderBy chain when we're NOT in the QA confidence
+        // path. The QA path uses Firestore's natural document-id order so we
+        // can avoid (confidence × quality_score) composites.
+        if (hasPriceRange) orderings.push(['price', sort === 'price_desc' ? 'desc' : 'asc']);
+        if (hasBedroomsRange) orderings.push(['bedrooms', 'asc']);
+        if (sort === 'price_asc' && !hasPriceRange) orderings.push(['price', 'asc']);
+        if (sort === 'price_desc' && !hasPriceRange) orderings.push(['price', 'desc']);
+        if (sort === 'quality') {
+            orderings.push(['quality_score', 'desc']);
+            if (!hasPriceRange) orderings.push(['price', 'asc']);
+        }
     }
     for (const [field, dir] of orderings) query = query.orderBy(field, dir);
 
@@ -140,6 +155,14 @@ async function queryListings(db, opts, context) {
 
     let mapped = [];
     snapshot.forEach(doc => mapped.push(mapToFrontend(doc.data())));
+
+    // In-memory range filters when we're on the QA confidence path. Same
+    // page-may-be-shorter-than-limit caveat as features and propertyType.
+    if (inMemoryRanges) {
+        if (minPrice != null) mapped = mapped.filter(p => (p.price || 0) >= minPrice);
+        if (maxPrice != null) mapped = mapped.filter(p => (p.price || 0) <= maxPrice);
+        if (minBedrooms != null) mapped = mapped.filter(p => (p.bedrooms || 0) >= minBedrooms);
+    }
 
     if (features.length > 0) {
         mapped = mapped.filter(p => {
