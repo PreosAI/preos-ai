@@ -138,38 +138,58 @@ function normLandmark(s) {
         .trim();
 }
 
-// Defence-in-depth: if the LLM still emits a generic term despite the prompt,
-// reject it before sending to Mapbox. These were the actual failure cases
-// observed in the first 50-property run.
-const GENERIC_LANDMARK_TOKENS = new Set([
-    'beach', 'beaches', 'sandy beaches', 'the beach', 'sea',
-    'shops', 'restaurants', 'shopping', 'shopping centre',
-    'golf', 'golf course', 'golf courses', 'tennis', 'tennis court', 'tennis courts',
-    'park', 'parks', 'national park', 'parque nacional', 'parque natural',
-    'parque nacional protegido', 'parque protegido',
+// Defence-in-depth: reject landmark tokens that have no proper-noun anchor
+// — i.e. that are JUST a generic place-type word with at most a generic
+// qualifier ("the beach", "sandy beaches", "private beach"). Phase A.5
+// audit found the previous endsWith() check was over-aggressive: it
+// rejected "Aloha Golf Course" / "Don Carlos Hotel" / "Guadalmina Baja
+// Golf Course" because they ended in a generic suffix, even though the
+// proper-noun PREFIX makes them perfectly geocodable.
+//
+// New gate: reject only when the WHOLE string matches /^<qualifier?>
+// <generic>$/ — the landmark contains nothing else.
+const GENERIC_PLACE_WORDS = [
+    'beach', 'beaches', 'sea', 'seafront', 'coast', 'coastline',
+    'shop', 'shops', 'shopping', 'shopping centre', 'shopping center',
+    'golf', 'golf course', 'golf courses',
+    'tennis', 'tennis court', 'tennis courts', 'padel court', 'padel courts',
+    'park', 'parks', 'national park', 'natural park',
+    'parque nacional', 'parque natural', 'parque nacional protegido', 'parque protegido',
     'mountain', 'mountains', 'forest', 'forests',
-    'school', 'schools', 'supermarket', 'supermarkets',
-    'pharmacy', 'church', 'churches', 'hospital', 'hospitals',
-    'town centre', 'city centre', 'town center', 'city center',
-    'beach club', 'restaurant', 'restaurants and bars',
-    // Spanish equivalents
-    'playa', 'playas', 'mar', 'tiendas', 'restaurantes',
+    'school', 'schools', 'university',
+    'supermarket', 'supermarkets', 'pharmacy', 'church', 'churches',
+    'hospital', 'hospitals',
+    'town centre', 'town center', 'city centre', 'city center', 'town', 'pueblo',
+    'beach club', 'restaurant', 'restaurants', 'restaurants and bars', 'bars',
+    'gym', 'gyms', 'plaza', 'plazas',
+    // Spanish equivalents — same idea
+    'playa', 'playas', 'mar', 'tienda', 'tiendas', 'restaurante', 'restaurantes',
     'parque', 'iglesia', 'colegio', 'farmacia', 'supermercado',
-    'montana', 'montanas', 'bosque', 'campo de golf',
-    'pueblo', 'centro'
-]);
+    'montana', 'montanas', 'bosque', 'campo de golf', 'centro', 'centro comercial'
+];
+
+// Words that NEVER make a generic landmark "named" — they're descriptive
+// adjectives or articles. e.g. "the beach", "sandy beaches", "lovely beach".
+const GENERIC_QUALIFIER_WORDS = [
+    'the', 'a', 'an', 'la', 'el', 'los', 'las',
+    'sandy', 'rocky', 'secluded', 'private', 'public', 'beautiful', 'lovely',
+    'nearby', 'local', 'small', 'big', 'main', 'old', 'new'
+];
+
+const _GENERIC_PLACE_RE = (function () {
+    const places = GENERIC_PLACE_WORDS.map(w => w.replace(/\s+/g, '\\s+'))
+        .sort((a, b) => b.length - a.length).join('|');
+    const quals = GENERIC_QUALIFIER_WORDS.join('|');
+    // Whole-string match: optional qualifier + generic word.
+    return new RegExp('^(?:(?:' + quals + ')\\s+)?(?:' + places + ')$', 'i');
+})();
 
 function isGenericLandmark(name) {
     if (!name) return true;
     const n = normLandmark(name);
     if (n.length < 4) return true;
-    if (GENERIC_LANDMARK_TOKENS.has(n)) return true;
     if (/^(close to|near|next to)\b/.test(n)) return true;
-    // Phrases like "sandy beach", "private beach", "beautiful beach" etc.
-    for (const tok of GENERIC_LANDMARK_TOKENS) {
-        if (n.endsWith(' ' + tok)) return true;
-    }
-    return false;
+    return _GENERIC_PLACE_RE.test(n);
 }
 
 function inBbox(lat, lng) {
@@ -426,10 +446,68 @@ function haversineMeters(lat1, lng1, lat2, lng2) {
 
 // ── Candidate coord computation ──────────────────────────────
 
+// Phase A.5 point #2 — landmark-vs-anchor cross-check.
+//
+// If ≥1 landmark resolves AND the centroid of resolved landmarks is
+// >500 m from the Mapbox anchor, the anchor is suspect (R4649410-class
+// failure where Mapbox places the listing in roughly the right area but
+// off by ~1 km, and only landmark triangulation can move it). Re-anchor
+// to the landmark centroid before cadastre lookup. ≤500 m means the
+// landmarks corroborate the anchor; trust the (more stable) anchor coord.
+//
+// Both candidates are logged to candidates_considered for audit so the
+// reasoning trace shows the disagreement (if any).
+const LANDMARK_DISAGREEMENT_THRESHOLD_M = 500;
+
 function computeCandidate(anchor, signals, resolved) {
     const valid = (resolved || []).filter(r => r && Number.isFinite(r.lat) && Number.isFinite(r.lng));
     const hasAnchor = anchor && Number.isFinite(anchor.lat) && Number.isFinite(anchor.lng) && inBbox(anchor.lat, anchor.lng);
 
+    if (valid.length >= 1 && hasAnchor) {
+        const cLat = valid.reduce((s, r) => s + r.lat, 0) / valid.length;
+        const cLng = valid.reduce((s, r) => s + r.lng, 0) / valid.length;
+        const dist = Math.round(haversineMeters(anchor.lat, anchor.lng, cLat, cLng));
+        const candidatesAudit = [
+            { lat: anchor.lat, lng: anchor.lng, source: 'anchor', label: 'mapbox-anchor' },
+            { lat: cLat, lng: cLng, source: 'landmark_centroid', label: 'landmark-centroid', n_landmarks: valid.length }
+        ];
+
+        if (dist > LANDMARK_DISAGREEMENT_THRESHOLD_M) {
+            // Landmarks disagree with the anchor — trust landmarks.
+            return {
+                lat: cLat, lng: cLng,
+                source: 'landmark_centroid_reanchored',
+                score: Math.min(95, 70 + valid.length * 5),
+                inputs: valid.map(v => v.name),
+                centroid_vs_anchor_m: dist,
+                candidates_considered: candidatesAudit
+            };
+        }
+        // Within threshold → landmarks corroborate the anchor; use the anchor
+        // (it's typically more precise than a 1-2 landmark centroid).
+        return {
+            lat: anchor.lat, lng: anchor.lng,
+            source: 'anchor_corroborated_by_landmarks',
+            score: Math.min(90, 60 + valid.length * 10),
+            inputs: ['anchor'].concat(valid.map(v => v.name)),
+            centroid_vs_anchor_m: dist,
+            candidates_considered: candidatesAudit
+        };
+    }
+
+    // Has anchor, no landmarks → preserve the anchor as-is.
+    if (hasAnchor) {
+        return {
+            lat: anchor.lat, lng: anchor.lng,
+            source: 'anchor_preserved',
+            score: 40,
+            inputs: ['anchor']
+        };
+    }
+
+    // No anchor + landmarks resolved → use the landmark centroid as our only
+    // signal. (Should be rare given strikes 1-3 always try to produce an
+    // anchor.)
     if (valid.length >= 2) {
         const lat = valid.reduce((s, r) => s + r.lat, 0) / valid.length;
         const lng = valid.reduce((s, r) => s + r.lng, 0) / valid.length;
@@ -441,36 +519,11 @@ function computeCandidate(anchor, signals, resolved) {
         };
     }
     if (valid.length === 1) {
-        if (hasAnchor) {
-            const dist = haversineMeters(anchor.lat, anchor.lng, valid[0].lat, valid[0].lng);
-            if (dist < 1000) {
-                return {
-                    lat: valid[0].lat, lng: valid[0].lng,
-                    source: 'single_landmark',
-                    score: 75,
-                    inputs: [valid[0].name]
-                };
-            }
-            return {
-                lat: anchor.lat, lng: anchor.lng,
-                source: 'anchor_preserved_with_landmark',
-                score: 60,
-                inputs: ['anchor', valid[0].name + ' (too-far-to-trust)']
-            };
-        }
         return {
             lat: valid[0].lat, lng: valid[0].lng,
             source: 'single_landmark',
             score: 60,
             inputs: [valid[0].name]
-        };
-    }
-    if (hasAnchor) {
-        return {
-            lat: anchor.lat, lng: anchor.lng,
-            source: 'anchor_preserved',
-            score: 40,
-            inputs: ['anchor']
         };
     }
     return null;
@@ -634,7 +687,15 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
                 // a non-dwelling is more visible to users.
                 const eligibleForExact = isExactEligibleType(
                     listing.rawPropertyType, listing.rawSubtype, listing.type);
-                if (eligibleForExact) {
+                // Phase A.5 point #3 — exact-cap on token mismatch.
+                // R4649410-class: strike-1 cadastre m² match without LLM-
+                // extracted urbanization/street tokens corroborating the
+                // address is plausibly a coincidental match in the same
+                // urbanization. Cap at 'high' instead.
+                const tokenMismatch = cadastreResult.address_check &&
+                    cadastreResult.address_check.result === 'no-match';
+
+                if (eligibleForExact && !tokenMismatch) {
                     return {
                         lat: candidate.lat, lng: candidate.lng,
                         tier: 'exact',
@@ -644,6 +705,22 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
                             'cadastre metadata match score=' + cadastreResult.best_match.score,
                             'refcat=' + cadastreResult.best_match.refcat,
                             'strike-1 anchor → exact'
+                        ]).join(' · ')
+                    };
+                }
+                if (eligibleForExact && tokenMismatch) {
+                    // Tokens present but don't appear in cadastre's address →
+                    // exact promotion is too aggressive. Land at 'high' with
+                    // a smaller score boost.
+                    return {
+                        lat: candidate.lat, lng: candidate.lng,
+                        tier: 'high',
+                        source: 'cadastre_verified_capped',
+                        score: Math.min(85, score + 10),
+                        reason: reasons.concat([
+                            'cadastre metadata match score=' + cadastreResult.best_match.score,
+                            'refcat=' + cadastreResult.best_match.refcat,
+                            'address_token_match=false → cap at high (Phase A.5 #3)'
                         ]).join(' · ')
                     };
                 }
@@ -819,7 +896,14 @@ async function triangulateLocation(listing, opts) {
     // municipality coord.
     const candidate = computeCandidate(anchor, signals, resolved);
     if (candidate) {
-        trace.candidates_considered = [{ ...candidate }];
+        // The new computeCandidate may include a candidates_considered audit
+        // log capturing anchor vs landmark-centroid disagreement. Fall back
+        // to a single-element list when not present (no-landmarks path).
+        trace.candidates_considered = candidate.candidates_considered ||
+            [{ lat: candidate.lat, lng: candidate.lng, source: candidate.source, score: candidate.score, inputs: candidate.inputs }];
+        if (typeof candidate.centroid_vs_anchor_m === 'number') {
+            trace.centroid_vs_anchor_m = candidate.centroid_vs_anchor_m;
+        }
     }
 
     // 4. Cadastre verification at candidate. If the candidate equals the
