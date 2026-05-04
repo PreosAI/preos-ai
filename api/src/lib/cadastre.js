@@ -77,9 +77,13 @@ function tagAll(xml, name) {
  * @returns {Promise<Array<{refcat:string, distance:number, address:string}>>}
  *          Sorted by distance ascending. Empty array if none within radius.
  */
-async function lookupByCoords(lat, lng) {
+async function lookupByCoords(lat, lng, cache) {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
         throw new Error('lookupByCoords: invalid coords ' + lat + ',' + lng);
+    }
+    if (cache) {
+        const cached = await cache.getCoords(lat, lng);
+        if (cached !== null && cached !== undefined) return cached;
     }
     const xml = await fetchXml(RCCOOR_DISTANCIA_URL, {
         SRS: 'EPSG:4326',
@@ -109,6 +113,7 @@ async function lookupByCoords(lat, lng) {
     }).filter(p => p.refcat.length >= 14);
 
     parcels.sort((a, b) => a.distance - b.distance);
+    if (cache) cache.setCoords(lat, lng, parcels);
     return parcels;
 }
 
@@ -125,9 +130,13 @@ async function lookupByCoords(lat, lng) {
  *   province:string
  * }|null>} null if cadastre returned no parcel.
  */
-async function lookupParcelDetails(refcat) {
+async function lookupParcelDetails(refcat, cache) {
     if (!refcat || refcat.length < 14) {
         throw new Error('lookupParcelDetails: refcat must be ≥14 chars');
+    }
+    if (cache) {
+        const cached = await cache.getParcel(refcat);
+        if (cached !== undefined) return cached; // null is a real cached "no details" answer
     }
     const xml = await fetchXml(DNPRC_URL, {
         Provincia: '',
@@ -140,7 +149,10 @@ async function lookupParcelDetails(refcat) {
         const code = tag(err, 'cod');
         const desc = tag(err, 'des');
         // Cadastre returns codeful errors for "no parcel found" — surface as null.
-        if (code === '43' || /no.*existe|no.*encontrad/i.test(desc)) return null;
+        if (code === '43' || /no.*existe|no.*encontrad/i.test(desc)) {
+            if (cache) cache.setParcel(refcat, null);
+            return null;
+        }
         throw new Error('cadastre DNPRC error ' + code + ': ' + desc);
     }
 
@@ -156,7 +168,7 @@ async function lookupParcelDetails(refcat) {
     const municipality = tag(tag(bi, 'dt') || tag(xml, 'dt'), 'nm');
     const province = tag(tag(bi, 'dt') || tag(xml, 'dt'), 'np');
 
-    return {
+    const out = {
         refcat,
         address,
         m2: m2Raw ? parseInt(m2Raw, 10) || null : null,
@@ -165,6 +177,8 @@ async function lookupParcelDetails(refcat) {
         municipality,
         province
     };
+    if (cache) cache.setParcel(refcat, out);
+    return out;
 }
 
 /**
@@ -263,7 +277,7 @@ function isUseTypeCompatible(parcelUse, listingType) {
  * nearest 1-3 are worth checking).
  */
 async function matchParcelToListing(parcels, listingMeta, opts) {
-    const { maxParcels = 5 } = opts || {};
+    const { maxParcels = 5, cache = null } = opts || {};
     if (!parcels || parcels.length === 0) {
         return { match: null, candidates: [], reason: 'no-parcels' };
     }
@@ -272,7 +286,7 @@ async function matchParcelToListing(parcels, listingMeta, opts) {
     for (const p of parcels.slice(0, maxParcels)) {
         let details = null;
         try {
-            details = await lookupParcelDetails(p.refcat);
+            details = await lookupParcelDetails(p.refcat, cache);
         } catch (e) {
             candidates.push({ refcat: p.refcat, distance: p.distance, error: e.message });
             continue;

@@ -185,19 +185,30 @@ function inBbox(lat, lng) {
 // Torremolinos because nothing closer matched the term).
 const ANCHOR_MAX_DIST_M = 5000;
 
-async function resolveLandmark(name, biasCity, mapboxToken, anchor) {
+async function resolveLandmark(name, biasCity, mapboxToken, anchor, cache) {
     if (!name) return null;
     const key = normLandmark(name);
-    // Cache key includes anchor bucket so a landmark queried from two
-    // different cities can still hit the cache when both anchors agree.
-    if (_landmarkCache.has(key)) {
-        const cached = _landmarkCache.get(key);
-        if (cached === null) return null;
+
+    function applyAnchorGate(resolved) {
+        if (!resolved) return null;
         if (anchor && Number.isFinite(anchor.lat) && Number.isFinite(anchor.lng)) {
-            const dist = haversineMeters(anchor.lat, anchor.lng, cached.lat, cached.lng);
+            const dist = haversineMeters(anchor.lat, anchor.lng, resolved.lat, resolved.lng);
             if (dist > ANCHOR_MAX_DIST_M) return null;
         }
-        return cached;
+        return resolved;
+    }
+
+    // In-memory cache (per-invocation).
+    if (_landmarkCache.has(key)) {
+        return applyAnchorGate(_landmarkCache.get(key));
+    }
+    // Firestore-backed cache (cross-invocation).
+    if (cache) {
+        const fromCache = await cache.getLandmark(key);
+        if (fromCache !== undefined) {
+            _landmarkCache.set(key, fromCache);
+            return applyAnchorGate(fromCache);
+        }
     }
 
     const search = (biasCity ? name + ', ' + biasCity : name) + ', Málaga, Spain';
@@ -223,21 +234,25 @@ async function resolveLandmark(name, biasCity, mapboxToken, anchor) {
         res = await fetch(url, { headers: { 'Accept': 'application/json' } });
     } catch (e) {
         _landmarkCache.set(key, null);
+        if (cache) cache.setLandmark(key, null);
         return null;
     }
     if (!res.ok) {
         _landmarkCache.set(key, null);
+        if (cache) cache.setLandmark(key, null);
         return null;
     }
     const data = await res.json();
     if (!data.features || data.features.length === 0) {
         _landmarkCache.set(key, null);
+        if (cache) cache.setLandmark(key, null);
         return null;
     }
     const f = data.features[0];
     const [lng, lat] = f.center || [];
     if (!inBbox(lat, lng)) {
         _landmarkCache.set(key, null);
+        if (cache) cache.setLandmark(key, null);
         return null;
     }
     const out = {
@@ -248,23 +263,25 @@ async function resolveLandmark(name, biasCity, mapboxToken, anchor) {
         relevance: f.relevance
     };
     _landmarkCache.set(key, out);
-
-    // Anchor distance gate.
-    if (anchor && Number.isFinite(anchor.lat) && Number.isFinite(anchor.lng)) {
-        const dist = haversineMeters(anchor.lat, anchor.lng, lat, lng);
-        if (dist > ANCHOR_MAX_DIST_M) return null;
-    }
-    return out;
+    if (cache) cache.setLandmark(key, out);
+    return applyAnchorGate(out);
 }
 
 // ── City centroid resolver (used by strike 2 and 3) ───────────
 
 const _cityCentroidCache = new Map();
 
-async function resolveCityCentroid(searchText, mapboxToken, types) {
+async function resolveCityCentroid(searchText, mapboxToken, types, cache) {
     if (!searchText) return null;
     const cacheKey = searchText + '|' + (types || '');
     if (_cityCentroidCache.has(cacheKey)) return _cityCentroidCache.get(cacheKey);
+    if (cache) {
+        const fromCache = await cache.getCityCentroid(cacheKey);
+        if (fromCache !== undefined) {
+            _cityCentroidCache.set(cacheKey, fromCache);
+            return fromCache;
+        }
+    }
 
     const url = MAPBOX_BASE + encodeURIComponent(searchText) + '.json?' + new URLSearchParams({
         access_token: mapboxToken,
@@ -284,17 +301,27 @@ async function resolveCityCentroid(searchText, mapboxToken, types) {
         _cityCentroidCache.set(searchText, null);
         return null;
     }
-    if (!res.ok) { _cityCentroidCache.set(cacheKey, null); return null; }
+    if (!res.ok) {
+        _cityCentroidCache.set(cacheKey, null);
+        if (cache) cache.setCityCentroid(cacheKey, null);
+        return null;
+    }
     const data = await res.json();
     if (!data.features || data.features.length === 0) {
         _cityCentroidCache.set(cacheKey, null);
+        if (cache) cache.setCityCentroid(cacheKey, null);
         return null;
     }
     const f = data.features[0];
     const [lng, lat] = f.center || [];
-    if (!inBbox(lat, lng)) { _cityCentroidCache.set(cacheKey, null); return null; }
+    if (!inBbox(lat, lng)) {
+        _cityCentroidCache.set(cacheKey, null);
+        if (cache) cache.setCityCentroid(cacheKey, null);
+        return null;
+    }
     const out = { lat, lng, place_name: f.place_name, relevance: f.relevance };
     _cityCentroidCache.set(cacheKey, out);
+    if (cache) cache.setCityCentroid(cacheKey, out);
     return out;
 }
 
@@ -315,7 +342,7 @@ async function resolveCityCentroid(searchText, mapboxToken, types) {
  * EXCEPT that a cadastre metadata match (score ≥ 50) at the chosen anchor
  * still promotes to 'exact' regardless of which strike won.
  */
-async function resolveValidMunicipalityAnchor(listing, mapboxToken) {
+async function resolveValidMunicipalityAnchor(listing, mapboxToken, cache) {
     const expectedMuni = getExpectedMunicipality(listing.city);
     const trace = { expected_municipality: expectedMuni, strikes: [] };
 
@@ -325,7 +352,7 @@ async function resolveValidMunicipalityAnchor(listing, mapboxToken) {
             return null;
         }
         let parcels = [];
-        try { parcels = await lookupByCoords(coord.lat, coord.lng); } catch (e) {
+        try { parcels = await lookupByCoords(coord.lat, coord.lng, cache); } catch (e) {
             trace.strikes.push({ strike: label, source, coord, parcels_returned: 0, matched: false, error: e.message });
             return null;
         }
@@ -354,7 +381,7 @@ async function resolveValidMunicipalityAnchor(listing, mapboxToken) {
     // tagged to Málaga city (Marbesa, The Golden Mile, Carib Playa, etc.).
     if (expectedMuni) {
         const s2search = (listing.city || '').trim() + ', ' + expectedMuni + ', Spain';
-        const s2coord = await resolveCityCentroid(s2search, mapboxToken);
+        const s2coord = await resolveCityCentroid(s2search, mapboxToken, undefined, cache);
         const s2 = await tryStrike(2, s2coord, 'mapbox-city-in-muni', 'medium');
         if (s2) return { ...s2, trace };
     }
@@ -365,7 +392,7 @@ async function resolveValidMunicipalityAnchor(listing, mapboxToken) {
     // in the search text). Coord lands at the municipality centre.
     if (expectedMuni) {
         const s3search = expectedMuni + ', Spain';
-        const s3coord = await resolveCityCentroid(s3search, mapboxToken, 'place,locality');
+        const s3coord = await resolveCityCentroid(s3search, mapboxToken, 'place,locality', cache);
         const s3 = await tryStrike(3, s3coord, 'mapbox-municipality-centroid', 'low');
         if (s3) return { ...s3, trace };
     }
@@ -460,12 +487,12 @@ function buildCrossValidationTokens(signals) {
     return tokens.filter(t => t && t.length >= 4);
 }
 
-async function cadastreVerify(candidate, listing, signals, prefetchedParcels) {
+async function cadastreVerify(candidate, listing, signals, prefetchedParcels, cache) {
     if (!candidate) return null;
     let parcels = prefetchedParcels;
     if (!parcels) {
         try {
-            parcels = await lookupByCoords(candidate.lat, candidate.lng);
+            parcels = await lookupByCoords(candidate.lat, candidate.lng, cache);
         } catch (e) {
             return { error: 'cadastre lookup failed: ' + e.message };
         }
@@ -480,7 +507,7 @@ async function cadastreVerify(candidate, listing, signals, prefetchedParcels) {
         year_built_confidence: signals.year_built_extracted_confidence || null,
         type: listing.type
     };
-    const match = await matchParcelToListing(parcels, listingMeta, { maxParcels: 3 });
+    const match = await matchParcelToListing(parcels, listingMeta, { maxParcels: 3, cache });
 
     // Cross-validation: does the closest parcel's address contain LLM-extracted tokens?
     const closestAddr = normLandmark(parcels[0].address || '');
@@ -645,7 +672,7 @@ async function extractSignals(listing) {
  *     year_built_seed, usage }
  */
 async function triangulateLocation(listing, opts) {
-    const { mapboxToken } = opts || {};
+    const { mapboxToken, cache = null } = opts || {};
     if (!mapboxToken) throw new Error('triangulateLocation: mapboxToken is required');
 
     const trace = {
@@ -665,7 +692,7 @@ async function triangulateLocation(listing, opts) {
     // 2. Three-strike municipality resolution. Find a coord that lands in
     // the cadastre's expected municipality before we trust any landmark
     // refinement.
-    const muniResult = await resolveValidMunicipalityAnchor(listing, mapboxToken);
+    const muniResult = await resolveValidMunicipalityAnchor(listing, mapboxToken, cache);
     trace.municipality_resolution = muniResult.trace;
     if (!muniResult.anchor) {
         trace.final_confidence_score = 0;
@@ -707,7 +734,7 @@ async function triangulateLocation(listing, opts) {
     const resolved = [];
     const rejected_far = [];
     for (const ref of dedup) {
-        const r = await resolveLandmark(ref.name, listing.city, mapboxToken, anchor);
+        const r = await resolveLandmark(ref.name, listing.city, mapboxToken, anchor, cache);
         if (r) {
             r.claimed_distance_m = parseDistanceMeters(ref.distance);
             r.claimed_direction = ref.direction || null;
@@ -738,7 +765,7 @@ async function triangulateLocation(listing, opts) {
         Math.abs(candidate.lng - anchor.lng) < 1e-9) {
         prefetched = muniResult.parcels;
     }
-    const cadastreResult = await cadastreVerify(candidate, listing, signals, prefetched);
+    const cadastreResult = await cadastreVerify(candidate, listing, signals, prefetched, cache);
     trace.cadastre_check = cadastreResult;
 
     // 5. Tier assignment, with tier_floor cap from strike outcome.
