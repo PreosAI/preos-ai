@@ -1,0 +1,420 @@
+{
+  "cursor": null,
+  "batches": 11,
+  "processed": 2673,
+  "history": [
+    {
+      "batch": 1,
+      "processed": 148,
+      "elapsed_ms": 193347,
+      "wall_ms": 193347,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 117,
+        "coord_miss": 0,
+        "coord_neg": 16,
+        "parcel_hit": 190,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 22,
+        "landmark_miss": 0,
+        "landmark_neg": 0,
+        "city_hit": 94,
+        "city_miss": 10
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 67,
+        "rejected": 80,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 68,
+        "3": 0,
+        "rejected": 80,
+        "none": 0
+      },
+      "cost_usd": 0.438
+    },
+    {
+      "batch": 2,
+      "processed": 260,
+      "elapsed_ms": 193251,
+      "wall_ms": 193528,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 234,
+        "coord_miss": 0,
+        "coord_neg": 36,
+        "parcel_hit": 205,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 18,
+        "landmark_miss": 0,
+        "landmark_neg": 0,
+        "city_hit": 23,
+        "city_miss": 2
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 2,
+        "low": 71,
+        "rejected": 187,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 73,
+        "3": 0,
+        "rejected": 187,
+        "none": 0
+      },
+      "cost_usd": 0.8481
+    },
+    {
+      "batch": 3,
+      "processed": 264,
+      "elapsed_ms": 193152,
+      "wall_ms": 193432,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 258,
+        "coord_miss": 0,
+        "coord_neg": 35,
+        "parcel_hit": 406,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 30,
+        "landmark_miss": 2,
+        "landmark_neg": 0,
+        "city_hit": 22,
+        "city_miss": 8
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 3,
+        "low": 143,
+        "rejected": 118,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 146,
+        "3": 0,
+        "rejected": 118,
+        "none": 0
+      },
+      "cost_usd": 0.8543
+    },
+    {
+      "batch": 4,
+      "processed": 260,
+      "elapsed_ms": 192666,
+      "wall_ms": 192952,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 249,
+        "coord_miss": 0,
+        "coord_neg": 23,
+        "parcel_hit": 363,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 32,
+        "landmark_miss": 3,
+        "landmark_neg": 0,
+        "city_hit": 31,
+        "city_miss": 1
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 4,
+        "low": 126,
+        "rejected": 130,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 130,
+        "3": 0,
+        "rejected": 130,
+        "none": 0
+      },
+      "cost_usd": 0.8608
+    },
+    {
+      "batch": 5,
+      "processed": 268,
+      "elapsed_ms": 193960,
+      "wall_ms": 194364,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 264,
+        "coord_miss": 0,
+        "coord_neg": 30,
+        "parcel_hit": 469,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 34,
+        "landmark_miss": 1,
+        "landmark_neg": 0,
+        "city_hit": 16,
+        "city_miss": 3
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 3,
+        "low": 164,
+        "rejected": 101,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 167,
+        "3": 0,
+        "rejected": 101,
+        "none": 0
+      },
+      "cost_usd": 0.8676
+    },
+    {
+      "batch": 6,
+      "processed": 268,
+      "elapsed_ms": 193518,
+      "wall_ms": 193887,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 280,
+        "coord_miss": 0,
+        "coord_neg": 45,
+        "parcel_hit": 441,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 37,
+        "landmark_miss": 2,
+        "landmark_neg": 0,
+        "city_hit": 16,
+        "city_miss": 2
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 2,
+        "low": 155,
+        "rejected": 111,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 157,
+        "3": 0,
+        "rejected": 111,
+        "none": 0
+      },
+      "cost_usd": 0.8829
+    },
+    {
+      "batch": 7,
+      "processed": 256,
+      "elapsed_ms": 195093,
+      "wall_ms": 195381,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 260,
+        "coord_miss": 0,
+        "coord_neg": 31,
+        "parcel_hit": 408,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 30,
+        "landmark_miss": 3,
+        "landmark_neg": 0,
+        "city_hit": 8,
+        "city_miss": 2
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 4,
+        "low": 139,
+        "rejected": 113,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 143,
+        "3": 0,
+        "rejected": 113,
+        "none": 0
+      },
+      "cost_usd": 0.8698
+    },
+    {
+      "batch": 8,
+      "processed": 272,
+      "elapsed_ms": 194104,
+      "wall_ms": 194453,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 294,
+        "coord_miss": 0,
+        "coord_neg": 54,
+        "parcel_hit": 430,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 18,
+        "landmark_miss": 2,
+        "landmark_neg": 0,
+        "city_hit": 8,
+        "city_miss": 2
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 4,
+        "low": 146,
+        "rejected": 122,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 150,
+        "3": 0,
+        "rejected": 122,
+        "none": 0
+      },
+      "cost_usd": 0.9104
+    },
+    {
+      "batch": 9,
+      "processed": 264,
+      "elapsed_ms": 193147,
+      "wall_ms": 193475,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 267,
+        "coord_miss": 0,
+        "coord_neg": 24,
+        "parcel_hit": 462,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 24,
+        "landmark_miss": 1,
+        "landmark_neg": 0,
+        "city_hit": 8,
+        "city_miss": 1
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 4,
+        "low": 159,
+        "rejected": 101,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 163,
+        "3": 0,
+        "rejected": 101,
+        "none": 0
+      },
+      "cost_usd": 0.8769
+    },
+    {
+      "batch": 10,
+      "processed": 268,
+      "elapsed_ms": 193945,
+      "wall_ms": 194227,
+      "status": "partial",
+      "cache_stats": {
+        "coord_hit": 260,
+        "coord_miss": 0,
+        "coord_neg": 27,
+        "parcel_hit": 462,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 24,
+        "landmark_miss": 3,
+        "landmark_neg": 1,
+        "city_hit": 2,
+        "city_miss": 1
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 5,
+        "low": 157,
+        "rejected": 106,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 162,
+        "3": 0,
+        "rejected": 106,
+        "none": 0
+      },
+      "cost_usd": 0.8918
+    },
+    {
+      "batch": 11,
+      "processed": 145,
+      "elapsed_ms": 108172,
+      "wall_ms": 108471,
+      "status": "complete",
+      "cache_stats": {
+        "coord_hit": 152,
+        "coord_miss": 0,
+        "coord_neg": 30,
+        "parcel_hit": 220,
+        "parcel_miss": 0,
+        "parcel_neg": 0,
+        "landmark_hit": 10,
+        "landmark_miss": 1,
+        "landmark_neg": 0,
+        "city_hit": 2,
+        "city_miss": 1
+      },
+      "confidence": {
+        "exact": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 76,
+        "rejected": 68,
+        "error": 0
+      },
+      "strike": {
+        "1": 0,
+        "2": 77,
+        "3": 0,
+        "rejected": 68,
+        "none": 0
+      },
+      "cost_usd": 0.486
+    }
+  ],
+  "confidence": {
+    "exact": 0,
+    "high": 0,
+    "medium": 33,
+    "low": 1403,
+    "rejected": 1237,
+    "error": 0
+  },
+  "strike": {
+    "1": 0,
+    "2": 1436,
+    "3": 0,
+    "rejected": 1237,
+    "none": 0
+  },
+  "totalCost": 8.7866,
+  "yearSeed": 506
+}
