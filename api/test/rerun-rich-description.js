@@ -130,11 +130,18 @@ async function persistResult(db, ref, originalDoc, result) {
     const db = admin.firestore();
     const cache = new TriangulationCache(db);
 
-    // Build target ref set: locationConfidence ∈ {exact, high} AND
-    // (description_es length > 500 OR description_en length > 500).
+    // Build target ref set. Two sources:
+    //   1. Current locationConfidence ∈ {exact, high} AND rich description
+    //      (>500 char in ES OR EN) — same query as the original Step 6 set.
+    //   2. ALSO include listings that were in the original Step 6 set but
+    //      since dropped to medium/low (Step 6 transitions 110: high→medium 103
+    //      + high→low 7). Those we read from the prior progress file's
+    //      samples array. This way "same 818" is preserved even though tier
+    //      labels have shifted.
     console.log('Building target ref set…');
     const refs = [];
     const beforeTier = {};
+    const seenRef = new Set();
     for (const tier of ['exact', 'high']) {
         const snap = await db.collection('listings').where('locationConfidence', '==', tier)
             .select('description_es', 'description_en', 'locationConfidence').get();
@@ -145,8 +152,25 @@ async function persistResult(db, ref, originalDoc, result) {
             if (e > 500 || n > 500) {
                 refs.push(doc.id);
                 beforeTier[doc.id] = tier;
+                seenRef.add(doc.id);
             }
         });
+    }
+    // Pull additional refs from the prior progress snapshot (post-Step 6
+    // medium/low slices that were originally in the 818).
+    const priorPath = path.join(__dirname, 'rerun-rich-progress-step6.json');
+    if (fs.existsSync(priorPath)) {
+        const prior = JSON.parse(fs.readFileSync(priorPath, 'utf8'));
+        for (const s of (prior.samples || [])) {
+            if (s && s.ref && !seenRef.has(s.ref)) {
+                refs.push(s.ref);
+                seenRef.add(s.ref);
+                // beforeTier here is "current tier going into THIS run", which
+                // for the snapshot-only refs is the medium/low they ended at.
+                // We re-query the actual current tier below for the audit.
+            }
+        }
+        console.log('  (loaded ' + refs.length + ' refs total, ' + (refs.length - Object.keys(beforeTier).length) + ' from snapshot)');
     }
     refs.sort();
     console.log('  targets:', refs.length);
