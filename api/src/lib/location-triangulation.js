@@ -636,7 +636,7 @@ function isExactEligibleType(rawType, rawSubtype, normalizedType) {
     return false;
 }
 
-function assignTier(candidate, cadastreResult, signals, resolved, listing, tierFloor, muniSource) {
+function assignTier(candidate, cadastreResult, signals, resolved, listing, tierFloor, muniSource, landmarksCollapsedCount) {
     if (!candidate) {
         return {
             lat: null, lng: null,
@@ -695,7 +695,21 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
                 const tokenMismatch = cadastreResult.address_check &&
                     cadastreResult.address_check.result === 'no-match';
 
-                if (eligibleForExact && !tokenMismatch) {
+                // Phase A.5+ — exact-cap on collapsed-landmark-only signal.
+                // When the LLM extracted ≥1 landmark but ALL of them collapsed
+                // (Mapbox returned the parent area centroid instead of a
+                // specific POI), we have NO independent corroboration of the
+                // anchor. Even if cadastre's address contains the urbanization
+                // name (token match), that's broad-strokes confirmation, not
+                // pinpoint. Cap at 'high'. This catches the R4649410 case
+                // where token match alone was rubber-stamping wrong-coord
+                // m² agreements.
+                const llmExtractedAny = (signals.landmarks_mentioned || []).length > 0 ||
+                    (signals.adjacent_landmarks || []).length > 0;
+                const hasResolved = (resolved || []).length > 0;
+                const allCollapsed = llmExtractedAny && !hasResolved && (landmarksCollapsedCount || 0) > 0;
+
+                if (eligibleForExact && !tokenMismatch && !allCollapsed) {
                     return {
                         lat: candidate.lat, lng: candidate.lng,
                         tier: 'exact',
@@ -708,10 +722,10 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
                         ]).join(' · ')
                     };
                 }
-                if (eligibleForExact && tokenMismatch) {
-                    // Tokens present but don't appear in cadastre's address →
-                    // exact promotion is too aggressive. Land at 'high' with
-                    // a smaller score boost.
+                if (eligibleForExact && (tokenMismatch || allCollapsed)) {
+                    const capReason = tokenMismatch
+                        ? 'address_token_match=false → cap at high (Phase A.5 #3)'
+                        : 'all_landmarks_collapsed → cap at high (Phase A.5+)';
                     return {
                         lat: candidate.lat, lng: candidate.lng,
                         tier: 'high',
@@ -720,7 +734,7 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
                         reason: reasons.concat([
                             'cadastre metadata match score=' + cadastreResult.best_match.score,
                             'refcat=' + cadastreResult.best_match.refcat,
-                            'address_token_match=false → cap at high (Phase A.5 #3)'
+                            capReason
                         ]).join(' · ')
                     };
                 }
@@ -961,7 +975,8 @@ async function triangulateLocation(listing, opts) {
     // 5. Tier assignment, with tier_floor cap from strike outcome.
     const decision = assignTier(
         candidate, cadastreResult, signals, resolved, listing,
-        muniResult.tier_floor, muniResult.source
+        muniResult.tier_floor, muniResult.source,
+        landmarks_collapsed.length
     );
     trace.final_confidence_score = decision.score;
     trace.final_decision_reason = decision.reason;
