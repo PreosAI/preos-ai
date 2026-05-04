@@ -759,6 +759,12 @@ window.PreosLang = (function () {
       spec_surface:         'Superficie',
       spec_year_built:      'Año construcción',
 
+      // Map pin confidence labels (Phase A triangulation)
+      confidence_exact:     'Ubicación verificada',
+      confidence_high:      'Alta confianza',
+      confidence_medium:    'Aproximada',
+      confidence_low:       'Solo zona',
+
       // Section titles
       section_about:        'Acerca de esta casa',
       section_details:      'Detalles de la propiedad',
@@ -1630,6 +1636,12 @@ window.PreosLang = (function () {
       // Spec labels
       spec_surface:         'Floor area',
       spec_year_built:      'Year built',
+
+      // Map pin confidence labels (Phase A triangulation)
+      confidence_exact:     'Verified location',
+      confidence_high:      'High confidence',
+      confidence_medium:    'Approximate',
+      confidence_low:       'Area only',
 
       // Section titles
       section_about:        'About this home',

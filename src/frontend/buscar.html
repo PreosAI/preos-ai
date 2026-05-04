@@ -807,6 +807,21 @@
       transition: background .15s;
     }
     .map-popup-link:hover { background: #b01a1a; }
+    .map-popup-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .map-popup-tier-exact  { background: #e8f5e9; color: #1f7a3a; }
+    .map-popup-tier-high   { background: #fef2f2; color: #b01a1a; }
+    .map-popup-tier-medium { background: #fff7ed; color: #b25b15; }
+    .map-popup-tier-low    { background: #f3f4f6; color: #555; }
+    .map-popup-verified { font-weight: 800; }
 
     /* ─── HAMBURGER ────────────────────────────────────────── */
     .hamburger {
@@ -1774,17 +1789,38 @@
   }
 
   function buildMarkers(props) {
+    // Drop properties with no usable coords AND any whose triangulation
+    // explicitly returned 'rejected' (the listing stays in the list view
+    // with a "location pending" affordance, but doesn't render on the map).
     const validProps = props.filter(p =>
-      p.lat != null && p.lng != null && !isNaN(p.lat) && !isNaN(p.lng)
+      p.lat != null && p.lng != null && !isNaN(p.lat) && !isNaN(p.lng) &&
+      p.locationConfidence !== 'rejected'
     );
+    const lang = (typeof localStorage !== 'undefined' && localStorage.getItem('preos-lang')) || 'es';
+    const labelByTier = {
+      exact:  lang === 'en' ? 'Verified location' : 'Ubicación verificada',
+      high:   lang === 'en' ? 'High confidence'   : 'Alta confianza',
+      medium: lang === 'en' ? 'Approximate'        : 'Aproximada',
+      low:    lang === 'en' ? 'Area only'          : 'Solo zona'
+    };
     return validProps.map(p => {
+      const tier = p.locationConfidence || 'high';
+      const icon = (confidenceIcons[tier] || confidenceIcons.high);
+      const tierLabel = labelByTier[tier] || '';
+      const verifiedBadge = tier === 'exact'
+        ? '<span class="map-popup-verified" aria-hidden="true">✓</span>'
+        : '';
+      const tierBadge = tierLabel
+        ? `<div class="map-popup-tier map-popup-tier-${tier}">${verifiedBadge}<span>${tierLabel}</span></div>`
+        : '';
       const popup = `
         <div class="map-popup">
           <div class="map-popup-price">${formatPrice(p.price)}</div>
           <div class="map-popup-addr">${p.location}</div>
+          ${tierBadge}
           <a href="propiedad.html?id=${p.id}" class="map-popup-link">Ver propiedad</a>
         </div>`;
-      return L.marker([p.lat, p.lng], { icon: redIcon }).bindPopup(popup, { maxWidth: 220 });
+      return L.marker([p.lat, p.lng], { icon }).bindPopup(popup, { maxWidth: 240 });
     });
   }
 
@@ -1820,6 +1856,45 @@
     iconAnchor: [14, 36],
     popupAnchor: [0, -38],
   });
+
+  // Tier-styled pins (Phase A triangulation):
+  //   exact  — solid red + verified badge dot
+  //   high   — solid red (= existing redIcon)
+  //   medium — lighter amber, smaller circle
+  //   low    — outline only, dotted stroke (centroid-only placement)
+  function makePinIcon(html) {
+    return L.divIcon({
+      className: '',
+      html,
+      iconSize: [28, 36],
+      iconAnchor: [14, 36],
+      popupAnchor: [0, -38]
+    });
+  }
+  const exactIcon = makePinIcon(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+       <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 12.6 21.16 13.13 21.66a1.25 1.25 0 0 0 1.74 0C15.4 35.16 28 23.63 28 14 28 6.27 21.73 0 14 0z" fill="#cc1f1f"/>
+       <circle cx="14" cy="14" r="6" fill="#fff"/>
+       <circle cx="22" cy="6" r="5" fill="#1aa260" stroke="#fff" stroke-width="1.5"/>
+       <path d="M19.5 6 L21.3 7.6 L24.5 4.4" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>`);
+  const highIcon = redIcon;
+  const mediumIcon = makePinIcon(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="34" viewBox="0 0 28 36">
+       <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 12.6 21.16 13.13 21.66a1.25 1.25 0 0 0 1.74 0C15.4 35.16 28 23.63 28 14 28 6.27 21.73 0 14 0z" fill="#e58a2c"/>
+       <circle cx="14" cy="14" r="5" fill="#fff"/>
+     </svg>`);
+  const lowIcon = makePinIcon(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="34" viewBox="0 0 28 36">
+       <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 12.6 21.16 13.13 21.66a1.25 1.25 0 0 0 1.74 0C15.4 35.16 28 23.63 28 14 28 6.27 21.73 0 14 0z" fill="none" stroke="#888" stroke-width="1.6" stroke-dasharray="3 2"/>
+       <circle cx="14" cy="14" r="4" fill="#888"/>
+     </svg>`);
+  const confidenceIcons = {
+    exact:  exactIcon,
+    high:   highIcon,
+    medium: mediumIcon,
+    low:    lowIcon
+  };
 
   // ── Search helpers ────────────────────────────────────────────
   var _debounceTimer = null;
