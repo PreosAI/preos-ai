@@ -875,15 +875,55 @@ async function triangulateLocation(listing, opts) {
 
     const resolved = [];
     const rejected_far = [];
+    const landmarks_collapsed = [];
+    // Phase A.5+ collapsed-landmark detection.
+    //
+    // Mapbox sometimes "resolves" a specific named landmark by returning the
+    // surrounding urbanization centroid — e.g. it has no POI for "Guadalmina
+    // Baja Golf Course" and falls back to the Guadalmina urbanization. The
+    // resulting coord may equal or hug the listing's existing anchor, which
+    // would otherwise pass the cross-check as if the landmark corroborated
+    // the anchor. Two signals catch this:
+    //   - distance to anchor < 50 m → a "specific" POI returning the same
+    //     coord as the listing's city centroid is almost certainly Mapbox
+    //     collapsing to the parent area.
+    //   - place_name's first segment equals the listing's city/location.
+    //     Even at >50 m, when Mapbox's first-segment IS just the listing's
+    //     city, the resolution is at urbanization granularity, not POI.
+    const cityNormForCollapse = (function () {
+        const c = listing.city || '';
+        return c.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+    })();
+    function detectCollapse(r) {
+        if (!r) return null;
+        if (anchor && Number.isFinite(anchor.lat) && Number.isFinite(anchor.lng)) {
+            const dist = Math.round(haversineMeters(anchor.lat, anchor.lng, r.lat, r.lng));
+            if (dist < 50) return { reason: 'within_50m_of_anchor', distance_m: dist, place_name: r.place_name };
+        }
+        if (r.place_name && cityNormForCollapse) {
+            const firstSeg = r.place_name.split(',')[0].trim()
+                .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+            if (firstSeg && firstSeg === cityNormForCollapse) {
+                return { reason: 'place_name_matches_listing_city', place_name: r.place_name };
+            }
+        }
+        return null;
+    }
+
     for (const ref of dedup) {
         const r = await resolveLandmark(ref.name, listing.city, mapboxToken, anchor, cache);
-        if (r) {
-            r.claimed_distance_m = parseDistanceMeters(ref.distance);
-            r.claimed_direction = ref.direction || null;
-            resolved.push(r);
-        } else {
+        if (!r) {
             rejected_far.push(ref.name);
+            continue;
         }
+        const collapse = detectCollapse(r);
+        if (collapse) {
+            landmarks_collapsed.push({ name: ref.name, ...collapse });
+            continue;
+        }
+        r.claimed_distance_m = parseDistanceMeters(ref.distance);
+        r.claimed_direction = ref.direction || null;
+        resolved.push(r);
     }
     trace.landmarks_resolved = resolved.map(r => ({
         name: r.name, lat: r.lat, lng: r.lng, place_name: r.place_name,
@@ -891,6 +931,7 @@ async function triangulateLocation(listing, opts) {
     }));
     trace.landmarks_rejected_generic = rejected_generic;
     trace.landmarks_rejected_far = rejected_far;
+    trace.landmarks_collapsed = landmarks_collapsed;
 
     // 3. Compute candidate from validated landmarks anchored to the verified
     // municipality coord.
