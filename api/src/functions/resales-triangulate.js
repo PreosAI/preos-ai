@@ -106,6 +106,13 @@ function toTriangulatorInput(ref, d) {
         plot_m2: d.gardenPlot || null,
         terrace_m2: d.terrace || null,
         type: normalizedType,
+        // Raw Resales type / subtype strings — needed by the type-eligibility
+        // gate in assignTier (Phase A.5). The normalizer collapses unrelated
+        // raw types into shared buckets ("Apartment Complex" → 'Apartamento'),
+        // which would let non-residential cases sneak past a normalized-type
+        // whitelist; keep the originals so the gate sees the full picture.
+        rawPropertyType: type,
+        rawSubtype: sub,
         features: d.features || [],
         description_es: d.description_es || d.description || '',
         description_en: d.description_en || '',

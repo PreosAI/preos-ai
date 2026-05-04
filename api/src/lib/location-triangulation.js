@@ -537,6 +537,52 @@ function capTier(tier, floor) {
     return TIER_RANK[tier] <= TIER_RANK[floor] ? tier : floor;
 }
 
+// Property-type whitelist for exact tier (Phase A.5).
+//
+// Cadastre metadata-match alone isn't sufficient to claim exact for non-
+// residential listings — m² agreement between a listing and a same-area
+// commercial / land / parking parcel can be coincidental, and the consequence
+// of a false 'exact' on a non-dwelling is more visible than on a residential
+// (e.g. a Storage Room rendered as a verified pin on the map).
+//
+// Any of the following keywords appearing in propertyType / subtype / the
+// normalized type allows exact tier; the blocklist takes precedence.
+const RESIDENTIAL_TYPE_KEYWORDS = [
+    'villa', 'chalet',
+    'apartment', 'flat', 'apartamento',
+    'townhouse', 'semi-detached', 'semidetached', 'adosado',
+    'penthouse', 'atico', 'ático',
+    'studio', 'estudio',
+    'duplex', 'dúplex',
+    'house', 'casa',
+    'finca', 'cortijo'
+];
+const NON_RESIDENTIAL_TYPE_BLOCKLIST = [
+    'storage', 'garage', 'parking', 'aparcamiento',
+    'plot', 'land', 'solar', 'parcela',
+    'cave',
+    'commercial', 'comercial', 'local',
+    'restaurant', 'restaurante',
+    'shop', 'tienda',
+    'office', 'oficina',
+    'hotel', 'hostel',
+    'bar',
+    'apartment complex', 'building', 'edificio'
+];
+
+function isExactEligibleType(rawType, rawSubtype, normalizedType) {
+    const text = ((rawType || '') + ' ' + (rawSubtype || '') + ' ' + (normalizedType || ''))
+        .toLowerCase();
+    if (!text.trim()) return false;
+    for (const block of NON_RESIDENTIAL_TYPE_BLOCKLIST) {
+        if (text.includes(block)) return false;
+    }
+    for (const allow of RESIDENTIAL_TYPE_KEYWORDS) {
+        if (text.includes(allow)) return true;
+    }
+    return false;
+}
+
 function assignTier(candidate, cadastreResult, signals, resolved, listing, tierFloor, muniSource) {
     if (!candidate) {
         return {
@@ -580,21 +626,38 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
         // (we keep it in the trace), just not as a confidence signal.
         if (cadastreResult.best_match && (cadastreResult.best_match.score || 0) >= 50) {
             if (!tierFloor) {
-                return {
-                    lat: candidate.lat, lng: candidate.lng,
-                    tier: 'exact',
-                    source: 'cadastre_verified',
-                    score: Math.min(100, score + 25),
-                    reason: reasons.concat([
-                        'cadastre metadata match score=' + cadastreResult.best_match.score,
-                        'refcat=' + cadastreResult.best_match.refcat,
-                        'strike-1 anchor → exact'
-                    ]).join(' · ')
-                };
+                // Phase A.5 type-eligibility gate. Non-residential types
+                // (Storage Room, Garage, Plot, Restaurant, etc.) cannot
+                // claim exact regardless of cadastre score — m² agreement
+                // with a same-area commercial / land parcel is plausibly
+                // coincidental and the rendering cost of a false-exact on
+                // a non-dwelling is more visible to users.
+                const eligibleForExact = isExactEligibleType(
+                    listing.rawPropertyType, listing.rawSubtype, listing.type);
+                if (eligibleForExact) {
+                    return {
+                        lat: candidate.lat, lng: candidate.lng,
+                        tier: 'exact',
+                        source: 'cadastre_verified',
+                        score: Math.min(100, score + 25),
+                        reason: reasons.concat([
+                            'cadastre metadata match score=' + cadastreResult.best_match.score,
+                            'refcat=' + cadastreResult.best_match.refcat,
+                            'strike-1 anchor → exact'
+                        ]).join(' · ')
+                    };
+                }
+                // Non-residential — suppress the exact promotion and cap
+                // tier at medium so the score-based logic below can't push
+                // above medium even with strong landmarks/address tokens.
+                const t = listing.rawPropertyType || listing.type || 'unknown';
+                reasons.push('type_not_eligible_for_exact: ' + t);
+                tierFloor = 'medium';
+            } else {
+                reasons.push('cadastre metadata match score=' + cadastreResult.best_match.score +
+                    ' on strike-' + (tierFloor === 'medium' ? '2' : '3') +
+                    ' anchor — score nudge suppressed (centroid placement, coincidental match risk)');
             }
-            reasons.push('cadastre metadata match score=' + cadastreResult.best_match.score +
-                ' on strike-' + (tierFloor === 'medium' ? '2' : '3') +
-                ' anchor — score nudge suppressed (centroid placement, coincidental match risk)');
         }
     }
 
