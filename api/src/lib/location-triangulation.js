@@ -544,8 +544,11 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
         // strike-1 anchors because strike-2/3 centroids are city/municipality
         // centres; a metadata match THERE is most likely coincidental (lots
         // of parcels at any city centre, one of them is bound to share a m²
-        // value with the listing). For strike-2/3 anchors the cadastre match
-        // still bumps to 'medium' but not 'exact'.
+        // value with the listing). For strike-2/3 anchors we suppress the
+        // promotion AND the score nudge — a centroid placement is honestly
+        // 'low' tier regardless of any coincidental cadastre fit. The
+        // metadata match might still be useful as informational metadata
+        // (we keep it in the trace), just not as a confidence signal.
         if (cadastreResult.best_match && (cadastreResult.best_match.score || 0) >= 50) {
             if (!tierFloor) {
                 return {
@@ -560,11 +563,9 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
                     ]).join(' · ')
                 };
             }
-            // Strike-2/3 anchor: bump score but cap to tier_floor below.
-            score += 15;
             reasons.push('cadastre metadata match score=' + cadastreResult.best_match.score +
                 ' on strike-' + (tierFloor === 'medium' ? '2' : '3') +
-                ' anchor — coincidental match risk, no exact promotion');
+                ' anchor — score nudge suppressed (centroid placement, coincidental match risk)');
         }
     }
 
