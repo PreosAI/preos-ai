@@ -54,9 +54,19 @@ function computeQualityScore(d, locationConfidence) {
 }
 
 // Take a slice of the listings collection starting after `cursor` (or from
-// the beginning if null), ordered deterministically by reference.
-async function loadBatch(db, cursor, batchSize) {
+// the beginning if null), ordered deterministically by reference. When
+// `confidenceFilter` is set we only return listings whose locationConfidence
+// matches it — used for the post-fix targeted re-run on rejected docs.
+async function loadBatch(db, cursor, batchSize, confidenceFilter) {
     let q = db.collection('listings').orderBy(admin.firestore.FieldPath.documentId());
+    if (confidenceFilter) {
+        // Composite query: where + orderBy on documentId requires no extra
+        // index (it's the natural document order). Confidence filter is
+        // applied first — Firestore narrows by index, then orderBy.
+        q = db.collection('listings')
+            .where('locationConfidence', '==', confidenceFilter)
+            .orderBy(admin.firestore.FieldPath.documentId());
+    }
     if (cursor) {
         const cursorSnap = await db.collection('listings').doc(cursor).get();
         if (cursorSnap.exists) q = q.startAfter(cursorSnap);
@@ -173,6 +183,7 @@ app.http('resales-triangulate-locations', {
         const startCursor = request.query.get('startCursor') || null;
         const batchSize = Math.max(1, Math.min(200, parseInt(request.query.get('batchSize') || '50', 10)));
         const parallelism = Math.max(1, Math.min(20, parseInt(request.query.get('parallelism') || '5', 10)));
+        const confidenceFilter = request.query.get('only') || null; // e.g. 'rejected' for targeted retry
         const TIME_BUDGET_MS = 200_000;
         const tStart = Date.now();
 
@@ -194,7 +205,7 @@ app.http('resales-triangulate-locations', {
                 const remainingTime = TIME_BUDGET_MS - (Date.now() - tStart);
                 if (remainingTime < 8_000) break; // need at least one wave's worth of time
 
-                const batch = await loadBatch(db, cursor, parallelism);
+                const batch = await loadBatch(db, cursor, parallelism, confidenceFilter);
                 if (batch.length === 0) {
                     collectionExhausted = true;
                     break;

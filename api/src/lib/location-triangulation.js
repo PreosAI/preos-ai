@@ -552,19 +552,21 @@ function assignTier(candidate, cadastreResult, signals, resolved, listing, tierF
     if (tierFloor) reasons.push('tier_floor=' + tierFloor + ' (from strike fallback)');
 
     if (cadastreResult && !cadastreResult.error) {
-        // Address-token cross-check. The +15 bonus always applies. The -20
-        // mismatch penalty is suppressed when tier_floor is set: strike 2/3
-        // anchors are municipality centroids by design — they're city-centre
-        // addresses, not urbanization addresses, so a token mismatch there
-        // is expected and shouldn't be punished.
+        // Address-token cross-check. The +15 bonus applies when the LLM-
+        // extracted urbanization / building / street tokens DO appear in the
+        // cadastre's closest parcel address — that's a real signal we landed
+        // on the right block. The mismatch case is no longer penalised:
+        // post-backfill audit showed it produced 33% false rejections,
+        // because Mapbox's existing-coord strike-1 placements often land at
+        // a city/locality centroid whose cadastre address is a city-centre
+        // street that obviously doesn't carry urbanization-specific tokens.
+        // The strike system already validates municipality, which is the
+        // signal that actually matters.
         if (cadastreResult.address_check && cadastreResult.address_check.result === 'match') {
             score += 15;
             reasons.push('cadastre-address-tokens-match +15');
-        } else if (cadastreResult.address_check && cadastreResult.address_check.result === 'no-match' && !tierFloor) {
-            score -= 20;
-            reasons.push('cadastre-address-tokens-mismatch -20');
-        } else if (cadastreResult.address_check && cadastreResult.address_check.result === 'no-match' && tierFloor) {
-            reasons.push('cadastre-address-tokens-mismatch suppressed (strike-fallback anchor)');
+        } else if (cadastreResult.address_check && cadastreResult.address_check.result === 'no-match') {
+            reasons.push('cadastre-address-tokens-mismatch (no penalty applied — centroid placements)');
         }
 
         // Cadastre metadata match → exact tier promotion. Restricted to
