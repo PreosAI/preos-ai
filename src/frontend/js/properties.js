@@ -34,6 +34,7 @@ async function fetchListings(opts) {
   if (opts.minBedrooms)  params.set('minBedrooms', String(opts.minBedrooms));
   if (opts.features && opts.features.length)
     params.set('features', opts.features.join(','));
+  if (opts.confidence)   params.set('confidence', opts.confidence);
   if (opts.cursor)       params.set('cursor', opts.cursor);
   if (opts.limit)        params.set('limit', String(opts.limit));
   if (opts.sort)         params.set('sort', opts.sort);

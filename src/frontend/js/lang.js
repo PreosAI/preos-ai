@@ -765,6 +765,14 @@ window.PreosLang = (function () {
       confidence_medium:    'Aproximada',
       confidence_low:       'Solo zona',
 
+      // Internal QA filter — visible only when ?confidence=<tier> is on the URL
+      qa_filter_exact:      'QA: solo exactas',
+      qa_filter_high:       'QA: solo alta confianza',
+      qa_filter_medium:     'QA: solo media confianza',
+      qa_filter_low:        'QA: solo baja confianza',
+      qa_filter_rejected:   'QA: solo rechazadas',
+      qa_filter_clear:      'Quitar filtro',
+
       // Section titles
       section_about:        'Acerca de esta casa',
       section_details:      'Detalles de la propiedad',
@@ -1642,6 +1650,14 @@ window.PreosLang = (function () {
       confidence_high:      'High confidence',
       confidence_medium:    'Approximate',
       confidence_low:       'Area only',
+
+      // Internal QA filter — visible only when ?confidence=<tier> is on the URL
+      qa_filter_exact:      'QA: exact only',
+      qa_filter_high:       'QA: high confidence only',
+      qa_filter_medium:     'QA: medium confidence only',
+      qa_filter_low:        'QA: low confidence only',
+      qa_filter_rejected:   'QA: rejected only',
+      qa_filter_clear:      'Clear filter',
 
       // Section titles
       section_about:        'About this home',

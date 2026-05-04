@@ -93,9 +93,12 @@ app.http('resales-listings-paged', {
             const sort = ['quality', 'price_asc', 'price_desc'].includes(sortRaw) ? sortRaw : 'quality';
             const langRaw = (q.get('lang') || 'es').toLowerCase();
             const lang = langRaw === 'en' ? 'en' : 'es';
+            const confidenceRaw = (q.get('confidence') || '').trim().toLowerCase();
+            const confidence = ['exact', 'high', 'medium', 'low', 'rejected'].includes(confidenceRaw)
+                ? confidenceRaw : '';
 
             const cacheKey = buildCacheKey({ city, propertyType, minPrice, maxPrice, minBedrooms,
-                features: features.join(','), cursor, limit, sort, lang });
+                features: features.join(','), confidence, cursor, limit, sort, lang });
             const cached = cacheGet(cacheKey);
             if (cached) {
                 context.log('Cache hit:', cacheKey);
@@ -109,7 +112,7 @@ app.http('resales-listings-paged', {
 
             const body = await queryListings(getDb(), {
                 city, propertyType, minPrice, maxPrice, minBedrooms,
-                features, cursor, limit, sort
+                features, confidence, cursor, limit, sort
             }, context);
 
             cacheSet(cacheKey, body);

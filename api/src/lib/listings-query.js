@@ -89,6 +89,7 @@ async function queryListings(db, opts, context) {
         maxPrice = null,
         minBedrooms = null,
         features = [],
+        confidence = '',
         cursor = '',
         limit = 50,
         sort = 'quality'
@@ -100,6 +101,9 @@ async function queryListings(db, opts, context) {
     if (minPrice != null) query = query.where('price', '>=', minPrice);
     if (maxPrice != null) query = query.where('price', '<=', maxPrice);
     if (minBedrooms != null) query = query.where('bedrooms', '>=', minBedrooms);
+    // confidence filter — used by the internal QA tooling to inspect properties
+    // by Phase A triangulation tier. Single-field where, no extra index needed.
+    if (confidence) query = query.where('locationConfidence', '==', confidence);
 
     const hasPriceRange = minPrice != null || maxPrice != null;
     const hasBedroomsRange = minBedrooms != null;
