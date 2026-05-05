@@ -1,17 +1,13 @@
-// GET /api/resales/test-property-details?ref={reference}[&lang=1|2|1,2]
+// GET /api/resales/property-details-raw?ref={reference}[&lang=1|2|1,2]
 //
-// TEMPORARY investigation endpoint (Phase A.5+ follow-up). Calls the Resales
-// V6 PropertyDetails operation and returns the raw upstream response so we
-// can audit which fields are present beyond what SearchProperties exposes
-// (cadastral reference, LastUpdate, higher-res images, agent contact, full
-// address, etc.).
+// Ad-hoc inspection endpoint for the Resales V6 PropertyDetails operation.
+// Returns the raw upstream response wrapped in a small envelope. Kept as a
+// QA tool for debugging field-level questions.
 //
 // Routes through Fixie (FIXIE_URL) so the request uses the static IP
-// whitelisted with Resales support — bypasses the 401 we saw earlier when
-// hitting from non-whitelisted IPs.
+// whitelisted with Resales.
 //
-// No mapping, no caching, no filtering. Just raw passthrough. To be removed
-// after the investigation completes.
+// No mapping, no caching, no filtering — pure passthrough.
 
 const { app } = require('@azure/functions');
 const { fetch: undiciFetch, ProxyAgent } = require('undici');
@@ -29,10 +25,10 @@ function corsHeaders(request) {
     };
 }
 
-app.http('resales-test-property-details', {
+app.http('resales-property-details-raw', {
     methods: ['GET', 'OPTIONS'],
     authLevel: 'anonymous',
-    route: 'resales/test-property-details',
+    route: 'resales/property-details-raw',
     handler: async (request, context) => {
         const cors = corsHeaders(request);
         if (request.method === 'OPTIONS') return { status: 204, headers: cors };
