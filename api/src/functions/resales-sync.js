@@ -2,6 +2,15 @@ const { app } = require('@azure/functions');
 const { fetch: undiciFetch, ProxyAgent } = require('undici');
 const admin = require('firebase-admin');
 const { parseFeaturesTree } = require('../lib/features');
+const {
+    fetchPropertyDetails,
+    parseBuiltYear,
+    parseFeeNumber,
+    extractHighResImages,
+    extractImagesCount,
+    extractDescription,
+    extractEnergyRating
+} = require('../lib/property-details');
 
 let db;
 function getDb() {
@@ -125,11 +134,16 @@ app.http('resales-sync', {
         const pLang = lang === 'en' ? '1' : '2';
         const pageSize = 40;
         const startTime = Date.now();
-        const MAX_RUNTIME_MS = 150 * 1000; // 2.5 min — stay under 230s Azure gateway timeout
+        // PropertyDetails enrichment is rate-limited at ~1 req/sec, so each
+        // page now costs ~44 s of upstream time. Bump runtime budget to 200 s
+        // (under the 230 s Azure gateway timeout) and check budget per page.
+        const MAX_RUNTIME_MS = 200 * 1000;
         let page = startPage;
         let totalSynced = 0;
         let totalProperties = 0;
         let emptyDescCount = 0;
+        let enrichedCount = 0;
+        let enrichmentSkippedCount = 0;
         let stoppedEarly = false;
 
         try {
@@ -166,17 +180,69 @@ app.http('resales-sync', {
                     context.log('Total properties:', totalProperties);
                 }
 
-                // Map and write this page immediately
-                const docs = data.Property.map(p => mapProperty(p, lang));
-                for (const p of data.Property) {
-                    if (!p.Description) emptyDescCount++;
+                // Per-property enrichment via PropertyDetails. Done serially
+                // so the 1100 ms throttle in the client is the actual cadence.
+                // PropertyDetails returns BOTH descriptions plus BuiltYear,
+                // /w1200/ image URLs, fees, EnergyRating — fields not in
+                // SearchProperties.
+                const docs = [];
+                for (const raw of data.Property) {
+                    if (!raw.Description) emptyDescCount++;
+                    const baseDoc = mapProperty(raw, lang);
+                    let pd = null;
+                    try {
+                        pd = await fetchPropertyDetails(raw.Reference, { lang: '1,2' });
+                    } catch (err) {
+                        const codes = (err && err.errorCodes) || {};
+                        // Halt the whole sync on auth issues — rules say
+                        // 401-equivalents must surface, not silently skip.
+                        if (codes['001'] || codes['099'] || /\b40[13]\b/.test(String(err.message))) {
+                            context.error('PropertyDetails auth failure on ' + raw.Reference + ':', err.message);
+                            throw err;
+                        }
+                        // Other transient errors — log and continue, keep
+                        // SearchProperties data only.
+                        context.warn('PropertyDetails enrichment failed for ' + raw.Reference + ':', err.message);
+                        enrichmentSkippedCount++;
+                    }
+                    if (pd) {
+                        const built = parseBuiltYear(pd.BuiltYear);
+                        if (built != null) {
+                            baseDoc.year_built = built;
+                            baseDoc.year_built_source = 'resales';
+                        }
+                        const highRes = extractHighResImages(pd);
+                        if (highRes.length) {
+                            baseDoc.images_high_res = highRes;
+                            baseDoc.images_count = extractImagesCount(pd);
+                        }
+                        const ibi = parseFeeNumber(pd.IBI_Fees_Year);
+                        if (ibi != null) baseDoc.ibi_fees_year = ibi;
+                        const community = parseFeeNumber(pd.Community_Fees_Year);
+                        if (community != null) baseDoc.community_fees_year = community;
+                        const basura = parseFeeNumber(pd.Basura_Tax_Year);
+                        if (basura != null) baseDoc.basura_tax_year = basura;
+                        const energy = extractEnergyRating(pd);
+                        if (energy) baseDoc.energy_rating = energy;
+                        // PropertyDetails returns both languages in one call,
+                        // so we always write both regardless of `lang` param.
+                        const dEn = extractDescription(pd, 'en');
+                        const dEs = extractDescription(pd, 'es');
+                        if (dEn) baseDoc.description_en = dEn;
+                        if (dEs) baseDoc.description_es = dEs;
+                        enrichedCount++;
+                    } else if (pd === null) {
+                        // upstream success but no Property — deleted ref.
+                        enrichmentSkippedCount++;
+                    }
+                    docs.push(baseDoc);
                 }
                 await writeBatch(db, docs);
                 totalSynced += docs.length;
-                context.log('Page', page, 'written.', totalSynced, 'total synced');
+                context.log('Page', page, 'written.', totalSynced, 'total synced.',
+                    'enriched=' + enrichedCount, 'skipped=' + enrichmentSkippedCount);
 
                 page++;
-                await new Promise(r => setTimeout(r, 300));
             }
 
             context.log('Sync (' + lang + ') finished. emptyDescCount=' + emptyDescCount);
@@ -191,7 +257,9 @@ app.http('resales-sync', {
                 nextPage: stoppedEarly ? page : null,
                 filterAlias: filterAlias,
                 lang: lang,
-                emptyDescCount: emptyDescCount
+                emptyDescCount: emptyDescCount,
+                enrichedCount: enrichedCount,
+                enrichmentSkippedCount: enrichmentSkippedCount
             }, { merge: true });
 
             return {
@@ -202,6 +270,8 @@ app.http('resales-sync', {
                     totalSynced,
                     totalProperties,
                     emptyDescCount,
+                    enrichedCount,
+                    enrichmentSkippedCount,
                     lastPage: page - 1,
                     nextPage: stoppedEarly ? page : null,
                     message: stoppedEarly
@@ -213,7 +283,8 @@ app.http('resales-sync', {
             context.error('Sync error:', err.message, err.stack);
             return {
                 status: 500,
-                jsonBody: { error: 'Sync failed', detail: err.message, lang, lastPage: page, totalSynced }
+                jsonBody: { error: 'Sync failed', detail: err.message, lang, lastPage: page, totalSynced,
+                    enrichedCount, enrichmentSkippedCount }
             };
         }
     }
