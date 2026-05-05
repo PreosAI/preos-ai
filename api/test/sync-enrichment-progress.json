@@ -1,0 +1,75 @@
+{
+  "invocations": 7,
+  "page": 8,
+  "totalSynced": 80,
+  "totalEnriched": 268,
+  "totalSkipped": 24,
+  "history": [
+    {
+      "invocation": 1,
+      "startPage": 1,
+      "lastPage": 5,
+      "nextPage": 6,
+      "status": "partial",
+      "wall_ms": 200000,
+      "enrichedCount": 200,
+      "skipped": 0
+    },
+    {
+      "invocation": 2,
+      "startPage": 6,
+      "lastPage": 7,
+      "nextPage": 8,
+      "status": "partial",
+      "wall_ms": 201835,
+      "enrichedCount": 68,
+      "skipped": 24
+    },
+    {
+      "invocation": 3,
+      "startPage": 8,
+      "lastPage": 8,
+      "wall_ms": 10452,
+      "enrichedCount": 0,
+      "skipped": 0,
+      "err": "Sync failed"
+    },
+    {
+      "invocation": 4,
+      "startPage": 8,
+      "lastPage": 8,
+      "wall_ms": 10941,
+      "enrichedCount": 0,
+      "skipped": 0,
+      "err": "Sync failed"
+    },
+    {
+      "invocation": 5,
+      "startPage": 8,
+      "lastPage": 8,
+      "wall_ms": 10465,
+      "enrichedCount": 0,
+      "skipped": 0,
+      "err": "Sync failed"
+    },
+    {
+      "invocation": 6,
+      "startPage": 8,
+      "lastPage": 8,
+      "wall_ms": 10460,
+      "enrichedCount": 0,
+      "skipped": 0,
+      "err": "Sync failed"
+    },
+    {
+      "invocation": 7,
+      "startPage": 8,
+      "lastPage": 8,
+      "wall_ms": 10716,
+      "enrichedCount": 0,
+      "skipped": 0,
+      "err": "Sync failed"
+    }
+  ],
+  "_consecutiveTransientFailures": 3
+}
