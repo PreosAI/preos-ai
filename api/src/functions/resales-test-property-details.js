@@ -54,6 +54,10 @@ app.http('resales-test-property-details', {
         upstream.searchParams.set('p2', p2);
         upstream.searchParams.set('P_RefId', ref);
         upstream.searchParams.set('p_Lang', lang);
+        // First probe surfaced "FilterId and FilterAgencyId missing" — pass
+        // the same filter id used by SearchProperties / sync.
+        const filterId = request.query.get('filter') || process.env.RESALES_FILTER_ID || '1';
+        upstream.searchParams.set('p_agency_filterid', filterId);
         // Pass through optional flags the caller may want to test with.
         for (const k of ['P_Photos', 'P_RTA', 'P_decree218', 'P_DimensionUnit']) {
             const v = request.query.get(k) || request.query.get(k.toLowerCase());
